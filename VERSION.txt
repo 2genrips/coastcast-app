@@ -1,1 +1,1 @@
-0.9.0
+CoastCast v1.0.0 Beta

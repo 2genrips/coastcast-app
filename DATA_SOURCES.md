@@ -14,3 +14,7 @@ Regulations Watch contains official state-agency links for the 23 U.S. saltwater
 
 ## Species Intelligence
 Species scores are CoastCast planning estimates based on live forecast conditions, prototype species preference ranges, fishing style, tide state, daylight and a small optional personal-history signal from catches stored only on the user's device. They are not biological guarantees.
+
+
+## v1.0 Smart Alerts
+Forecast watches are evaluated locally against the forecast already loaded in CoastCast. They do not introduce a new external data provider. Device notifications, when permitted, are emitted only during an active app/open-refresh check. Continuous background push monitoring requires a future backend/push service.

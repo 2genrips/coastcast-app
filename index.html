@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, official regulation links, smart trip planning, maps, bait shops and a personal catch logbook." />
+  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, smart trips, favorites, forecast alerts, maps, bait shops and a personal catch logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=0.9.0" />
+  <link rel="stylesheet" href="styles.css?v=1.0.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -70,6 +70,13 @@
           </div>
           <div id="sourceHealth" class="source-health" aria-label="Forecast data sources"></div>
           <div id="dataQualityMessage" class="data-quality-message">Demo values are shown until live feeds confirm.</div>
+        </section>
+
+        <section class="home-actions" aria-label="Quick actions">
+          <button id="homePlanBtn" class="home-action" type="button"><span class="home-action-icon">↗</span><span><strong>Plan</strong><small>Best trip</small></span></button>
+          <button id="homeSaveBtn" class="home-action" type="button"><span class="home-action-icon">☆</span><span><strong>Save</strong><small>Favorite</small></span></button>
+          <button id="homeAlertBtn" class="home-action" type="button"><span class="home-action-icon">◉</span><span><strong>Alert</strong><small>Watch score</small></span></button>
+          <button id="homeMapBtn" class="home-action" type="button"><span class="home-action-icon">⌖</span><span><strong>Map</strong><small>Nearby spots</small></span></button>
         </section>
 
         <section class="score-hero panel">
@@ -238,6 +245,14 @@
           </div>
           <div id="bestDaySummary" class="best-day-summary"></div>
           <div id="dayScores" class="day-score-grid"></div>
+        </section>
+
+        <section class="panel home-alert-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">SMART WATCH</div><h2>Fishing alerts</h2></div>
+            <button id="homeCreateAlertBtn" class="link-button" type="button">Create alert</button>
+          </div>
+          <div id="homeAlertSummary" class="home-alert-summary"><div class="empty-state compact-empty">No alert rules yet. Watch a favorite coast for a strong fishing window.</div></div>
         </section>
 
         <section class="panel">
@@ -454,6 +469,52 @@
         </section>
       </section>
 
+
+      <!-- TRIPS -->
+      <section class="view" data-view="trips" id="view-trips">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">MY COASTCAST</div>
+            <h1>Trips</h1>
+            <p class="page-subtitle">Keep your best plans, favorite fishing spots and forecast watches together.</p>
+          </div>
+          <button id="tripsPlanBtn" class="primary-button small" type="button">+ Plan trip</button>
+        </div>
+
+        <section class="trip-hub-stats">
+          <article class="panel trip-hub-stat"><strong id="savedTripCount">0</strong><span>Saved plans</span></article>
+          <article class="panel trip-hub-stat"><strong id="favoriteSpotCount">0</strong><span>Favorites</span></article>
+          <article class="panel trip-hub-stat"><strong id="smartAlertCount">0</strong><span>Alerts</span></article>
+        </section>
+
+        <section class="panel launch-panel">
+          <div class="launch-panel-top"><div><div class="eyebrow">TRIP COMMAND CENTER</div><h2 id="tripHubHeadline">Ready when the coast lines up</h2></div><span id="tripHubBadge" class="tiny-pill">BETA</span></div>
+          <div id="tripHubRecommendation" class="trip-hub-recommendation">CoastCast will combine your live forecast, target species, favorites and alert rules here.</div>
+          <div class="trip-hub-actions"><button id="tripHubPlanBtn" class="primary-button" type="button">Build best trip</button><button id="tripHubAlertBtn" class="secondary-button" type="button">Create smart alert</button></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading"><div><div class="eyebrow">SAVED TRIPS</div><h2>My trip plans</h2></div><span class="tiny-pill">Newest first</span></div>
+          <div id="savedTripList" class="trip-card-list"><div class="empty-state">Build a Smart Trip and it will be saved here.</div></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading"><div><div class="eyebrow">FAVORITES</div><h2>Saved fishing spots</h2></div><button id="tripsMapBtn" class="link-button" type="button">Open map</button></div>
+          <div id="favoriteSpotList" class="favorite-trip-list"><div class="empty-state">Save a fishing location and it will appear here.</div></div>
+        </section>
+
+        <section class="panel alert-center-panel">
+          <div class="section-heading"><div><div class="eyebrow">SMART ALERTS</div><h2>Forecast watches</h2></div><button id="createAlertBtn" class="primary-button tiny" type="button">+ Alert</button></div>
+          <div id="alertCenterStatus" class="alert-center-status">Alerts are checked whenever CoastCast opens or refreshes live data.</div>
+          <div id="alertRuleList" class="alert-rule-list"><div class="empty-state">No forecast watches yet.</div></div>
+        </section>
+
+        <section class="panel community-launch-card">
+          <div><div class="eyebrow">COMMUNITY</div><h2>Local catches</h2><p>Keep the Fishbrain-style discovery feed available without crowding the main navigation.</p></div>
+          <button id="openCommunityBtn" class="secondary-button" type="button">Open community</button>
+        </section>
+      </section>
+
       <!-- LOGBOOK -->
       <section class="view" data-view="logbook" id="view-logbook">
         <div class="page-head">
@@ -537,7 +598,7 @@
       <button class="nav-button" type="button" data-view-target="forecast"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17c2.2-3.2 4.2-4.5 6.2-3.8 2 .7 3.5.1 4.6-1.8C16 9.4 17.8 8 20 7"/><path d="M4 7h5M4 11h3M4 21h16"/></svg></span><small>Forecast</small></button>
       <button class="nav-button nav-map" type="button" data-view-target="map"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.1 7-13a7 7 0 1 0-14 0c0 6.9 7 13 7 13Z"/><circle cx="12" cy="9" r="2.5"/></svg></span><small>Map</small></button>
       <button class="nav-button" type="button" data-view-target="logbook"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v15H7a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Z"/><path d="M8 8h8M8 12h6M8 16h5"/></svg></span><small>Logbook</small></button>
-      <button class="nav-button" type="button" data-view-target="community"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3 20c.5-4 2.5-6 6-6s5.5 2 6 6M14 15c3.5-.5 5.8 1.1 7 4.5"/></svg></span><small>Community</small></button>
+      <button class="nav-button" type="button" data-view-target="trips"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5z"/><path d="M8 3v4M16 3v4M8 11h8M8 15h5"/></svg></span><small>Trips</small></button>
     </nav>
   </div>
 
@@ -620,6 +681,27 @@
     </form>
   </dialog>
 
+
+  <!-- SMART ALERT DIALOG -->
+  <dialog id="alertDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">SMART WATCH</div><h2>Create fishing alert</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <div class="alert-location-card"><span>Watching</span><strong id="alertLocationName">Current fishing location</strong><small>CoastCast checks this rule whenever the app opens or refreshes.</small></div>
+      <label class="field-group"><span>Target species</span><select id="alertSpecies" class="select-control"></select></label>
+      <div class="two-col">
+        <label class="field-group"><span>Minimum score</span><select id="alertScoreThreshold" class="select-control"><option value="75">75 — Very good</option><option value="80">80</option><option value="85" selected>85 — Excellent watch</option><option value="90">90 — Prime only</option></select></label>
+        <label class="field-group"><span>Maximum wind</span><select id="alertMaxWind" class="select-control"><option value="999">Any wind</option><option value="10">10 mph</option><option value="15" selected>15 mph</option><option value="20">20 mph</option></select></label>
+      </div>
+      <label class="field-group"><span>Look ahead</span><select id="alertDays" class="select-control"><option value="3">Next 3 days</option><option value="5">Next 5 days</option><option value="7" selected>Next 7 days</option></select></label>
+      <button id="saveAlertBtn" class="primary-button full" type="button">Save forecast watch</button>
+      <button id="enableNotificationsBtn" class="secondary-button full" type="button">Enable device notifications</button>
+      <p class="micro-note">Without a server push service, CoastCast can alert you when the installed app opens or refreshes live data. True background alerts are a later launch step.</p>
+    </form>
+  </dialog>
+
   <!-- SETTINGS DIALOG -->
   <dialog id="settingsDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
@@ -630,7 +712,7 @@
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
       <label class="field-group"><span>Nearby shop radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <div class="settings-note">CoastCast v0.9 is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
+      <div class="settings-note">CoastCast v1.0 Beta is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -657,6 +739,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=0.9.0"></script>
+  <script src="app.js?v=1.0.0"></script>
 </body>
 </html>

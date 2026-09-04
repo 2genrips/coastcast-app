@@ -1,17 +1,20 @@
-# CoastCast v0.9 — Android / GitHub Pages Update
+# CoastCast v1.0 Beta — Android / GitHub Pages
 
-1. Extract the ZIP on Android.
+1. Extract this ZIP on your Android phone.
 2. Open your existing CoastCast GitHub repository.
-3. Upload every file from inside the coastcast_v0.9 folder to the repository root.
-4. Replace files with matching names and commit to `main`.
+3. Upload **all files and the branding folder from inside this folder** into the repository root.
+4. Replace matching files and commit to `main`.
 5. Wait for GitHub Pages to redeploy.
-6. Fully close CoastCast, reopen the site/app, and refresh once if v0.8 is still cached.
+6. Fully close CoastCast and reopen it. If the old build remains, open the GitHub Pages URL in Chrome and refresh once.
 
-## Test v0.9
-- Home: confirm **Species Intelligence** ranks several species.
-- Tap **Target** on a ranked species and confirm the main Fishing Score changes.
-- Home: open **Regulations Watch** and confirm the detected state is correct.
-- Forecast: tap **Plan trip**, choose a different species and a priority, then build the smart trip plan.
-- Try locations on different coasts (for example Galveston TX, San Diego CA, Montauk NY, Honolulu HI) and confirm the regulations source/state and regional species list change.
+## What to test
 
-Existing v0.8 catches, saved spots and settings migrate automatically into v0.9.
+- Home → Quick actions → **Alert**.
+- Create a forecast watch for the current location and target species.
+- Trips → confirm the alert appears under Smart Alerts.
+- Build a Smart Trip and confirm it appears in **Saved Trips**.
+- Save the current fishing location and confirm it appears under **Favorites**.
+- Tap Analyze on a favorite to reload the forecast for that spot.
+- Optional: enable device notification permission. CoastCast v1.0 checks rules when the app opens or live data refreshes; it does not yet have a server-powered background push service.
+
+Existing v0.9 catches, favorites, settings and trip plans are migrated locally.
