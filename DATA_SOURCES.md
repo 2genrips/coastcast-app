@@ -22,3 +22,11 @@ Forecast watches are evaluated locally against the forecast already loaded in Co
 
 ## v1.1 optional cloud sync
 Supabase is not required for forecasts and is not a CoastCast data provider. If the user connects their own Supabase project, CoastCast stores one user-owned JSON sync record protected by Supabase Auth and Row Level Security. The app never needs a service-role key.
+
+
+## v1.2 CoastCast Scout
+Scout performs lightweight location-specific forecast checks using:
+- Open-Meteo Weather API
+- Open-Meteo Marine API
+
+Candidate locations can come from the selected coastal point, CoastCast public-map discovery, saved private waypoints, and nearby CoastCast preset coast locations. Scout currently treats tide movement as a regional moving-water factor during multi-spot screening; after the angler taps Analyze, the normal exact-location CoastCast workflow loads the nearest NOAA tide source for that selected destination.

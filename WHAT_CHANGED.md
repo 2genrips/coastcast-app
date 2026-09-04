@@ -1,16 +1,28 @@
-# CoastCast v1.1 Beta
+# CoastCast v1.2 — Big Beta
 
-## New in this build
+## Signature feature: CoastCast Scout
+- Rank nearby coastal spots for a target species.
+- Choose 10, 25, or 50 mile search radius.
+- Rank Today, Tomorrow, or This Weekend.
+- Uses nearby map discoveries, saved private favorites, the selected coast, and known CoastCast coastal destinations.
+- Tries spot-specific Open-Meteo weather + marine requests for up to six candidates.
+- Falls back to clearly labeled preview scoring when a live source fails.
+- Shows score, wind, surf, water temperature, rain, distance, and best hour for every candidate.
 
-- New **Profile** experience accessible from the top-right avatar.
-- Angler display name, home coast, favorite species and default fishing style.
-- Profile dashboard for catches, favorites, trips and alerts.
-- New **Data Vault** to export a portable CoastCast JSON backup and restore it on another device/browser.
-- Optional **Supabase Cloud Sync Beta** with email/password authentication.
-- Manual **Sync now** and **Restore from cloud** controls.
-- Optional auto-sync of local changes after sign-in.
-- Includes `SUPABASE_SETUP.sql` with a single user-owned JSON record table and Row Level Security policies.
-- Includes `CLOUD_SYNC_SETUP.md` with Android-friendly setup steps.
-- Service worker now includes future web-push event hooks so the PWA is ready for a later notification backend.
-- Honest background-alert readiness panel: 24/7 checks still require a scheduled backend worker and push delivery.
-- v1.0 local data migrates automatically into v1.1.
+## Spot Compare
+- Add up to three Scout results to a compare tray.
+- Compare score, distance, best time, wind, surf, water temperature, and rain side-by-side.
+- Analyze the Scout winner live or send the winner straight into Smart Trip Planner.
+
+## Go Fishing Mode
+- Start an active trip from the Trips screen.
+- Keeps current score, wind, surf, water temperature and checklist together.
+- One-tap bait-shop and fishing-spot routing.
+- Tracks trip start/end time and counts completed trips locally.
+- Checklist state is saved on-device.
+
+## Data / compatibility
+- Migrates v1.1 local data forward.
+- Backup export now includes Scout and Go Fishing state.
+- Cloud sync payload inherits the expanded app backup data through the existing v1.1 sync path.
+- GitHub Pages / Android PWA deployment is unchanged.

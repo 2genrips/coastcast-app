@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, smart trips, favorites, forecast alerts, cloud-ready profiles, maps, bait shops and a personal catch logbook." />
+  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, CoastCast Scout spot ranking, side-by-side spot comparison, active trip mode, favorites, alerts, maps, bait shops and a personal catch logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=1.1.0" />
+  <link rel="stylesheet" href="styles.css?v=1.2.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -77,7 +77,7 @@
           <button id="homePlanBtn" class="home-action" type="button"><span class="home-action-icon">↗</span><span><strong>Plan</strong><small>Best trip</small></span></button>
           <button id="homeSaveBtn" class="home-action" type="button"><span class="home-action-icon">☆</span><span><strong>Save</strong><small>Favorite</small></span></button>
           <button id="homeAlertBtn" class="home-action" type="button"><span class="home-action-icon">◉</span><span><strong>Alert</strong><small>Watch score</small></span></button>
-          <button id="homeMapBtn" class="home-action" type="button"><span class="home-action-icon">⌖</span><span><strong>Map</strong><small>Nearby spots</small></span></button>
+          <button id="homeMapBtn" class="home-action scout-home-action" type="button"><span class="home-action-icon">◎</span><span><strong>Scout</strong><small>Rank spots</small></span></button>
         </section>
 
         <section class="score-hero panel">
@@ -379,12 +379,38 @@
       <section class="view" data-view="map" id="view-map">
         <div class="page-head map-page-head">
           <div>
-            <div class="eyebrow">NATIONWIDE SPOT INTELLIGENCE</div>
-            <h1>Fishing map</h1>
-            <p class="page-subtitle">Analyze any U.S. coast, discover indexed access points, save private waypoints and plan your bait stop.</p>
+            <div class="eyebrow">COASTCAST SCOUT • NATIONWIDE</div>
+            <h1>Scout the coast</h1>
+            <p class="page-subtitle">Rank nearby coastal spots for your target species, compare the strongest options, then analyze the winner live.</p>
           </div>
           <button id="addWaypointBtn" class="primary-button small" type="button">+ Save spot</button>
         </div>
+
+
+        <section class="panel scout-command-panel">
+          <div class="section-heading scout-heading">
+            <div><div class="eyebrow">COASTCAST SCOUT</div><h2>Where should I fish?</h2></div>
+            <span id="scoutLiveBadge" class="tiny-pill">READY</span>
+          </div>
+          <p class="section-note">Scout combines nearby public-access discoveries, your private favorites and known coastal destinations, then checks location-specific weather and marine conditions for your target.</p>
+          <div class="scout-controls">
+            <label class="field-group compact-field"><span>Target</span><select id="scoutSpecies" class="select-control"></select></label>
+            <label class="field-group compact-field"><span>Search radius</span><select id="scoutRadius" class="select-control"><option value="10">10 miles</option><option value="25" selected>25 miles</option><option value="50">50 miles</option></select></label>
+            <label class="field-group compact-field"><span>When</span><select id="scoutPeriod" class="select-control"><option value="today">Today</option><option value="tomorrow">Tomorrow</option><option value="weekend">This weekend</option></select></label>
+          </div>
+          <button id="runScoutBtn" class="primary-button full scout-run-button" type="button"><span>◎</span> Run CoastCast Scout</button>
+          <div id="scoutStatus" class="scout-status">Scout is ready. Run it from any U.S. coastal destination.</div>
+          <div class="scout-metrics">
+            <div><span>CANDIDATES</span><strong id="scoutCandidateCount">0</strong></div>
+            <div><span>BEST SCORE</span><strong id="scoutBestScore">--</strong></div>
+            <div><span>TOP SPOT</span><strong id="scoutTopName">Not ranked</strong></div>
+          </div>
+          <div id="scoutResults" class="scout-results"><div class="empty-state">Run Scout to rank nearby fishing options with live conditions.</div></div>
+          <div id="compareTray" class="compare-tray">
+            <div><span class="eyebrow">COMPARE TRAY</span><strong id="compareTrayText">Choose up to 3 Scout results</strong></div>
+            <div class="compare-tray-actions"><button id="clearCompareBtn" class="secondary-button tiny" type="button" disabled>Clear</button><button id="compareSpotsBtn" class="primary-button tiny" type="button" disabled>Compare spots</button></div>
+          </div>
+        </section>
 
         <section class="map-intel-hero panel">
           <div class="map-intel-grid">
@@ -492,6 +518,22 @@
           <div class="launch-panel-top"><div><div class="eyebrow">TRIP COMMAND CENTER</div><h2 id="tripHubHeadline">Ready when the coast lines up</h2></div><span id="tripHubBadge" class="tiny-pill">BETA</span></div>
           <div id="tripHubRecommendation" class="trip-hub-recommendation">CoastCast will combine your live forecast, target species, favorites and alert rules here.</div>
           <div class="trip-hub-actions"><button id="tripHubPlanBtn" class="primary-button" type="button">Build best trip</button><button id="tripHubAlertBtn" class="secondary-button" type="button">Create smart alert</button></div>
+        </section>
+
+        <section class="panel go-mode-panel" id="goModePanel">
+          <div class="section-heading">
+            <div><div class="eyebrow">GO FISHING MODE</div><h2 id="goModeTitle">Turn the forecast into a trip</h2></div>
+            <span id="goModeBadge" class="tiny-pill">READY</span>
+          </div>
+          <div id="goModeSummary" class="go-mode-summary">Start a live trip at your current fishing destination. CoastCast keeps your target, best window, conditions, route shortcuts and checklist in one place.</div>
+          <div id="goModeLiveStats" class="go-mode-live-stats"></div>
+          <div id="goModeChecklist" class="go-mode-checklist"></div>
+          <div class="go-mode-actions">
+            <button id="startGoModeBtn" class="primary-button" type="button">Start fishing trip</button>
+            <button id="goModeShopBtn" class="secondary-button" type="button" disabled>Bait shop</button>
+            <button id="goModeSpotBtn" class="secondary-button" type="button" disabled>Directions to spot</button>
+            <button id="endGoModeBtn" class="danger-button" type="button" hidden>End trip</button>
+          </div>
         </section>
 
         <section class="panel">
@@ -780,6 +822,17 @@
   </dialog>
 
 
+
+  <!-- SCOUT SPOT COMPARISON -->
+  <dialog id="compareDialog" class="sheet-dialog compare-dialog">
+    <form class="sheet-card compare-sheet" method="dialog">
+      <div class="sheet-head"><div><div class="eyebrow">COASTCAST SCOUT</div><h2>Spot comparison</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div id="compareWinner" class="compare-winner">Choose two or three Scout results to compare.</div>
+      <div id="compareGrid" class="compare-grid"></div>
+      <div class="sheet-actions compare-actions"><button id="compareAnalyzeWinnerBtn" class="primary-button" type="button" disabled>Analyze winner</button><button id="comparePlanWinnerBtn" class="secondary-button" type="button" disabled>Plan winner</button></div>
+    </form>
+  </dialog>
+
   <!-- PROFILE EDITOR -->
   <dialog id="profileDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
@@ -845,6 +898,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=1.1.0"></script>
+  <script src="app.js?v=1.2.0"></script>
 </body>
 </html>

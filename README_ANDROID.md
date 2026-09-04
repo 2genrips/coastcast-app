@@ -1,17 +1,19 @@
-# CoastCast v1.1 Beta — Android / GitHub Pages
+# CoastCast v1.2 — Android / GitHub Pages Update
 
-1. Extract this ZIP on your Android phone.
-2. Open your existing CoastCast GitHub repository.
-3. Upload **all files and the branding folder from inside `coastcast_v1.1`** to the repository root.
-4. Replace matching files and commit to `main`.
-5. Wait for GitHub Pages to redeploy.
-6. Fully close CoastCast and reopen it. If v1.0 remains, open the Pages URL in Chrome and refresh once.
+1. Download `coastcast_v1.2_scout_big_beta.zip`.
+2. Extract it with Android My Files.
+3. Open the extracted `coastcast_v1.2` folder.
+4. Upload all files inside it to the root of your existing CoastCast GitHub repository.
+5. Replace matching files and commit to `main`.
+6. Wait for GitHub Pages to redeploy.
+7. Completely close CoastCast and reopen it. If v1.1 remains cached, open the website in Chrome and refresh once.
 
-## First things to test
+## First test
+- Open **Scout** (the Map tab).
+- Choose a target species, 25 miles, and Today.
+- Tap **Run CoastCast Scout**.
+- Add 2–3 results to Compare and open **Compare spots**.
+- Pick the winner and Analyze it.
+- Open **Trips** and start **Go Fishing Mode**.
 
-- Tap the new **CC profile avatar** in the top-right.
-- Edit your angler profile.
-- Tap **Export CoastCast backup** and confirm Android downloads a JSON file.
-- Cloud sync is optional. If you want it, follow `CLOUD_SYNC_SETUP.md` and run `SUPABASE_SETUP.sql` in your own Supabase project.
-
-Your v1.0 catches, favorites, trip plans and alerts migrate forward automatically.
+Scout uses multiple live requests. Free public APIs can occasionally rate-limit or time out. CoastCast labels preview results instead of pretending they are live.

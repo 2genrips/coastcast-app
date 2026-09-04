@@ -19,6 +19,8 @@
       alertMatches: [],
       profile: {name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'},
       cloud: {url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null},
+      scout: {running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null},
+      goMode: {active:false,startedAt:null,location:null,species:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]},
       data: null,
       map: null,
       mapLayers: { spots: [], catches: [], shops: [], current: [], recommended: [], access: [] },
@@ -205,6 +207,7 @@
       this.restore();
       this.populateSpeciesControls();
       this.populateProfileControls();
+      this.populateScoutControls();
       this.populatePresets();
       this.bindNavigation();
       this.bindControls();
@@ -223,7 +226,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -238,6 +241,8 @@
         if(Array.isArray(saved.alertRules)) this.state.alertRules=saved.alertRules;
         if(saved.profile&&typeof saved.profile==='object') this.state.profile={...this.state.profile,...saved.profile};
         if(saved.cloud&&typeof saved.cloud==='object') this.state.cloud={...this.state.cloud,...saved.cloud,password:undefined};
+        if(saved.scout&&typeof saved.scout==='object') this.state.scout={...this.state.scout,...saved.scout,running:false};
+        if(saved.goMode&&typeof saved.goMode==='object') this.state.goMode={...this.state.goMode,...saved.goMode,checks:{...this.state.goMode.checks,...(saved.goMode.checks||{})},history:Array.isArray(saved.goMode.history)?saved.goMode.history:[]};
         if(this.state.cloud.session&&this.state.cloud.session.expires_at&&Number(this.state.cloud.session.expires_at)*1000<Date.now()) this.state.cloud.session=null;
       }catch(_){ }
     },
@@ -248,9 +253,11 @@
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
         waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,
         profile:this.state.profile,
-        cloud:{url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync}
+        cloud:{url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync},
+        scout:{radius:this.state.scout.radius,period:this.state.scout.period,species:this.state.scout.species,results:this.state.scout.results,compareIds:this.state.scout.compareIds,lastRun:this.state.scout.lastRun},
+        goMode:this.state.goMode
       };
-      try{ localStorage.setItem('coastcast-v11-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v12-state',JSON.stringify(payload)); }catch(_){ }
       if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
@@ -265,8 +272,8 @@
       this.$$('.nav-button').forEach(b=>b.classList.toggle('active',b.dataset.viewTarget===view));
       window.scrollTo({top:0,behavior:'smooth'});
       if(view==='forecast'){this.renderForecast();setTimeout(()=>this.renderTides(),20);}
-      if(view==='map') setTimeout(()=>{this.ensureMap();this.renderMapLayers();this.renderSpotIntelligence();if(!this.state.mapPOIs.length&&this.state.mapPlacesStatus==='idle')this.loadMapPlaces(false);},50);
-      if(view==='trips') this.renderTrips();
+      if(view==='map') setTimeout(()=>{this.ensureMap();this.renderMapLayers();this.renderSpotIntelligence();this.renderScout();if(!this.state.mapPOIs.length&&this.state.mapPlacesStatus==='idle')this.loadMapPlaces(false);},50);
+      if(view==='trips'){this.renderTrips();this.renderGoMode();}
       if(view==='logbook') this.renderLogbook();
       if(view==='community') this.renderCommunity();
       if(view==='profile') this.renderProfile();
@@ -310,6 +317,20 @@
       this.$('locationSearchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();this.searchLocations();}});
       this.$('mapRecenterBtn').addEventListener('click',()=>this.recenterMap());
       this.$('scanAreaBtn')?.addEventListener('click',()=>this.loadMapPlaces(true));
+      this.$('runScoutBtn')?.addEventListener('click',()=>this.runScout());
+      this.$('scoutSpecies')?.addEventListener('change',e=>{this.state.scout.species=e.target.value;this.save();});
+      this.$('scoutRadius')?.addEventListener('change',e=>{this.state.scout.radius=Number(e.target.value);this.save();});
+      this.$('scoutPeriod')?.addEventListener('change',e=>{this.state.scout.period=e.target.value;this.save();});
+      this.$('scoutResults')?.addEventListener('click',e=>this.handleScoutClick(e));
+      this.$('clearCompareBtn')?.addEventListener('click',()=>this.clearScoutCompare());
+      this.$('compareSpotsBtn')?.addEventListener('click',()=>this.openScoutCompare());
+      this.$('compareAnalyzeWinnerBtn')?.addEventListener('click',()=>this.useScoutWinner(false));
+      this.$('comparePlanWinnerBtn')?.addEventListener('click',()=>this.useScoutWinner(true));
+      this.$('startGoModeBtn')?.addEventListener('click',()=>this.startGoMode());
+      this.$('goModeShopBtn')?.addEventListener('click',()=>this.openGoShopRoute());
+      this.$('goModeSpotBtn')?.addEventListener('click',()=>this.openGoSpotRoute());
+      this.$('endGoModeBtn')?.addEventListener('click',()=>this.endGoMode());
+      this.$('goModeChecklist')?.addEventListener('change',e=>this.handleGoChecklist(e));
       this.$('topSpotAnalyzeBtn')?.addEventListener('click',()=>{if(this.state.selectedIntelSpot)this.analyzeMapPlace(this.state.selectedIntelSpot.id);});
       this.$('topSpotSaveBtn')?.addEventListener('click',()=>{if(this.state.selectedIntelSpot)this.saveMapPlace(this.state.selectedIntelSpot.id);});
       this.$('spotIntelList')?.addEventListener('click',e=>{const analyze=e.target.closest('[data-analyze-poi]'),save=e.target.closest('[data-save-poi]');if(analyze)this.analyzeMapPlace(analyze.dataset.analyzePoi);if(save)this.saveMapPlace(save.dataset.savePoi);});
@@ -486,7 +507,7 @@
       this.closeDialog('locationDialog');
       this.$('locationSearchResults').innerHTML='';
       this.state.selectedTideStation=null;
-      this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;
+      this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.scout.results=[];this.state.scout.compareIds=[];
       this.state.data=this.buildDemoData();
       this.renderAll();
       this.recenterMap();
@@ -870,7 +891,7 @@
       this.recalculateScores();
       this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderRegulations();this.renderConditions();this.renderFactors();
       this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();this.renderSpotIntelligence();
-      this.evaluateAlerts({notify:true});this.renderTrips();this.renderHomeAlerts();this.renderProfile();
+      this.evaluateAlerts({notify:true});this.renderTrips();this.renderHomeAlerts();this.renderProfile();this.renderScout();this.renderGoMode();
       if(this.state.view==='map') this.renderMapLayers();
     },
 
@@ -1262,6 +1283,127 @@
       const alertId=alertToggle?.dataset.alertId||alertDelete?.dataset.alertId;if(alertId){const idx=this.state.alertRules.findIndex(r=>String(r.id)===String(alertId));if(idx<0)return;if(alertDelete)this.state.alertRules.splice(idx,1);else this.state.alertRules[idx].enabled=this.state.alertRules[idx].enabled===false?true:false;this.save();this.evaluateAlerts({notify:false});this.renderTrips();this.renderHomeAlerts();}
     },
 
+
+    populateScoutControls(){
+      const el=this.$('scoutSpecies');if(!el)return;
+      el.innerHTML=Object.keys(this.species).map(name=>`<option value="${this.escape(name)}">${this.escape(name)}</option>`).join('');
+      el.value=this.state.scout.species||this.state.targetSpecies;
+      if(this.$('scoutRadius'))this.$('scoutRadius').value=String(this.state.scout.radius||25);
+      if(this.$('scoutPeriod'))this.$('scoutPeriod').value=this.state.scout.period||'today';
+    },
+
+    scoutPeriodLabel(period=this.state.scout.period){return period==='tomorrow'?'Tomorrow':period==='weekend'?'This weekend':'Today';},
+
+    renderScout(){
+      if(!this.$('scoutResults'))return;
+      const st=this.state.scout;
+      if(this.$('scoutSpecies'))this.$('scoutSpecies').value=st.species||this.state.targetSpecies;
+      if(this.$('scoutRadius'))this.$('scoutRadius').value=String(st.radius||25);
+      if(this.$('scoutPeriod'))this.$('scoutPeriod').value=st.period||'today';
+      const results=Array.isArray(st.results)?st.results:[];
+      if(this.$('scoutLiveBadge'))this.$('scoutLiveBadge').textContent=st.running?'SCANNING':results.length?(results.some(x=>x.confidence==='live')?'LIVE RANKING':'PREVIEW'):'READY';
+      if(this.$('scoutCandidateCount'))this.$('scoutCandidateCount').textContent=String(results.length);
+      if(this.$('scoutBestScore'))this.$('scoutBestScore').textContent=results[0]?String(results[0].score):'--';
+      if(this.$('scoutTopName'))this.$('scoutTopName').textContent=results[0]?.name||'Not ranked';
+      if(this.$('scoutStatus')){
+        if(st.running)this.$('scoutStatus').innerHTML='<span class="scan-spinner"></span><strong>Scouting the coast…</strong> Checking spot-specific weather and marine conditions.';
+        else if(st.lastRun)this.$('scoutStatus').textContent=`Last Scout: ${new Date(st.lastRun).toLocaleString()} • ${this.scoutPeriodLabel()} • ${st.species}`;
+        else this.$('scoutStatus').textContent='Scout is ready. Run it from any U.S. coastal destination.';
+      }
+      const box=this.$('scoutResults');
+      if(st.running){box.innerHTML='<div class="scout-loading-stack"><div class="scout-skeleton"></div><div class="scout-skeleton"></div><div class="scout-skeleton"></div></div>';}
+      else if(!results.length){box.innerHTML='<div class="empty-state">Run Scout to rank nearby fishing options with live conditions.</div>';}
+      else box.innerHTML=results.map((r,i)=>{
+        const selected=(st.compareIds||[]).includes(r.id);const grade=r.score>=90?'PRIME':r.score>=80?'GREAT':r.score>=70?'GOOD':'FAIR';
+        return `<article class="scout-result-card ${i===0?'winner':''}"><div class="scout-result-rank">${i===0?'★':i+1}</div><div class="scout-result-main"><div class="scout-result-kicker">${this.escape(r.type||'Coastal spot')} • ${this.fmt(r.distance,1)} mi • ${this.escape(r.confidence==='live'?'LIVE CONDITIONS':'PREVIEW')}</div><h3>${this.escape(r.name)}</h3><div class="scout-condition-line"><span>Wind <strong>${this.fmt(r.wind,0)} mph</strong></span><span>Surf <strong>${this.fmt(r.wave,1)} ft</strong></span><span>Water <strong>${this.fmt(r.water,0)}°</strong></span><span>Rain <strong>${this.fmt(r.rain,0)}%</strong></span></div><small>Best ${this.escape(r.bestTime||'window')} • ${this.escape(r.periodLabel||this.scoutPeriodLabel())}${r.note?` • ${this.escape(r.note)}`:''}</small></div><div class="scout-result-score"><strong>${r.score}</strong><span>${grade}</span></div><div class="scout-result-actions"><button class="mini-button primary-mini" type="button" data-scout-analyze="${this.escape(r.id)}">Analyze</button><button class="mini-button ${selected?'selected':''}" type="button" data-scout-compare="${this.escape(r.id)}">${selected?'Added':'Compare'}</button><button class="mini-button" type="button" data-scout-save="${this.escape(r.id)}">Save</button></div></article>`;
+      }).join('');
+      this.renderCompareTray();
+    },
+
+    renderCompareTray(){
+      if(!this.$('compareTrayText'))return;const ids=this.state.scout.compareIds||[];const names=ids.map(id=>this.state.scout.results.find(r=>r.id===id)?.name).filter(Boolean);
+      this.$('compareTrayText').textContent=names.length?`${names.length}/3 selected • ${names.join(' • ')}`:'Choose up to 3 Scout results';
+      this.$('compareSpotsBtn').disabled=names.length<2;this.$('clearCompareBtn').disabled=!names.length;
+    },
+
+    scoutCandidatePool(){
+      const center=this.state.location,radius=Math.max(5,Number(this.state.scout.radius)||25),seen=[];
+      const add=(p)=>{if(!p||!Number.isFinite(Number(p.lat))||!Number.isFinite(Number(p.lon)))return;const distance=this.haversine(center.lat,center.lon,Number(p.lat),Number(p.lon));if(distance>radius*1.15&&p.id!=='current-scout')return;const dup=seen.some(x=>this.haversine(x.lat,x.lon,Number(p.lat),Number(p.lon))<0.15||x.name.toLowerCase()===String(p.name||'').toLowerCase());if(dup)return;seen.push({id:String(p.id||`scout-${seen.length}-${Math.round(Number(p.lat)*10000)}`),name:p.name||'Coastal spot',lat:Number(p.lat),lon:Number(p.lon),type:p.type||p.source||'Coastal spot',distance,match:Number(p.match)||70,source:p.source||'CoastCast'});};
+      add({id:'current-scout',name:center.name,lat:center.lat,lon:center.lon,type:'Current destination',source:center.source,match:this.currentScore()});
+      [...(this.state.mapPOIs||[])].sort((a,b)=>(b.match||0)-(a.match||0)).slice(0,20).forEach(add);
+      (this.state.waypoints||[]).forEach(w=>add({id:`waypoint-${w.id}`,name:w.name,lat:w.lat,lon:w.lon,type:'Private favorite',source:'Your favorites',match:76}));
+      Object.entries(this.presets).forEach(([key,p])=>add({id:`preset-${key}`,name:p.name,lat:p.lat,lon:p.lon,type:'Known coast',source:'CoastCast coast',match:73}));
+      return seen.sort((a,b)=>(b.match-a.match)||(a.distance-b.distance)).slice(0,7);
+    },
+
+    async runScout(){
+      if(this.state.scout.running)return;
+      this.state.scout.running=true;this.state.scout.results=[];this.state.scout.compareIds=[];this.renderScout();
+      try{
+        if((!this.state.mapPOIs||!this.state.mapPOIs.length)&&this.state.mapPlacesStatus!=='loading')await this.loadMapPlaces(false);
+        let candidates=this.scoutCandidatePool();
+        if(!candidates.length)candidates=[{id:'current-scout',name:this.state.location.name,lat:this.state.location.lat,lon:this.state.location.lon,type:'Current destination',distance:0,match:this.currentScore(),source:this.state.location.source}];
+        const tasks=candidates.slice(0,6).map(c=>this.scoutEvaluateSpot(c));
+        const settled=await Promise.allSettled(tasks);const results=[];
+        settled.forEach((x,i)=>{if(x.status==='fulfilled'&&x.value)results.push(x.value);else{const c=candidates[i];if(c)results.push(this.scoutPreviewResult(c));}});
+        results.sort((a,b)=>b.score-a.score||a.distance-b.distance);this.state.scout.results=results;this.state.scout.lastRun=new Date().toISOString();
+      }catch(_){
+        this.state.scout.results=this.scoutCandidatePool().slice(0,6).map(c=>this.scoutPreviewResult(c)).sort((a,b)=>b.score-a.score);
+        this.showToast('Scout used preview scoring for some spots because a live source did not respond.');
+      }finally{this.state.scout.running=false;this.save();this.renderScout();}
+      if(this.state.scout.results[0])this.showToast(`${this.state.scout.results[0].name} is Scout's top match at ${this.state.scout.results[0].score}/100.`);
+    },
+
+    scoutPreviewResult(c){
+      const cur=this.state.data?.current||{};const score=Math.max(35,Math.min(99,Math.round((Number(c.match)||70)*.35+this.calculateScore({wind:cur.windSpeed,rain:cur.rain,wave:cur.waveHeight,water:cur.waterTemp,tide:this.currentTideLabel(),time:new Date(),pressure:cur.pressure},this.state.scout.species||this.state.targetSpecies,false)*.65)));
+      return {...c,score,wind:this.num(cur.windSpeed,8),wave:this.num(cur.waveHeight,2),water:this.num(cur.waterTemp,72),rain:this.num(cur.rain,0),bestTime:this.state.data?this.findBestWindow(this.state.data.hours.filter(h=>h.dateIndex===0).slice(0,24)).label:'Best loaded window',periodLabel:this.scoutPeriodLabel(),confidence:'preview',note:'Uses loaded conditions'};
+    },
+
+    async scoutEvaluateSpot(c){
+      const period=this.state.scout.period||'today',species=this.state.scout.species||this.state.targetSpecies;
+      const weatherParams=new URLSearchParams({latitude:String(c.lat),longitude:String(c.lon),timezone:'auto',forecast_days:'7',temperature_unit:'fahrenheit',wind_speed_unit:'mph',hourly:'temperature_2m,precipitation_probability,wind_speed_10m,wind_direction_10m,pressure_msl',daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max'});
+      const marineParams=new URLSearchParams({latitude:String(c.lat),longitude:String(c.lon),timezone:'auto',forecast_days:'7',length_unit:'imperial',cell_selection:'sea',hourly:'wave_height,wave_period,sea_surface_temperature'});
+      const [w,m]=await Promise.all([this.fetchJSON('https://api.open-meteo.com/v1/forecast?'+weatherParams.toString(),11000),this.fetchJSON('https://marine-api.open-meteo.com/v1/marine?'+marineParams.toString(),11000).catch(()=>null)]);
+      const wh=w.hourly||{},mh=m?.hourly||{};if(!Array.isArray(wh.time)||!wh.time.length)throw new Error('No scout weather');
+      const marineMap=new Map(Array.isArray(mh.time)?mh.time.map((t,i)=>[t,{wave:this.num(mh.wave_height?.[i],2),period:this.num(mh.wave_period?.[i],8),water:Number.isFinite(Number(mh.sea_surface_temperature?.[i]))?this.cToF(Number(mh.sea_surface_temperature[i])):this.state.data?.current?.waterTemp||72}]):[]);
+      const byDay=new Map();wh.time.forEach((t,i)=>{const date=String(t).slice(0,10);if(!byDay.has(date))byDay.set(date,[]);const mm=marineMap.get(t)||{};byDay.get(date).push({rawTime:t,wind:this.num(wh.wind_speed_10m?.[i],8),windDir:this.num(wh.wind_direction_10m?.[i],0),rain:this.num(wh.precipitation_probability?.[i],0),pressure:this.num(wh.pressure_msl?.[i],1015),wave:this.num(mm.wave,2),period:this.num(mm.period,8),water:this.num(mm.water,this.state.data?.current?.waterTemp||72)});});
+      const dates=[...byDay.keys()].slice(0,7);let targetDates=[];
+      if(period==='tomorrow')targetDates=dates.slice(1,2);else if(period==='weekend')targetDates=dates.filter(d=>{const day=new Date(d+'T12:00:00').getDay();return day===0||day===6;}).slice(0,2);else targetDates=dates.slice(0,1);
+      if(!targetDates.length)targetDates=dates.slice(0,1);
+      let bestDay=null;
+      for(const date of targetDates){const hrs=byDay.get(date)||[];const scored=hrs.map(h=>({...h,score:this.calculateScore({wind:h.wind,rain:h.rain,wave:h.wave,water:h.water,tide:'Moving',time:h.rawTime,pressure:h.pressure},species,false)}));if(!scored.length)continue;scored.sort((a,b)=>b.score-a.score);const top=scored.slice(0,Math.min(4,scored.length));let score=Math.round(this.average(top.map(x=>x.score)));score=Math.round(Math.max(0,Math.min(100,score+(Number(c.match||70)-70)*.08)));const best=scored[0];const candidate={date,score,best,avgWind:this.average(top.map(x=>x.wind)),avgWave:this.average(top.map(x=>x.wave)),avgWater:this.average(top.map(x=>x.water)),avgRain:this.average(top.map(x=>x.rain))};if(!bestDay||candidate.score>bestDay.score)bestDay=candidate;}
+      if(!bestDay)throw new Error('No scout day');
+      const bt=new Date(bestDay.best.rawTime);const label=bt.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+      return {...c,score:bestDay.score,wind:bestDay.avgWind,wave:bestDay.avgWave,water:bestDay.avgWater,rain:bestDay.avgRain,bestTime:label,periodLabel:period==='weekend'?`${new Date(bestDay.date+'T12:00:00').toLocaleDateString([],{weekday:'short'})} best window`:this.scoutPeriodLabel(),confidence:'live',note:bestDay.best.period?`${this.fmt(bestDay.best.period,0)} sec period`:''};
+    },
+
+    handleScoutClick(e){
+      const analyze=e.target.closest('[data-scout-analyze]'),compare=e.target.closest('[data-scout-compare]'),save=e.target.closest('[data-scout-save]');const id=analyze?.dataset.scoutAnalyze||compare?.dataset.scoutCompare||save?.dataset.scoutSave;if(!id)return;const r=this.state.scout.results.find(x=>String(x.id)===String(id));if(!r)return;
+      if(analyze){this.useScoutSpot(r,false);return;}if(save){this.saveScoutSpot(r);return;}if(compare){this.toggleScoutCompare(r.id);return;}
+    },
+
+    saveScoutSpot(r){const exists=this.state.waypoints.some(w=>this.haversine(r.lat,r.lon,w.lat,w.lon)<.03);if(exists){this.showToast('That spot is already saved.');return;}this.state.waypoints.unshift({id:Date.now(),name:r.name,notes:`Scout ${r.score}/100 • ${r.type}`,lat:r.lat,lon:r.lon,privacy:'private'});this.save();this.renderWaypoints();this.renderTrips();this.showToast(`${r.name} saved privately.`);},
+    toggleScoutCompare(id){let ids=[...(this.state.scout.compareIds||[])];if(ids.includes(id))ids=ids.filter(x=>x!==id);else if(ids.length<3)ids.push(id);else{this.showToast('Compare up to 3 spots at a time.');return;}this.state.scout.compareIds=ids;this.save();this.renderScout();},
+    clearScoutCompare(){this.state.scout.compareIds=[];this.save();this.renderScout();},
+
+    openScoutCompare(){const rows=(this.state.scout.compareIds||[]).map(id=>this.state.scout.results.find(r=>r.id===id)).filter(Boolean);if(rows.length<2)return;rows.sort((a,b)=>b.score-a.score);this.state.scout.compareWinnerId=rows[0].id;this.$('compareWinner').innerHTML=`<strong>Scout winner: ${this.escape(rows[0].name)}</strong><span>${rows[0].score}/100 for ${this.escape(this.state.scout.species)} • ${this.escape(this.scoutPeriodLabel())}</span>`;this.$('compareGrid').innerHTML=rows.map((r,i)=>`<article class="compare-card ${i===0?'winner':''}"><div class="compare-card-head"><span>${i===0?'TOP PICK':`OPTION ${i+1}`}</span><strong>${r.score}</strong></div><h3>${this.escape(r.name)}</h3><dl><div><dt>Distance</dt><dd>${this.fmt(r.distance,1)} mi</dd></div><div><dt>Best time</dt><dd>${this.escape(r.bestTime)}</dd></div><div><dt>Wind</dt><dd>${this.fmt(r.wind,0)} mph</dd></div><div><dt>Surf</dt><dd>${this.fmt(r.wave,1)} ft</dd></div><div><dt>Water</dt><dd>${this.fmt(r.water,0)}°F</dd></div><div><dt>Rain</dt><dd>${this.fmt(r.rain,0)}%</dd></div></dl><button class="mini-button compare-use-spot" data-compare-use="${this.escape(r.id)}" type="button">Use this spot</button></article>`).join('');this.$('compareGrid').onclick=(e)=>{const b=e.target.closest('[data-compare-use]');if(!b)return;const r=this.state.scout.results.find(x=>String(x.id)===String(b.dataset.compareUse));if(r){this.closeDialog('compareDialog');this.useScoutSpot(r,false);}};this.$('compareAnalyzeWinnerBtn').disabled=false;this.$('comparePlanWinnerBtn').disabled=false;this.openDialog('compareDialog');},
+    useScoutWinner(plan=false){const r=this.state.scout.results.find(x=>String(x.id)===String(this.state.scout.compareWinnerId));if(!r)return;this.closeDialog('compareDialog');this.useScoutSpot(r,plan);},
+    useScoutSpot(r,plan=false){this.state.location={key:'scout',name:r.name,lat:Number(r.lat),lon:Number(r.lon),source:`CoastCast Scout • ${r.type}`};this.state.targetSpecies=this.state.scout.species||this.state.targetSpecies;this.onLocationChanged();if(plan)setTimeout(()=>this.openPlanner(),150);else this.navigate('home');this.showToast(`${r.name} selected. Loading exact-location analysis…`);},
+
+    renderGoMode(){
+      if(!this.$('goModePanel'))return;const g=this.state.goMode||{},active=!!g.active,c=this.state.data?.current||{},best=this.state.data?this.findBestWindow(this.state.data.hours.filter(h=>h.dateIndex===0).slice(0,24)):{label:'—'};
+      this.$('goModeBadge').textContent=active?'ON TRIP':'READY';this.$('goModeBadge').classList.toggle('live',active);this.$('goModeTitle').textContent=active?`Fishing ${g.species||this.state.targetSpecies}`:'Turn the forecast into a trip';
+      this.$('goModeSummary').innerHTML=active?`<strong>${this.escape(g.location?.name||this.state.location.name)}</strong> • Started ${new Date(g.startedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})} • Best loaded window ${this.escape(best.label||'—')}`:'Start a live trip at your current fishing destination. CoastCast keeps your target, best window, conditions, route shortcuts and checklist in one place.';
+      this.$('goModeLiveStats').innerHTML=`<div><span>SCORE</span><strong>${this.currentScore()}</strong></div><div><span>WIND</span><strong>${this.fmt(c.windSpeed,0)} mph</strong></div><div><span>SURF</span><strong>${this.fmt(c.waveHeight,1)} ft</strong></div><div><span>WATER</span><strong>${this.fmt(c.waterTemp,0)}°</strong></div>`;
+      const checks=g.checks||{};this.$('goModeChecklist').innerHTML=[['bait','Bait / lures'],['ice','Ice & drinks'],['license','License / regulations'],['gear','Rods, rigs & safety gear']].map(([k,label])=>`<label class="go-check ${checks[k]?'done':''}"><input type="checkbox" data-go-check="${k}" ${checks[k]?'checked':''}/><span>${checks[k]?'✓':'○'}</span><strong>${label}</strong></label>`).join('');
+      this.$('startGoModeBtn').hidden=active;this.$('endGoModeBtn').hidden=!active;this.$('goModeShopBtn').disabled=!active||!(this.state.data?.shops||[]).length;this.$('goModeSpotBtn').disabled=!active;
+    },
+    startGoMode(){if(this.state.goMode.active)return;this.state.goMode={...this.state.goMode,active:true,startedAt:new Date().toISOString(),location:{...this.state.location},species:this.state.targetSpecies,checks:{bait:false,ice:false,license:false,gear:false}};this.save();this.renderGoMode();this.showToast('Go Fishing Mode started. Tight lines.');},
+    handleGoChecklist(e){const input=e.target.closest('[data-go-check]');if(!input)return;this.state.goMode.checks[input.dataset.goCheck]=!!input.checked;this.save();this.renderGoMode();},
+    openGoShopRoute(){const s=(this.state.data?.shops||[])[0];if(!s)return this.showToast('No bait shop is loaded for this destination.');window.open(this.mapsUrl(s.lat,s.lon,s.name),'_blank','noopener');},
+    openGoSpotRoute(){const l=this.state.goMode.location||this.state.location;window.open(this.mapsUrl(l.lat,l.lon,l.name),'_blank','noopener');},
+    endGoMode(){if(!this.state.goMode.active)return;const start=new Date(this.state.goMode.startedAt||Date.now());const minutes=Math.max(1,Math.round((Date.now()-start.getTime())/60000));this.state.goMode.history=[{id:Date.now(),location:this.state.goMode.location?.name||this.state.location.name,species:this.state.goMode.species||this.state.targetSpecies,startedAt:this.state.goMode.startedAt,endedAt:new Date().toISOString(),minutes,checks:{...(this.state.goMode.checks||{})}},...(this.state.goMode.history||[])].slice(0,30);this.state.goMode.active=false;this.state.trips=(Number(this.state.trips)||0)+1;this.save();this.renderGoMode();this.renderTrips();this.showToast(`Trip ended • ${minutes} min logged.`);},
+
     mapPlacesCacheKey(){const l=this.state.location;return `coastcast-map-places:${Number(l.lat).toFixed(2)}:${Number(l.lon).toFixed(2)}:${this.state.radius}`;},
 
     async loadMapPlaces(forceToast=false){
@@ -1512,8 +1654,8 @@
 
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
-      try{localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{localStorage.removeItem('coastcast-v8-state');}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      try{localStorage.removeItem('coastcast-v12-state');localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
+      this.state.live=false;try{localStorage.removeItem('coastcast-v8-state');}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,location:null,species:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 
 
@@ -1561,7 +1703,7 @@
     },
 
     backupPayload(){
-      return {format:'coastcast-backup',version:'1.1.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile}};
+      return {format:'coastcast-backup',version:'1.2.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode}};
     },
 
     exportBackup(){
@@ -1571,7 +1713,7 @@
     async importBackupFile(event){
       const file=event.target.files?.[0];if(!file)return;
       try{const text=await file.text();const parsed=JSON.parse(text);const d=parsed?.appState||parsed;if(!d||typeof d!=='object')throw new Error('Invalid');if(!confirm('Restore this CoastCast backup? Current local saved data will be replaced.'))return;
-        if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};
+        if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};
         this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();if(this.$('backupStatus'))this.$('backupStatus').textContent=`Backup restored from ${this.escape(file.name)}.`;this.showToast('Backup restored. Refresh live data for the restored destination.');
       }catch(_){this.showToast('That file is not a valid CoastCast backup.');}finally{event.target.value='';}
     },
@@ -1625,11 +1767,11 @@
     },
 
     saveCloudMetaOnly(){
-      try{const raw=localStorage.getItem('coastcast-v11-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v11-state',JSON.stringify(p));}catch(_){ }
+      try{const raw=localStorage.getItem('coastcast-v12-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v12-state',JSON.stringify(p));}catch(_){ }
     },
 
     async cloudPull(){
-      if(!this.cloudSignedIn()){this.showToast('Sign in to cloud sync first.');return;}if(!confirm('Restore your cloud copy onto this device? Current local fishing data will be replaced.'))return;const c=this.state.cloud;try{if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent='Downloading cloud data…';const uid=c.session.user.id;const r=await this.cloudRequest(`${c.url}/rest/v1/coastcast_user_data?user_id=eq.${encodeURIComponent(uid)}&select=data,updated_at&limit=1`,{method:'GET'});const rows=await r.json();if(!r.ok)throw new Error(rows?.message||'Could not download cloud data.');if(!Array.isArray(rows)||!rows.length)throw new Error('No cloud backup exists yet.');const d=rows[0].data||{};if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};this.state.cloud.lastSync=rows[0].updated_at||new Date().toISOString();this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();this.showToast('Cloud data restored. Refresh live data for this destination.');}
+      if(!this.cloudSignedIn()){this.showToast('Sign in to cloud sync first.');return;}if(!confirm('Restore your cloud copy onto this device? Current local fishing data will be replaced.'))return;const c=this.state.cloud;try{if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent='Downloading cloud data…';const uid=c.session.user.id;const r=await this.cloudRequest(`${c.url}/rest/v1/coastcast_user_data?user_id=eq.${encodeURIComponent(uid)}&select=data,updated_at&limit=1`,{method:'GET'});const rows=await r.json();if(!r.ok)throw new Error(rows?.message||'Could not download cloud data.');if(!Array.isArray(rows)||!rows.length)throw new Error('No cloud backup exists yet.');const d=rows[0].data||{};if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};this.state.cloud.lastSync=rows[0].updated_at||new Date().toISOString();this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();this.showToast('Cloud data restored. Refresh live data for this destination.');}
       catch(err){if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent=err.message||'Cloud restore failed.';this.showToast(err.message||'Cloud restore failed.');}
     },
 
