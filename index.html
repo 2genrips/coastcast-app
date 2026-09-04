@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=0.6.0" />
+  <link rel="stylesheet" href="styles.css?v=0.7.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -321,48 +321,94 @@
 
       <!-- MAP -->
       <section class="view" data-view="map" id="view-map">
-        <div class="page-head">
+        <div class="page-head map-page-head">
           <div>
-            <div class="eyebrow">EXPLORE</div>
+            <div class="eyebrow">SPOT INTELLIGENCE</div>
             <h1>Fishing map</h1>
-            <p class="page-subtitle">Spots, catches and bait stores around your destination.</p>
+            <p class="page-subtitle">Find real public access points, compare nearby spots, save private waypoints and plan your bait stop.</p>
           </div>
-          <button id="addWaypointBtn" class="primary-button small" type="button">+ Spot</button>
+          <button id="addWaypointBtn" class="primary-button small" type="button">+ Save spot</button>
         </div>
 
-        <section class="panel map-panel">
-          <div class="map-search-row">
-            <button id="mapSearchBtn" class="map-search-button" type="button">⌕ Search fishing location</button>
+        <section class="map-intel-hero panel">
+          <div class="map-intel-grid">
+            <div class="map-intel-metric"><span>AREA SCORE</span><strong id="mapCurrentScore">--</strong><small id="mapScoreSpecies">Target mode</small></div>
+            <div class="map-intel-metric"><span>BEST DAY</span><strong id="mapBestDay">--</strong><small id="mapBestDayScore">7-day outlook</small></div>
+            <div class="map-intel-metric"><span>PLACES</span><strong id="mapPlacesCount">0</strong><small id="spotIntelStatus">Not scanned</small></div>
+          </div>
+          <div class="map-intel-actions">
+            <button id="scanAreaBtn" class="primary-button" type="button">Scan fishing area</button>
+            <button id="mapSearchBtn" class="secondary-button" type="button">Change location</button>
+          </div>
+          <p class="micro-note">Nearby spot scores are an area-match preview. Tap <strong>Analyze</strong> to load live conditions at the exact public place before planning a trip.</p>
+        </section>
+
+        <section id="topSpotCard" class="top-spot-card panel">
+          <div class="top-spot-rank">BEST NEARBY MATCH</div>
+          <div class="top-spot-row">
+            <div class="top-spot-copy">
+              <h2 id="topSpotName">Scan the area to find public fishing access</h2>
+              <p id="topSpotReason">CoastCast will rank named beaches, piers, fishing access, marinas and boat ramps around your selected destination.</p>
+            </div>
+            <div class="top-spot-score"><strong id="topSpotScore">--</strong><span>AREA MATCH</span></div>
+          </div>
+          <div class="top-spot-actions">
+            <button id="topSpotAnalyzeBtn" class="primary-button" type="button" disabled>Analyze live</button>
+            <button id="topSpotSaveBtn" class="secondary-button" type="button" disabled>Save private</button>
+          </div>
+          <div id="weekendIntel" class="weekend-intel">Your best forecast day will appear here.</div>
+        </section>
+
+        <section class="panel map-panel map-panel-v7">
+          <div class="map-toolbar">
+            <div class="map-toolbar-copy"><span class="eyebrow">LIVE MAP</span><strong id="mapCenterLabel">Selected fishing destination</strong></div>
             <button id="mapRecenterBtn" class="icon-button inline" type="button" aria-label="Recenter map">◎</button>
           </div>
           <div class="map-filter-row" role="group" aria-label="Map filters">
             <button class="filter-chip active" data-map-filter="all" type="button">All</button>
-            <button class="filter-chip" data-map-filter="spots" type="button">Saved spots</button>
-            <button class="filter-chip" data-map-filter="catches" type="button">My catches</button>
-            <button class="filter-chip" data-map-filter="shops" type="button">Bait shops</button>
+            <button class="filter-chip" data-map-filter="recommended" type="button">Top matches</button>
+            <button class="filter-chip" data-map-filter="access" type="button">Public access</button>
+            <button class="filter-chip" data-map-filter="spots" type="button">Saved</button>
+            <button class="filter-chip" data-map-filter="catches" type="button">Catches</button>
+            <button class="filter-chip" data-map-filter="shops" type="button">Bait</button>
           </div>
-          <div id="leafletMap" class="real-map" aria-label="Interactive fishing map"></div>
+          <div id="leafletMap" class="real-map intelligence-map" aria-label="Interactive fishing map"></div>
           <div id="mapFallback" class="map-fallback hidden">
-            <div class="map-fallback-icon">🗺️</div>
+            <div class="map-fallback-icon">MAP</div>
             <strong>Map unavailable</strong>
-            <span>The rest of CoastCast still works. Reconnect and refresh to load the interactive map.</span>
+            <span>The forecast and logbook still work. Reconnect and refresh to load the interactive map.</span>
           </div>
-          <div id="mapSelection" class="map-selection">Fishing spot is centered on <strong>Wrightsville Beach, NC</strong>.</div>
+          <div class="map-legend" aria-label="Map legend">
+            <span><i class="legend-dot recommended"></i>Top match</span>
+            <span><i class="legend-dot access"></i>Public access</span>
+            <span><i class="legend-dot saved"></i>Saved</span>
+            <span><i class="legend-dot bait"></i>Bait</span>
+          </div>
+          <div id="mapSelection" class="map-selection">Fishing spot is centered on your selected destination.</div>
         </section>
 
         <section class="panel">
           <div class="section-heading">
-            <div><div class="eyebrow">WAYPOINTS</div><h2>Saved fishing spots</h2></div>
+            <div><div class="eyebrow">NEARBY SPOTS</div><h2>Spot intelligence</h2></div>
+            <span class="tiny-pill">Public map data</span>
+          </div>
+          <div id="spotIntelList" class="spot-intel-list"><div class="empty-state">Tap Scan fishing area to discover real named public places around your destination.</div></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">WAYPOINTS</div><h2>My private spots</h2></div>
             <span id="waypointCount" class="tiny-pill">0 saved</span>
           </div>
           <div id="waypointList" class="list-stack empty-state">No saved fishing spots yet.</div>
         </section>
 
-        <section class="panel">
+        <section class="panel tackle-panel">
           <div class="section-heading">
-            <div><div class="eyebrow">NEARBY SERVICES</div><h2>Bait & tackle</h2></div>
-            <button id="refreshShopsBtn" class="link-button" type="button">Find live</button>
+            <div><div class="eyebrow">TRIP STOP</div><h2>Bait & tackle near the fishing spot</h2></div>
+            <button id="refreshShopsBtn" class="link-button" type="button">Search again</button>
           </div>
+          <p class="section-note">Results are measured from the fishing destination, not from your home. Use <strong>Shop → spot</strong> to route the last leg of your trip.</p>
           <div id="mapShopList" class="list-stack"></div>
         </section>
       </section>
@@ -566,6 +612,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=0.6.0"></script>
+  <script src="app.js?v=0.7.0"></script>
 </body>
 </html>

@@ -1,18 +1,21 @@
-# CoastCast v0.6 Data Sources
+# CoastCast v0.7 Data Sources
 
 ## Weather
-Open-Meteo Weather API: temperature, feels-like, weather code, rain probability, humidity, visibility, UV, wind, gusts, pressure, sunrise and sunset.
+Open-Meteo Weather API.
 
 ## Marine
-Open-Meteo Marine API: wave height/direction/period, swell height/direction/period, sea-surface temperature and ocean-current model data where available. CoastCast requests imperial wave lengths, selects a sea grid cell, converts SST from °C to °F, and converts current velocity from km/h to mph. Marine model resolution can be coarse near shore and must not be used for navigation.
+Open-Meteo Marine API. Coastal model data can be coarse close to shore and is not navigation guidance.
 
 ## Tides
-NOAA CO-OPS Data API for high/low tide predictions. NOAA station metadata is used for station discovery, with a small verified southeastern-NC seed list as a reliability fallback.
+NOAA CO-OPS tide predictions.
+
+## Public fishing places and access
+OpenStreetMap place data queried through public Overpass endpoints. CoastCast looks for mapped fishing access, named beaches, piers, marinas, boat ramps/slipways and docks. Map presence does **not** prove public fishing permission, current access, safety or operating hours.
 
 ## Bait & tackle
-OpenStreetMap / Overpass results around the selected fishing destination. CoastCast tries two public Overpass endpoints before falling back to demo listings. Store hours/services should be confirmed before driving.
+OpenStreetMap / Overpass business data with bounded OpenStreetMap/Nominatim search as a fallback. Successful real results are cached for six hours.
 
 ## Map
-Leaflet + OpenStreetMap map tiles.
+Leaflet + OpenStreetMap tiles.
 
-No forecast should be treated as a guarantee of fishing success or as navigation/surf-safety guidance.
+Always verify local access, closures, regulations, tides and surf safety independently.
