@@ -23,15 +23,15 @@
   <div id="app" class="app-shell">
     <header class="topbar">
       <div class="brand-lockup" aria-label="CoastCast Fishing Forecast">
-        <img src="icon.svg" alt="" class="brand-icon" />
+        <img src="branding/coastcast-mark-transparent.svg" alt="" class="brand-icon brand-icon-transparent" />
         <div class="brand-copy">
           <div class="brand-name"><span>COAST</span><b>CAST</b></div>
           <div class="brand-kicker">FISHING FORECAST</div>
         </div>
       </div>
       <div class="topbar-actions">
-        <button id="syncBtn" class="icon-button" type="button" aria-label="Refresh live data" title="Refresh live data">↻</button>
-        <button id="settingsBtn" class="icon-button" type="button" aria-label="Open settings" title="Settings">⚙</button>
+        <button id="syncBtn" class="icon-button" type="button" aria-label="Refresh live data" title="Refresh live data"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>
+        <button id="settingsBtn" class="icon-button" type="button" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg></button>
       </div>
     </header>
 
@@ -61,6 +61,7 @@
             <span class="status-divider">•</span>
             <span id="lastUpdated" class="muted-xs">Updated now</span>
           </div>
+          <div id="sourceHealth" class="source-health" aria-label="Forecast data sources"></div>
         </section>
 
         <section class="score-hero panel">
@@ -71,13 +72,13 @@
               <div class="score-scale">/100</div>
             </div>
             <div id="scoreLabel" class="grade-badge excellent">EXCELLENT</div>
-            <p id="scoreReason" class="score-reason">Incoming tide, light wind and first light create a strong surf-fishing window.</p>
+            <p id="scoreReason" class="score-reason">Incoming tide, light wind and first light create a strong surf-fishing window.</p><button id="scoreBreakdownBtn" class="score-breakdown-link" type="button">See score breakdown <span>→</span></button>
           </div>
           <div class="score-dial-wrap" aria-hidden="true">
             <svg class="score-dial" viewBox="0 0 120 120">
               <circle class="score-track" cx="60" cy="60" r="50"></circle>
               <circle id="scoreArc" class="score-arc" cx="60" cy="60" r="50"></circle>
-              <text x="60" y="56" text-anchor="middle" class="dial-icon">🎣</text>
+              <image href="branding/coastcast-mark-transparent.svg" x="39" y="28" width="42" height="42" transform="rotate(90 60 60)" class="dial-brand"/>
               <text id="dialGrade" x="60" y="79" text-anchor="middle" class="dial-label">PRIME</text>
             </svg>
           </div>
@@ -96,7 +97,7 @@
         </section>
 
         <section class="best-window panel accent-panel">
-          <div class="best-window-icon" aria-hidden="true">⏱</div>
+          <div class="best-window-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 13 16 10M9 2h6M12 2v4"/></svg></div>
           <div class="best-window-copy">
             <div class="eyebrow">BEST WINDOW TODAY</div>
             <div id="bestWindow" class="best-window-time">5:45 AM – 8:20 AM</div>
@@ -262,7 +263,9 @@
               <div><span>Wave height</span><strong id="detailWave">2.0 ft</strong></div>
               <div><span>Wave period</span><strong id="detailPeriod">9 sec</strong></div>
               <div><span>Wave direction</span><strong id="detailWaveDir">ESE</strong></div>
-              <div><span>Swell height</span><strong id="detailSwell">1.7 ft</strong></div>
+              <div><span>Swell</span><strong id="detailSwell">1.7 ft @ 10 sec</strong></div>
+              <div><span>Swell direction</span><strong id="detailSwellDir">ESE</strong></div>
+              <div><span>Ocean current</span><strong id="detailCurrent">—</strong></div>
               <div><span>Water temp</span><strong id="detailWater">75°F</strong></div>
             </div>
           </article>
@@ -273,6 +276,9 @@
               <div><span>Sunrise</span><strong id="detailSunrise">6:39 AM</strong></div>
               <div><span>Sunset</span><strong id="detailSunset">7:28 PM</strong></div>
               <div><span>Max rain chance</span><strong id="detailRain">20%</strong></div>
+              <div><span>Humidity</span><strong id="detailHumidity">—</strong></div>
+              <div><span>Visibility</span><strong id="detailVisibility">—</strong></div>
+              <div><span>UV index</span><strong id="detailUV">—</strong></div>
               <div><span>Pressure</span><strong id="detailPressure">30.08 in</strong></div>
               <div><span>Moon phase</span><strong id="detailMoon">Waxing gibbous</strong></div>
             </div>
@@ -317,7 +323,6 @@
             <button class="filter-chip" data-map-filter="spots" type="button">Saved spots</button>
             <button class="filter-chip" data-map-filter="catches" type="button">My catches</button>
             <button class="filter-chip" data-map-filter="shops" type="button">Bait shops</button>
-          </div>
           <div id="leafletMap" class="real-map" aria-label="Interactive fishing map"></div>
           <div id="mapFallback" class="map-fallback hidden">
             <div class="map-fallback-icon">🗺️</div>
@@ -419,6 +424,7 @@
 
         <div id="communityFeed" class="community-feed"></div>
       </section>
+      <footer class="app-trust-footer"><img src="branding/coastcast-mark-transparent.svg" alt=""/><div><strong>COASTCAST</strong><span>Plan Smarter. Fish Better.</span></div><small>Forecast guidance only. Always check local safety conditions.</small></footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Primary navigation">

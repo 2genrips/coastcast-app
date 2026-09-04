@@ -18,7 +18,8 @@
       map: null,
       mapLayers: { spots: [], catches: [], shops: [], current: [] },
       mapFilter: 'all',
-      selectedTideStation: null
+      selectedTideStation: null,
+      sourceHealth: {weather:'demo',marine:'demo',tides:'demo',shops:'demo'}
     },
 
     presets: {
@@ -118,7 +119,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -138,7 +139,7 @@
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
         waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips
       };
-      try{ localStorage.setItem('coastcast-v4-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v5-state',JSON.stringify(payload)); }catch(_){ }
     },
 
     bindNavigation(){
@@ -166,6 +167,7 @@
       this.$('liveModeToggle').addEventListener('change',e=>this.setLiveMode(e.target.checked));
       this.$('favoriteSpotBtn').addEventListener('click',()=>this.quickSaveSpot());
       this.$('speciesInfoBtn').addEventListener('click',()=>this.openDialog('infoDialog'));
+      this.$('scoreBreakdownBtn')?.addEventListener('click',()=>this.$('scoreFactors')?.scrollIntoView({behavior:'smooth',block:'center'}));
       this.$('quickPlanBtn').addEventListener('click',()=>this.openPlanner());
       this.$('plannerBtn').addEventListener('click',()=>this.openPlanner());
       this.$('findBestTripBtn').addEventListener('click',()=>this.findBestTrip());
@@ -313,7 +315,7 @@
       this.state.data=this.buildDemoData();
       this.renderAll();
       this.recenterMap();
-      if(this.state.live) this.loadLiveData(); else this.showToast('Fishing location updated. Turn on Live Data for real forecasts.');
+      if(this.state.live) this.loadLiveData(); else {this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo'};this.renderSourceHealth();this.showToast('Fishing location updated. Turn on Live Data for real forecasts.');}
     },
 
     setLiveMode(enabled){
@@ -321,7 +323,7 @@
       this.$('liveModeToggle').checked=this.state.live;
       this.renderMode();
       if(this.state.live) this.loadLiveData();
-      else{this.state.data=this.buildDemoData();this.state.selectedTideStation=null;this.recalculateScores();this.renderAll();this.showToast('Demo Data is on.');}
+      else{this.state.data=this.buildDemoData();this.state.selectedTideStation=null;this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo'};this.recalculateScores();this.renderAll();this.showToast('Demo Data is on.');}
     },
 
     async loadLiveData({quiet=false}={}){
@@ -341,6 +343,7 @@
       const marine=results[1].status==='fulfilled'?results[1].value:null;
       const tideData=results[2].status==='fulfilled'?results[2].value:null;
       const shops=results[3].status==='fulfilled'&&Array.isArray(results[3].value)&&results[3].value.length?results[3].value:null;
+      this.state.sourceHealth={weather:weather?'live':'partial',marine:marine?'live':'partial',tides:tideData?'live':'partial',shops:shops?'live':'partial'};
       this.state.data=this.mergeLiveData(base,weather,marine,tideData,shops);
       this.recalculateScores();
       this.renderAll();
@@ -356,9 +359,9 @@
       const params=new URLSearchParams({
         latitude:String(lat),longitude:String(lon),timezone:'auto',forecast_days:'7',
         temperature_unit:'fahrenheit',wind_speed_unit:'mph',precipitation_unit:'inch',
-        current:'temperature_2m,apparent_temperature,weather_code,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl',
-        hourly:'temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl',
-        daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset'
+        current:'temperature_2m,apparent_temperature,relative_humidity_2m,cloud_cover,weather_code,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl',
+        hourly:'temperature_2m,apparent_temperature,relative_humidity_2m,cloud_cover,visibility,uv_index,weather_code,precipitation_probability,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl',
+        daily:'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset'
       });
       return this.fetchJSON('https://api.open-meteo.com/v1/forecast?'+params.toString(),14000);
     },
@@ -367,8 +370,8 @@
       const params=new URLSearchParams({
         latitude:String(lat),longitude:String(lon),timezone:'auto',forecast_days:'7',
         length_unit:'imperial',temperature_unit:'fahrenheit',
-        current:'wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,sea_surface_temperature',
-        hourly:'wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,swell_wave_period,sea_surface_temperature'
+        current:'wave_height,wave_direction,wave_period,wave_peak_period,swell_wave_height,swell_wave_direction,swell_wave_period,swell_wave_peak_period,sea_surface_temperature,ocean_current_velocity,ocean_current_direction',
+        hourly:'wave_height,wave_direction,wave_period,wave_peak_period,swell_wave_height,swell_wave_direction,swell_wave_period,swell_wave_peak_period,sea_surface_temperature,ocean_current_velocity,ocean_current_direction'
       });
       return this.fetchJSON('https://marine-api.open-meteo.com/v1/marine?'+params.toString(),14000);
     },
@@ -453,6 +456,8 @@
         out.current.feels=this.num(c.apparent_temperature,out.current.feels);
         out.current.weatherCode=this.num(c.weather_code,out.current.weatherCode);
         out.current.weather=this.weatherText(out.current.weatherCode);
+        out.current.humidity=this.num(c.relative_humidity_2m,out.current.humidity??65);
+        out.current.cloudCover=this.num(c.cloud_cover,out.current.cloudCover??30);
         out.current.windSpeed=this.num(c.wind_speed_10m,out.current.windSpeed);
         out.current.windDir=this.num(c.wind_direction_10m,out.current.windDir);
         out.current.windGust=this.num(c.wind_gusts_10m,out.current.windGust);
@@ -464,12 +469,13 @@
             temp:this.num(h.temperature_2m?.[i],72),feels:this.num(h.apparent_temperature?.[i],72),
             weatherCode:this.num(h.weather_code?.[i],2),rain:this.num(h.precipitation_probability?.[i],0),
             wind:this.num(h.wind_speed_10m?.[i],0),windDir:this.num(h.wind_direction_10m?.[i],0),gust:this.num(h.wind_gusts_10m?.[i],0),
-            pressure:this.num(h.pressure_msl?.[i],1015),wave:2,period:8,tide:'Moving',score:70
+            pressure:this.num(h.pressure_msl?.[i],1015),humidity:this.num(h.relative_humidity_2m?.[i],65),cloudCover:this.num(h.cloud_cover?.[i],30),visibility:this.num(h.visibility?.[i],16000),uv:this.num(h.uv_index?.[i],0),wave:2,period:8,tide:'Moving',score:70
           }));
           const nowHour=new Date(); nowHour.setMinutes(0,0,0);
           const firstFuture=out.hours.findIndex(x=>new Date(x.rawTime)>=nowHour);
           if(firstFuture>0) out.hours=out.hours.slice(firstFuture);
           out.current.rain=out.hours[0]?.rain??0;
+          out.current.visibility=out.hours[0]?.visibility??16000;out.current.uv=out.hours[0]?.uv??0;
         }
         const d=weather.daily||{};
         if(Array.isArray(d.time)){
@@ -478,7 +484,7 @@
             high:this.round(d.temperature_2m_max?.[i],78),low:this.round(d.temperature_2m_min?.[i],65),
             rain:this.round(d.precipitation_probability_max?.[i],0),wind:out.hours.find(hh=>hh.dateIndex===i)?.wind??8,
             windDir:out.hours.find(hh=>hh.dateIndex===i)?.windDir??0,wave:2,water:out.current.waterTemp,
-            sunrise:this.timeFromIso(d.sunrise?.[i])||'—',sunset:this.timeFromIso(d.sunset?.[i])||'—',score:70
+            sunrise:this.timeFromIso(d.sunrise?.[i])||'—',sunset:this.timeFromIso(d.sunset?.[i])||'—',uv:this.round(d.uv_index_max?.[i],0),score:70
           }));
           out.sun={sunrise:out.days[0]?.sunrise||'—',sunset:out.days[0]?.sunset||'—'};
         }
@@ -492,12 +498,16 @@
         out.current.swellDir=this.num(c.swell_wave_direction,out.current.swellDir);
         out.current.swellPeriod=this.num(c.swell_wave_period,out.current.swellPeriod);
         out.current.waterTemp=this.num(c.sea_surface_temperature,out.current.waterTemp);
+        out.current.oceanCurrent=this.num(c.ocean_current_velocity,out.current.oceanCurrent??0);
+        out.current.oceanCurrentDir=this.num(c.ocean_current_direction,out.current.oceanCurrentDir??0);
+        out.current.wavePeakPeriod=this.num(c.wave_peak_period,out.current.wavePeakPeriod??out.current.wavePeriod);
+        out.current.swellPeakPeriod=this.num(c.swell_wave_peak_period,out.current.swellPeakPeriod??out.current.swellPeriod);
         const mh=marine.hourly||{};
         if(Array.isArray(mh.time)){
-          const marineMap=new Map(mh.time.map((t,i)=>[t,{wave:this.num(mh.wave_height?.[i],2),waveDir:this.num(mh.wave_direction?.[i],0),period:this.num(mh.wave_period?.[i],8),swell:this.num(mh.swell_wave_height?.[i],1.5),swellDir:this.num(mh.swell_wave_direction?.[i],0),swellPeriod:this.num(mh.swell_wave_period?.[i],9),water:this.num(mh.sea_surface_temperature?.[i],out.current.waterTemp)}]));
+          const marineMap=new Map(mh.time.map((t,i)=>[t,{wave:this.num(mh.wave_height?.[i],2),waveDir:this.num(mh.wave_direction?.[i],0),period:this.num(mh.wave_period?.[i],8),wavePeak:this.num(mh.wave_peak_period?.[i],8),swell:this.num(mh.swell_wave_height?.[i],1.5),swellDir:this.num(mh.swell_wave_direction?.[i],0),swellPeriod:this.num(mh.swell_wave_period?.[i],9),swellPeak:this.num(mh.swell_wave_peak_period?.[i],9),water:this.num(mh.sea_surface_temperature?.[i],out.current.waterTemp),currentVelocity:this.num(mh.ocean_current_velocity?.[i],0),currentDir:this.num(mh.ocean_current_direction?.[i],0)}]));
           out.hours.forEach(h=>{
             const m=marineMap.get(h.rawTime); if(!m) return;
-            h.wave=m.wave;h.waveDir=m.waveDir;h.period=m.period;h.swell=m.swell;h.swellDir=m.swellDir;h.swellPeriod=m.swellPeriod;h.water=m.water;
+            h.wave=m.wave;h.waveDir=m.waveDir;h.period=m.period;h.wavePeak=m.wavePeak;h.swell=m.swell;h.swellDir=m.swellDir;h.swellPeriod=m.swellPeriod;h.swellPeak=m.swellPeak;h.water=m.water;h.currentVelocity=m.currentVelocity;h.currentDir=m.currentDir;
           });
           out.days.forEach((d,di)=>{
             const vals=out.hours.filter(h=>h.dateIndex===di&&Number.isFinite(h.wave));
@@ -570,7 +580,7 @@
 
     renderAll(){
       this.recalculateScores();
-      this.renderMode();this.renderLocation();this.renderScore();this.renderSpecies();this.renderConditions();this.renderFactors();
+      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderConditions();this.renderFactors();
       this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();
       if(this.state.view==='map') this.renderMapLayers();
     },
@@ -581,6 +591,13 @@
       this.$('modeText').textContent=this.state.live?'Live data':'Demo data';
       this.$('liveModeBtn').textContent=this.state.live?'Use demo':'Use live data';
       this.$('liveModeToggle').checked=this.state.live;
+    },
+
+    renderSourceHealth(){
+      const box=this.$('sourceHealth'); if(!box) return;
+      const h=this.state.sourceHealth||{};
+      const items=[['Weather',h.weather],['Marine',h.marine],['NOAA tides',h.tides],['Tackle',h.shops]];
+      box.innerHTML=items.map(([name,status])=>`<span class="source-chip ${status==='live'?'live':status==='partial'?'partial':''}">${this.escape(name)} · ${status==='live'?'Live':status==='partial'?'Fallback':'Demo'}</span>`).join('');
     },
 
     renderLocation(){
@@ -724,10 +741,15 @@
       this.$('detailPeriod').textContent=`${this.fmt(c.wavePeriod,0)} sec`;
       this.$('detailWaveDir').textContent=this.compass(c.waveDir);
       this.$('detailSwell').textContent=`${this.fmt(c.swellHeight,1)} ft @ ${this.fmt(c.swellPeriod,0)} sec`;
+      this.$('detailSwellDir').textContent=this.compass(c.swellDir);
+      this.$('detailCurrent').textContent=Number.isFinite(c.oceanCurrent)&&c.oceanCurrent>0?`${this.fmt(c.oceanCurrent,1)} mph → ${this.compass(c.oceanCurrentDir)}`:'Not available';
       this.$('detailWater').textContent=`${this.fmt(c.waterTemp,0)}°F`;
       this.$('detailSunrise').textContent=selected?.sunrise||d.sun?.sunrise||'—';
       this.$('detailSunset').textContent=selected?.sunset||d.sun?.sunset||'—';
       this.$('detailRain').textContent=`${this.fmt(selected?.rain??c.rain,0)}%`;
+      this.$('detailHumidity').textContent=Number.isFinite(c.humidity)?`${this.fmt(c.humidity,0)}%`:'—';
+      this.$('detailVisibility').textContent=Number.isFinite(c.visibility)?`${this.fmt(c.visibility/1609.344,1)} mi`:'—';
+      this.$('detailUV').textContent=Number.isFinite(selected?.uv)?this.fmt(selected.uv,0):Number.isFinite(c.uv)?this.fmt(c.uv,0):'—';
       this.$('detailPressure').textContent=`${this.fmt(this.hpaToInHg(c.pressure),2)} in`;
       this.$('detailMoon').textContent=this.moonPhase();
     },
@@ -740,6 +762,8 @@
       if(c.windSpeed>=12)items.push(['Heavier sinkers / wind-ready rigging',false]);
       if(c.waveHeight>=3.5)items.push(['Review surf safety before entering the water',false]);
       if(c.temp<60)items.push(['Warm layers',false]); else items.push(['Breathable clothing',false]);
+      if((c.uv??0)>=6)items.push(['High-SPF sunscreen / UV protection',false]);
+      if((c.visibility??16000)<5000)items.push(['Low-visibility safety plan / lights',false]);
       items.push(['First-aid kit and trip safety plan',false]);
       this.$('tripChecklist').innerHTML=items.map(x=>`<label class="check-row"><input type="checkbox" ${x[1]?'checked':''}/><span>${this.escape(x[0])}</span></label>`).join('');
     },
@@ -841,7 +865,7 @@
 
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
-      try{localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
+      try{localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
       this.state.live=false;this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 

@@ -1,26 +1,26 @@
-# CoastCast Brand Guide
+# CoastCast Brand Guide — v0.5
 
-**Name:** CoastCast
-
-**Descriptor:** Fishing Forecast
-
+**Brand:** COASTCAST
+**Descriptor:** FISHING FORECAST
 **Tagline:** Plan Smarter. Fish Better.
 
-## Core palette
-- Deep Navy — `#0B1D2E`
-- Midnight — `#071724`
-- Ocean Blue — `#16334A`
-- Aqua — `#00B4C1`
-- Seafoam — `#7EE6C6`
-- Sky Blue — `#4DA6FF`
-- Sand Gold — `#FFB347`
-- Mist — `#E6F2F7`
-
-## Visual language
-Use the fish-wave-location-pin mark as the primary app icon. Dark navy is the dominant product background. Aqua is the main action/selection color, Sky Blue is used for marine/tide data, Seafoam is positive/prime fishing status, and Sand Gold is warning/secondary emphasis.
+## Palette
+- Deep Navy `#0B1320`
+- Midnight `#07111C`
+- Ocean Blue `#0F2D46`
+- Aqua `#119DB2`
+- Seafoam `#4FDFB5`
+- Sky `#7BB8FF`
+- Sand `#E6C99A`
+- Mist `#EEF8FF`
 
 ## Typography
-Use condensed, bold uppercase typography for COASTCAST headings/wordmark and a clean modern sans-serif for body copy. The web app uses Android/iOS-safe system fallbacks so it remains fast and reliable.
+- Headline/brand style: Barlow Condensed Bold
+- UI/body: Inter
+- System fallbacks remain in the app so it is still usable if Google Fonts is unavailable.
 
-## Usage
-Keep clear space around the mark. Do not stretch it, rotate it, recolor individual fish/wave pieces randomly, or place it on low-contrast backgrounds.
+## Mark
+The mark combines four ideas: compass/orientation, fish, ocean waves, and a location pin. Use the transparent mark in product headers and the rounded-square icon for PWA/app-store contexts.
+
+## Product style
+Dark, high-confidence marine navigation aesthetic. Use restrained aqua/seafoam accents for selection and status. Avoid neon overload, cartoon fish art, oversized emojis, glossy gaming effects, and crowded card layouts.

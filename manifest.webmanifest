@@ -1,14 +1,14 @@
 {
   "name": "CoastCast Fishing Forecast",
   "short_name": "CoastCast",
-  "description": "Plan smarter fishing trips with tides, weather, wind, surf, species insights, trip planning, catches and nearby bait & tackle.",
+  "description": "Professional coastal fishing planner with live weather, wind, tides, surf, water temperature, species scoring, trip planning, maps, bait shops and catch logbook.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#071724",
-  "theme_color": "#0B1D2E",
+  "background_color": "#07111C",
+  "theme_color": "#0B1320",
   "icons": [
     {
       "src": "icon-192.png",

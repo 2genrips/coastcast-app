@@ -1,19 +1,11 @@
-# CoastCast v0.4 — Android / GitHub Pages
+# CoastCast v0.5 — Android update
 
-This package is designed to replace the files in your existing CoastCast GitHub Pages repository.
+1. Download and extract `coastcast_v0.5_professional_live.zip`.
+2. Open your existing CoastCast GitHub repository in Chrome.
+3. Tap **Add file → Upload files**.
+4. Upload every file from inside the extracted v0.5 folder, including the `branding` folder.
+5. Commit the changes to `main`.
+6. Wait for GitHub Pages to redeploy, then reopen the same CoastCast URL/app icon.
+7. If v0.4 is still cached, close CoastCast completely, refresh the GitHub Pages version once in Chrome, then reopen the installed app.
 
-## Update from Android
-1. Download and extract `coastcast_v0.4_branded.zip`.
-2. Open your CoastCast repository at github.com in Chrome.
-3. Open the repo root (the same place where `index.html` is visible).
-4. Tap **Add file → Upload files**.
-5. Upload all files and the `branding` folder from this package.
-6. Commit the changes to the `main` branch.
-7. Open your existing GitHub Pages CoastCast URL.
-8. If the old version is cached, fully close CoastCast and reopen it. If needed, refresh the browser version once.
-
-## Important
-Do not create a second nested folder in the repository. `index.html`, `styles.css`, `app.js`, `manifest.webmanifest` and `sw.js` should remain at the root.
-
-## Brand files
-The `branding` folder contains the reusable CoastCast mark, wordmark, social graphic source and brand guide.
+Important: keep `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, and `sw.js` at the repository root. Do not upload the ZIP itself as the app.

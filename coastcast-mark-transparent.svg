@@ -1,14 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="t d">
-<title id="t">CoastCast mark</title><desc id="d">A location pin combining a compass, fish and ocean waves.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+<title id="title">CoastCast</title><desc id="desc">Compass, fish, wave and location point mark.</desc>
 <defs>
-  <linearGradient id="ocean" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4DA6FF"/><stop offset=".48" stop-color="#00B4C1"/><stop offset="1" stop-color="#7EE6C6"/></linearGradient>
-  <linearGradient id="deep" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#102F46"/><stop offset="1" stop-color="#071724"/></linearGradient>
+  <linearGradient id="ring" x1="38" y1="30" x2="208" y2="224" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#BDEBFF"/><stop offset=".33" stop-color="#6FC8F7"/><stop offset=".68" stop-color="#2DA7D6"/><stop offset="1" stop-color="#4FDFB5"/>
+  </linearGradient>
+  <linearGradient id="wave" x1="63" y1="144" x2="191" y2="186"><stop stop-color="#7BB8FF"/><stop offset="1" stop-color="#119DB2"/></linearGradient>
 </defs>
-
-<path d="M128 28c-49 0-88 39-88 87 0 63 88 116 88 116s88-53 88-116c0-48-39-87-88-87Z" fill="none" stroke="url(#ocean)" stroke-width="14" stroke-linecap="round"/>
-<path d="M128 44l8 24-8-5-8 5 8-24Z" fill="#E6F2F7"/>
-<path d="M71 112c17-23 44-34 75-24 13 4 23 11 31 18l19-11-6 18 6 18-19-11c-12 11-28 18-47 18-25 0-45-10-59-26Z" fill="#E6F2F7"/>
-<circle cx="151" cy="105" r="4" fill="#0B1D2E"/>
-<path d="M62 153c20-16 38-14 58 0s38 16 73-1" fill="none" stroke="#4DA6FF" stroke-width="10" stroke-linecap="round"/>
-<path d="M73 174c17-11 32-10 48 1s32 12 59-1" fill="none" stroke="#00B4C1" stroke-width="10" stroke-linecap="round"/>
+<!-- compass/pin silhouette -->
+<path d="M128 24c-54 0-98 43-98 96 0 69 98 116 98 116s98-47 98-116c0-53-44-96-98-96Z" fill="none" stroke="url(#ring)" stroke-width="11" stroke-linejoin="round"/>
+<circle cx="128" cy="119" r="69" fill="none" stroke="#DDF5FF" stroke-opacity=".2" stroke-width="3"/>
+<path d="M128 20l8 35-8-6-8 6 8-35Z" fill="#EAF8FF"/>
+<path d="M128 219l-7-23 7 5 7-5-7 23Z" fill="#69C8E9" opacity=".9"/>
+<path d="M31 119l27-7-5 7 5 7-27-7ZM225 119l-27-7 5 7-5 7 27-7Z" fill="#7CCBEA" opacity=".82"/>
+<!-- fish -->
+<path d="M69 110c16-21 40-32 69-26 17 3 31 11 43 22l22-14-7 22 7 22-22-14c-12 11-27 18-45 20-29 3-53-8-67-32Z" fill="#DFF6FF"/>
+<path d="M87 108c13-11 29-16 47-15" fill="none" stroke="#89D7F4" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+<circle cx="158" cy="103" r="4.8" fill="#0B1320"/>
+<!-- waves -->
+<path d="M62 153c22-17 42-15 63 0 21 15 42 16 70-2" fill="none" stroke="url(#wave)" stroke-width="10" stroke-linecap="round"/>
+<path d="M73 174c18-11 35-10 52 1 17 11 34 12 57-1" fill="none" stroke="#4FDFB5" stroke-width="9" stroke-linecap="round"/>
 </svg>

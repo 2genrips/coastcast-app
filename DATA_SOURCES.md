@@ -1,19 +1,16 @@
-# CoastCast v0.4 Data Sources
+# CoastCast v0.5 data sources
 
-## Weather
-Open-Meteo Forecast API
-https://open-meteo.com/en/docs
+## Live weather
+Open-Meteo Forecast API provides temperature, feels-like temperature, precipitation probability, wind, gusts, pressure, humidity, cloud cover, visibility, UV and sunrise/sunset data.
 
-## Marine
-Open-Meteo Marine API
-https://open-meteo.com/en/docs/marine-weather-api
+## Marine forecast
+Open-Meteo Marine API provides wave height/direction/period, swell data, sea-surface temperature and ocean-current fields when the model has coverage. Marine forecasts are model guidance and must not be treated as navigation data.
 
 ## Tides
-NOAA CO-OPS Metadata API and Data API
-https://api.tidesandcurrents.noaa.gov/mdapi/prod/
-https://api.tidesandcurrents.noaa.gov/api/prod/
+NOAA CO-OPS Data API provides tide predictions. CoastCast finds a nearby NOAA tide-prediction station and requests high/low predictions in English units.
 
-## Map / geocoding / nearby prototype search
-OpenStreetMap data, Leaflet map library, Nominatim geocoding, Overpass API.
+## Places
+OpenStreetMap Nominatim is used for location search/reverse geocoding. OpenStreetMap Overpass is used for nearby fishing/outdoor/bait/tackle results. Coverage varies by area.
 
-Production note: public community endpoints and public tile/geocoding services have usage policies and capacity limits. A commercial CoastCast release should move these functions behind a proper backend/provider arrangement.
+## Fallback behavior
+CoastCast keeps demo/fallback values when a live service is unavailable, and v0.5 displays source-status chips so you can see which categories are actually live.
