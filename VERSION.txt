@@ -1,2 +1,2 @@
-CoastCast v1.7.0
-Tackle Box + Offline Trip Pack + Catch Photo Log
+CoastCast v1.8.0
+Community + Catch Cards + Challenges

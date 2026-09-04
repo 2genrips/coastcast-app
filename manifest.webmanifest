@@ -1,7 +1,7 @@
 {
   "name": "CoastCast Fishing Forecast",
   "short_name": "CoastCast",
-  "description": "Nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, NWS alerts, Beach Readiness, Catch Forecast Timeline, Smart Departure, Scout, species intelligence, tackle inventory, offline trip packs and catch photos.",
+  "description": "Nationwide coastal fishing planner with live weather, NOAA tides, species intelligence, Scout, trips, tackle inventory, offline packs, catch photos, Community Beta, shareable catch cards and challenges.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
@@ -61,6 +61,17 @@
       "name": "Log Catch",
       "short_name": "Log Catch",
       "url": "./index.html#logbook",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "CoastCast Community",
+      "short_name": "Community",
+      "url": "./index.html#community",
       "icons": [
         {
           "src": "icon-192.png",

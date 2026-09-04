@@ -1,21 +1,17 @@
-# CoastCast v1.7 — What Changed
+# CoastCast v1.8 — Community + Catch Cards + Challenges
 
-## My Tackle Box
-- Track bait, lures, rigs, weights, hooks, leader, safety gear and other supplies.
-- Quantity controls with READY / LOW / OUT status.
-- Build a trip shopping list from low-stock items plus the current CoastCast bait and gear plan.
+## New
+- Branded 1080×1350 CoastCast catch-card generator
+- Android share-sheet support with download fallback
+- Explicit catch-share location precision: Hidden / General Water / Exact Spot
+- Community Beta with Local Preview mode that works without a backend
+- Optional Supabase-backed public catch feed
+- Cloud likes/reactions when Community tables are installed
+- Nearby / My Posts / Challenges tabs
+- Weekly challenge progress and CoastCast XP
+- Achievement badges driven by catches, photos, species, locations and completed sessions
+- Catch-card button directly on Logbook catch cards
+- Community state included in Backup and Cloud Sync
 
-## Offline Trip Pack
-- Save a compact trip snapshot before entering weak-service areas.
-- Stores location, target species, CoastCast score, Beach Readiness, weather, wind, surf, water temperature, bait/rig plan, departure timing, Safety Guard and tide snapshot.
-- Offline packs remain on the device and are included in CoastCast backup/cloud payloads.
-
-## Catch Photo Log
-- Add an optional catch photo from Android camera/gallery.
-- Photos are resized and compressed before local storage.
-- New Photo Memories section in Logbook.
-- Catch cards display saved photos.
-
-## Data
-- v1.7 local state migrates automatically from v1.6 and earlier.
-- Tackle inventory, shopping list, offline packs and catch photos are included in backup/cloud sync payloads.
+## Privacy
+Publishing is now an explicit action. A catch being stored in the logbook does not automatically make it a Community post. General Water is the default and Exact Spot requires a catch saved as Public.

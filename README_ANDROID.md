@@ -1,19 +1,20 @@
-# CoastCast v1.7 — Android Update
+# CoastCast v1.8 — Android Update
 
-1. Extract this ZIP on Android.
-2. Upload everything inside the `coastcast_v1.7` folder to the root of your existing CoastCast GitHub repository.
-3. Replace matching files and commit to `main`.
-4. Wait for GitHub Pages to deploy.
-5. Fully close CoastCast and reopen it. If v1.6 remains cached, refresh the GitHub Pages site once in Chrome.
+1. Extract the CoastCast v1.8 ZIP in **My Files**.
+2. Open your existing CoastCast GitHub repository in Chrome.
+3. Choose **Add file → Upload files**.
+4. Upload everything inside the `coastcast_v1.8` folder and replace matching files.
+5. Commit to `main`.
+6. Wait for GitHub Pages to redeploy.
+7. Fully close CoastCast and reopen it.
+
+Your v1.7 catches, tackle box, offline packs, photos, trips, profile and cloud settings migrate forward.
 
 ## First test
-1. Trips → My Tackle Box → add 2–3 items and lower one quantity until it shows LOW or OUT.
-2. Tap **Build shopping list**.
-3. Trips → **Save current trip for offline use** → open the saved pack.
-4. Logbook → **+ Catch** → attach a photo from your camera/gallery → save.
-5. Confirm the photo appears in **Photo Memories** and Recent Catches.
-
-Existing v1.6 catches, trips, favorites, alerts, profile, gear checks, regulation-review records, Scout data and departure settings migrate automatically.
-
-## Storage note
-Catch photos are resized/compressed for phone storage. Keep photo logging reasonable and export a CoastCast backup before clearing browser/app data.
+- Open **Community** from Trips.
+- Tap **Create catch card**.
+- Pick a logged catch.
+- Keep **General water area** selected.
+- Tap **Generate card → Share image**.
+- Tap **Publish to Community**. Without Supabase this appears in Local Preview; with the v1.8 SQL installed it publishes to Cloud Community Beta.
+- Open **Challenges** to see progress and badges from your existing logbook.

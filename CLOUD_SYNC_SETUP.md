@@ -1,33 +1,29 @@
-# CoastCast v1.1 — Cloud Sync Setup (Supabase)
+# CoastCast v1.8 — Cloud Sync + Community Beta
 
-Cloud sync is **optional**. The app continues to work locally without it.
+Cloud Sync is optional. CoastCast still works locally without Supabase.
 
-## One-time setup
+## Existing users upgrading from v1.7
+Run the new `SUPABASE_SETUP.sql` once in your existing Supabase project. It keeps the private `coastcast_user_data` table and adds:
 
-1. Create/open your Supabase project.
-2. Open **SQL Editor** in Supabase.
-3. Paste the contents of `SUPABASE_SETUP.sql` and run it.
-4. In Supabase, copy your **Project URL** and your **anon / publishable key**.
-   - Never use a service-role key in CoastCast.
-5. In CoastCast open **Profile → Cloud setup**.
-6. Paste the Project URL and anon/publishable key.
-7. Enter an email and password. Use **Create account**, then **Sign in** if email confirmation is required.
-8. Return to Profile and tap **Sync now**.
+- `community_catches` — public catch posts created only when an angler taps **Publish to Community**
+- `community_reactions` — Community Beta likes
 
-## What syncs
+## Setup from Android
+1. Open your Supabase project in Chrome.
+2. Open **SQL Editor**.
+3. Paste the complete contents of `SUPABASE_SETUP.sql` and run it.
+4. In CoastCast open **Profile → Cloud Sync**.
+5. Enter your project URL and anon/publishable key, then sign in.
+6. Open **Community → Refresh**.
 
-- Profile
-- Fishing destination/preferences
-- Saved fishing spots
-- Catch logbook
-- Saved trips
-- Smart alert rules
+## Privacy model
+- Private catches remain private in your CoastCast logbook.
+- Publishing to Community is a separate explicit action.
+- **General water area** is the default share precision.
+- General posts round map coordinates before upload and display only the generalized location label.
+- **Hidden** uploads no public latitude/longitude.
+- **Exact spot** is accepted only when the saved catch itself is marked Public.
+- A CoastCast catch-card image never prints raw coordinates.
 
-Your Supabase password is never saved by CoastCast. The project URL and anon/publishable key can be remembered locally because they are browser-client configuration, not admin credentials.
-
-## Background alerts
-
-v1.1 makes the service worker push-ready, but **24/7 alerts still require a backend worker plus web-push delivery**. The current app does not claim to monitor forecasts while fully closed.
-
-
-v1.7 sync payloads can include tackle inventory, shopping lists, offline trip packs and compressed catch photos. Large photo-heavy backups may increase Supabase row size; keep catch photos compressed and reasonable in number.
+## Photos
+Community Beta can store the already-compressed catch photo directly in a post for testing. This is suitable for a beta, but before a large public launch CoastCast should move community photos to Supabase Storage/CDN instead of database text rows.

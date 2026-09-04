@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, NWS safety alerts, Beach Readiness, species and bait intelligence, Scout spot ranking, tackle inventory, offline trip packs, catch photos, live sessions, trips and a private logbook." />
+  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, Scout, trips, tackle inventory, offline packs, catch photos, shareable catch cards, Community Beta and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -13,10 +13,10 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="CoastCast" />
   <meta property="og:title" content="CoastCast Fishing Forecast" />
-  <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
+  <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=1.7.0" />
+  <link rel="stylesheet" href="styles.css?v=1.8.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -909,12 +909,20 @@
       <section class="view" data-view="community" id="view-community">
         <div class="page-head">
           <div>
-            <div class="eyebrow">DISCOVER</div>
-            <h1>Local catches</h1>
-            <p class="page-subtitle">A privacy-aware community feed around the water you care about.</p>
+            <div class="eyebrow">COASTCAST COMMUNITY BETA</div>
+            <h1>Catches, cards & challenges</h1>
+            <p class="page-subtitle">Share the catch, not your honey hole. CoastCast keeps location precision in your control.</p>
           </div>
-          <button id="shareCatchBtn" class="primary-button small" type="button">Share catch</button>
+          <button id="shareCatchBtn" class="primary-button small" type="button">Create catch card</button>
         </div>
+
+        <section class="panel community-mode-panel">
+          <div class="community-mode-copy">
+            <div><span id="communityModeBadge" class="status-pill">LOCAL PREVIEW</span><strong id="communityModeTitle">Community preview on this device</strong></div>
+            <p id="communityModeText">Your public-looking feed is local until you connect Supabase Community Beta. Catch cards can be shared from Android right now.</p>
+          </div>
+          <button id="communityRefreshBtn" class="secondary-button small" type="button">Refresh</button>
+        </section>
 
         <section class="panel community-controls">
           <div class="community-filter-row">
@@ -923,14 +931,33 @@
             </select>
             <select id="communityRadiusFilter" class="select-control" aria-label="Community radius">
               <option value="10">Within 10 mi</option>
-              <option value="25">Within 25 mi</option>
+              <option value="25" selected>Within 25 mi</option>
               <option value="50">Within 50 mi</option>
             </select>
           </div>
-          <div class="privacy-note">📍 Exact catch coordinates stay hidden unless the angler chooses to share them.</div>
+          <div class="community-tab-row" role="tablist" aria-label="Community sections">
+            <button class="community-tab active" type="button" data-community-tab="feed">Nearby</button>
+            <button class="community-tab" type="button" data-community-tab="mine">My posts</button>
+            <button class="community-tab" type="button" data-community-tab="challenges">Challenges</button>
+          </div>
+          <div class="privacy-note">📍 Catch cards default to a generalized water area. Exact coordinates are never added unless you explicitly choose Exact Spot.</div>
         </section>
 
-        <div id="communityFeed" class="community-feed"></div>
+        <section id="communityFeedPanel">
+          <div id="communityFeed" class="community-feed"></div>
+        </section>
+
+        <section id="communityChallengesPanel" hidden>
+          <section class="panel challenge-hero">
+            <div><div class="eyebrow">WEEKLY PROGRESS</div><h2>Fish more. Learn more.</h2><p>Challenges are based on your own CoastCast logbook and trips. No leaderboard pressure required.</p></div>
+            <div id="communityChallengeScore" class="challenge-score"><strong>0</strong><span>XP</span></div>
+          </section>
+          <div id="communityChallenges" class="challenge-grid"></div>
+          <section class="panel">
+            <div class="section-title-row"><div><div class="eyebrow">BADGES</div><h2>Your CoastCast milestones</h2></div><span id="communityBadgeCount" class="tiny-pill">0 unlocked</span></div>
+            <div id="communityBadges" class="badge-grid"></div>
+          </section>
+        </section>
       </section>
       <footer class="app-trust-footer"><svg class="footer-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9 3 4 8.5 4 15.5 4 24.5 16 29 16 29s12-4.5 12-13.5C28 8.5 23 3 16 3Z" fill="none" stroke="#69C9E8" stroke-width="1.8"/><path d="M8.5 15c3-4 7-5 11-2l4-2-1 4 1 4-4-2c-4 3-8 2-11-2Z" fill="#DFF6FF"/><path d="M9 22c4-2 6-2 9 0 3 2 5 2 8 0" fill="none" stroke="#4FDFB5" stroke-width="1.6" stroke-linecap="round"/></svg><div><strong>COASTCAST</strong><span>Plan Smarter. Fish Better.</span></div><small>Forecast guidance only. Always check local safety conditions.</small></footer>
     </main>
@@ -977,6 +1004,36 @@
       <label class="field-group"><span>Notes</span><textarea id="waypointNotes" class="text-control textarea" maxlength="240" placeholder="Access, structure, parking, bait, etc."></textarea></label>
       <label class="field-group"><span>Privacy</span><select id="waypointPrivacy" class="select-control"><option value="private">Private</option><option value="water">Water name only</option><option value="public">Public</option></select></label>
       <div class="sheet-actions"><button class="secondary-button" value="cancel" type="submit">Cancel</button><button id="saveWaypointBtn" class="primary-button" type="button">Save spot</button></div>
+    </form>
+  </dialog>
+
+
+
+  <!-- SHARE CATCH CARD DIALOG -->
+  <dialog id="shareCatchDialog" class="sheet-dialog">
+    <form class="sheet-card share-card-sheet" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">COASTCAST CATCH CARD</div><h2>Share your catch</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <label class="field-group"><span>Logged catch</span><select id="shareCatchSelect" class="select-control"></select></label>
+      <label class="field-group"><span>Location shown on card</span>
+        <select id="shareLocationPrecision" class="select-control">
+          <option value="general" selected>General water area — recommended</option>
+          <option value="hidden">Hide location</option>
+          <option value="exact">Exact spot — public catches only</option>
+        </select>
+      </label>
+      <label class="field-group"><span>Caption</span><textarea id="shareCatchCaption" class="text-control textarea" maxlength="220" placeholder="Incoming tide did the work. Released healthy."></textarea></label>
+      <div id="shareCatchPreview" class="share-catch-preview">
+        <div class="share-preview-empty">Choose a logged catch to preview your CoastCast card.</div>
+      </div>
+      <div id="shareCatchStatus" class="privacy-note">The generated image never contains hidden coordinates.</div>
+      <div class="share-card-actions">
+        <button id="generateCatchCardBtn" class="secondary-button" type="button">Generate card</button>
+        <button id="publishCommunityBtn" class="secondary-button" type="button">Publish to Community</button>
+        <button id="shareCatchImageBtn" class="primary-button" type="button" disabled>Share image</button>
+      </div>
     </form>
   </dialog>
 
@@ -1131,7 +1188,7 @@
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
       <label class="field-group"><span>Nearby shop radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <div class="settings-note">CoastCast v1.7 Beta is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
+      <div class="settings-note">CoastCast v1.8 Beta is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -1158,6 +1215,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=1.7.0"></script>
+  <script src="app.js?v=1.8.0"></script>
 </body>
 </html>
