@@ -106,6 +106,8 @@
       this.ensureCatchDate();
       this.state.data = this.buildDemoData();
       this.renderAll();
+      const startView=(location.hash||'').replace('#','');
+      if(['forecast','map','logbook','community'].includes(startView)) this.navigate(startView);
       this.registerServiceWorker();
       if(this.state.live) this.loadLiveData({quiet:true});
     },
@@ -116,7 +118,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -136,7 +138,7 @@
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
         waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips
       };
-      try{ localStorage.setItem('coastcast-v3-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v4-state',JSON.stringify(payload)); }catch(_){ }
     },
 
     bindNavigation(){
@@ -839,7 +841,7 @@
 
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
-      try{localStorage.removeItem('coastcast-v3-state');}catch(_){ }
+      try{localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
       this.state.live=false;this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 

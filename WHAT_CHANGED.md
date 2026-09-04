@@ -1,27 +1,17 @@
-# CoastCast v0.3 Professional Dashboard
+# CoastCast v0.4 — Branded UI
 
-## Added / upgraded
+## Brand system
+- Official CoastCast fish + wave + location-pin mark
+- Deep navy / ocean blue / aqua / seafoam palette
+- COASTCAST wordmark and “Plan Smarter. Fish Better.” tagline
+- New Android/PWA icons, Apple touch icon, favicon and social share card
+- Matching navigation icons and refined dashboard styling
 
-- Professional Android-first dark coastal UI
-- Home fishing intelligence dashboard
-- 0–100 fishing score with real scoring logic
-- Species Mode with species-adjusted water/surf/tide preferences
-- Best fishing window calculation from hourly scores
-- Weather: temperature, feels-like, condition and rain risk
-- Wind: speed, direction and gusts
-- Marine: wave height, period/direction, swell and water temperature
-- Pressure display
-- NOAA high/low tide integration scaffold + tide chart
-- Seven-day trip ranking
-- Smart Trip Planner with target species, preferred session and max-wind preference
-- Interactive Leaflet/OpenStreetMap map
-- Saved fishing waypoints with privacy level
-- Nearby bait/tackle discovery around the fishing destination
-- Google Maps directions links for shops
-- Catch logbook with length, weight, bait/lure, notes and privacy
-- Automatic conditions snapshot saved with catches
-- Personal logbook insights scaffold
-- Privacy-aware community feed concept
-- Live Data / Demo Data fallback architecture
-- Mobile location search and phone GPS support
-- Updated PWA cache and install metadata
+## App improvements
+- Preserves all v0.3 fishing, forecast, map, bait-shop, species, trip, catch-log and community features
+- Migrates saved v0.3 local data into v0.4 automatically
+- Adds PWA shortcuts for Forecast, Map and Logbook
+- Updated service-worker cache to force the branded release to refresh
+
+## Files you upload to GitHub
+Upload everything from this ZIP to the root of the existing CoastCast repo and commit to `main`.

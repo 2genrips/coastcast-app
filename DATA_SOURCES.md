@@ -1,4 +1,4 @@
-# CoastCast v0.3 Data Sources
+# CoastCast v0.4 Data Sources
 
 ## Weather
 Open-Meteo Forecast API

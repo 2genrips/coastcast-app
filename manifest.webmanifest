@@ -1,16 +1,61 @@
 {
-  "name": "CoastCast Fishing Planner",
+  "name": "CoastCast Fishing Forecast",
   "short_name": "CoastCast",
-  "description": "Fishing-first coastal trip planner with weather, tides, wind, surf, species scoring, maps, bait shops, logbook and community tools.",
+  "description": "Plan smarter fishing trips with tides, weather, wind, surf, species insights, trip planning, catches and nearby bait & tackle.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#06131d",
-  "theme_color": "#061722",
+  "background_color": "#071724",
+  "theme_color": "#0B1D2E",
   "icons": [
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Forecast",
+      "short_name": "Forecast",
+      "url": "./index.html#forecast",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Fishing Map",
+      "short_name": "Map",
+      "url": "./index.html#map",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Log Catch",
+      "short_name": "Log Catch",
+      "url": "./index.html#logbook",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }

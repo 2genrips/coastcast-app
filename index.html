@@ -3,12 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#061722" />
+  <meta name="theme-color" content="#0B1D2E" />
   <meta name="description" content="CoastCast is a fishing-first coastal trip planner with live weather, marine conditions, tides, fishing scores, species mode, maps, bait shops and a personal catch logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="CoastCast" />
+  <meta property="og:title" content="CoastCast Fishing Forecast" />
+  <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
+  <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
   <title>CoastCast</title>
@@ -16,11 +22,11 @@
 <body>
   <div id="app" class="app-shell">
     <header class="topbar">
-      <div class="brand-lockup" aria-label="CoastCast">
+      <div class="brand-lockup" aria-label="CoastCast Fishing Forecast">
         <img src="icon.svg" alt="" class="brand-icon" />
-        <div>
-          <div class="brand-name">COASTCAST</div>
-          <div class="brand-kicker">FISH SMARTER</div>
+        <div class="brand-copy">
+          <div class="brand-name"><span>COAST</span><b>CAST</b></div>
+          <div class="brand-kicker">FISHING FORECAST</div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -416,11 +422,11 @@
     </main>
 
     <nav class="bottom-nav" aria-label="Primary navigation">
-      <button class="nav-button active" type="button" data-view-target="home"><span>⌂</span><small>Home</small></button>
-      <button class="nav-button" type="button" data-view-target="forecast"><span>≋</span><small>Forecast</small></button>
-      <button class="nav-button" type="button" data-view-target="map"><span>⌖</span><small>Map</small></button>
-      <button class="nav-button" type="button" data-view-target="logbook"><span>◫</span><small>Logbook</small></button>
-      <button class="nav-button" type="button" data-view-target="community"><span>♧</span><small>Community</small></button>
+      <button class="nav-button active" type="button" data-view-target="home"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5v8a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><small>Home</small></button>
+      <button class="nav-button" type="button" data-view-target="forecast"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17c2.2-3.2 4.2-4.5 6.2-3.8 2 .7 3.5.1 4.6-1.8C16 9.4 17.8 8 20 7"/><path d="M4 7h5M4 11h3M4 21h16"/></svg></span><small>Forecast</small></button>
+      <button class="nav-button nav-map" type="button" data-view-target="map"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.1 7-13a7 7 0 1 0-14 0c0 6.9 7 13 7 13Z"/><circle cx="12" cy="9" r="2.5"/></svg></span><small>Map</small></button>
+      <button class="nav-button" type="button" data-view-target="logbook"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12a1 1 0 0 1 1 1v15H7a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Z"/><path d="M8 8h8M8 12h6M8 16h5"/></svg></span><small>Logbook</small></button>
+      <button class="nav-button" type="button" data-view-target="community"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3 20c.5-4 2.5-6 6-6s5.5 2 6 6M14 15c3.5-.5 5.8 1.1 7 4.5"/></svg></span><small>Community</small></button>
     </nav>
   </div>
 

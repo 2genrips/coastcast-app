@@ -1,1 +1,1 @@
-CoastCast v0.3.0 - Professional Dashboard
+CoastCast v0.4.0 — Branded UI
