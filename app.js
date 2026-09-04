@@ -14,6 +14,7 @@
       waypoints: [],
       catches: [],
       trips: 0,
+      savedTripPlans: [],
       data: null,
       map: null,
       mapLayers: { spots: [], catches: [], shops: [], current: [], recommended: [], access: [] },
@@ -88,6 +89,57 @@
       'Bonefish': { icon:'B', abbr:'BO', water:[74,86], tideBias:6, waveIdeal:[0.2,2.5], note:'Warm shallow water and moving flats tides score higher in Hawaiʻi.' },
       'Trevally': { icon:'G', abbr:'GT', water:[74,86], tideBias:6, waveIdeal:[0.5,4], note:'Warm water, current and bait movement receive stronger weight in Hawaiʻi.' }
     },
+
+
+    speciesExtras: {
+      'Red Drum': {bait:['cut mullet','shrimp','paddletail'],habitat:'surf troughs, cuts, inlets and current edges'},
+      'Speckled Trout': {bait:['paddletail','topwater','live shrimp'],habitat:'clean moving water, grass edges and current seams'},
+      'Flounder': {bait:['mud minnow','finger mullet','bucktail'],habitat:'bottom structure, inlet edges and sandy drop-offs'},
+      'Bluefish': {bait:['metal spoon','cut bait','topwater'],habitat:'bait schools, working surf and current rips'},
+      'Spanish Mackerel': {bait:['metal spoon','Got-Cha plug','small live bait'],habitat:'clean nearshore water, piers and bait schools'},
+      'Black Drum': {bait:['shrimp','crab','clam'],habitat:'structure, channels, bridges and shell bottom'},
+      'Sheepshead': {bait:['fiddler crab','shrimp','barnacle'],habitat:'pilings, rocks, jetties and bridge structure'},
+      'Striped Bass': {bait:['bunker','bucktail','swimbait'],habitat:'rips, inlets, rocky shoreline and bait concentrations'},
+      'Pompano': {bait:['sand flea','shrimp','Fishbites'],habitat:'clean sandy surf, troughs and bars'},
+      'Snook': {bait:['live pilchard','shrimp','paddletail'],habitat:'inlets, passes, bridges and beach structure'},
+      'Tarpon': {bait:['live crab','mullet','swimbait'],habitat:'passes, beaches, channels and bait concentrations'},
+      'Surfperch': {bait:['sand crab','Gulp worm','shrimp'],habitat:'sandy troughs, cuts and working Pacific surf'},
+      'California Halibut': {bait:['live bait','swimbait','drop-shot'],habitat:'sandy flats, channels and current edges'},
+      'Lingcod': {bait:['swimbait','jig','live bait'],habitat:'rocky reefs, kelp edges and structure'},
+      'Rockfish': {bait:['jig','shrimp fly','swimbait'],habitat:'rock piles, reefs, kelp and deeper structure'},
+      'Pacific Halibut': {bait:['herring','salmon belly','jig'],habitat:'deeper flats, ledges and current breaks'},
+      'Salmon': {bait:['herring','spoon','spinner'],habitat:'coastal current seams, bait lanes and migration routes'},
+      'Bonefish': {bait:['shrimp','crab','small fly'],habitat:'shallow flats, channels and moving water'},
+      'Trevally': {bait:['topwater','live bait','stickbait'],habitat:'reefs, points, channels and current-washed structure'}
+    },
+
+    regulationSources: {
+      ME:{name:'Maine DMR',url:'https://www.maine.gov/dmr/fisheries/recreational/fishing-regulations-tips'},
+      NH:{name:'New Hampshire Fish & Game',url:'https://www.wildlife.nh.gov/fishing-new-hampshire'},
+      MA:{name:'Massachusetts DMF',url:'https://www.mass.gov/info-details/recreational-saltwater-fishing-regulations'},
+      RI:{name:'Rhode Island DEM',url:'https://dem.ri.gov/natural-resources-bureau/marine-fisheries/recreational-saltwater-fishing'},
+      CT:{name:'Connecticut DEEP',url:'https://portal.ct.gov/deep/fishing/saltwater-fishing-guide/species-regulations'},
+      NY:{name:'New York DEC',url:'https://dec.ny.gov/things-to-do/saltwater-fishing/recreational-fishing-regulations'},
+      NJ:{name:'New Jersey Fish & Wildlife',url:'https://dep.nj.gov/njfw/fishing/marine/seasons-and-regulations/'},
+      DE:{name:'Delaware DNREC',url:'https://dnrec.delaware.gov/fish-wildlife/fishing/regulations/'},
+      MD:{name:'Maryland DNR',url:'https://dnr.maryland.gov/fisheries/Pages/regulations/index.aspx'},
+      VA:{name:'Virginia Marine Resources Commission',url:'https://mrc.virginia.gov/regulations/'},
+      NC:{name:'North Carolina Marine Fisheries',url:'https://www.deq.nc.gov/about/divisions/marine-fisheries/rules-proclamations-and-size-and-bag-limits'},
+      SC:{name:'South Carolina DNR',url:'https://www.dnr.sc.gov/regs/fishing.html'},
+      GA:{name:'Georgia Coastal Resources',url:'https://coastalgadnr.org/Limits'},
+      FL:{name:'Florida FWC',url:'https://myfwc.com/fishing/saltwater/recreational/'},
+      AL:{name:'Alabama Marine Resources',url:'https://www.outdooralabama.com/fishing/saltwater-recreational-size-creel-limits'},
+      MS:{name:'Mississippi DMR',url:'https://dmr.ms.gov/recreational-fishing/'},
+      LA:{name:'Louisiana Wildlife & Fisheries',url:'https://www.wlf.louisiana.gov/page/recreational-saltwater-finfish'},
+      TX:{name:'Texas Parks & Wildlife',url:'https://tpwd.texas.gov/regulations/outdoor-annual/fishing/'},
+      CA:{name:'California Fish & Wildlife',url:'https://wildlife.ca.gov/Fishing/Ocean'},
+      OR:{name:'Oregon Fish & Wildlife',url:'https://myodfw.com/fishing/marine-zone'},
+      WA:{name:'Washington Fish & Wildlife',url:'https://wdfw.wa.gov/fishing/regulations'},
+      AK:{name:'Alaska Fish & Game',url:'https://www.adfg.alaska.gov/index.cfm?adfg=fishregulations.sport'},
+      HI:{name:'Hawaiʻi Division of Aquatic Resources',url:'https://dlnr.hawaii.gov/dar/fishing/fishing-regulations/'}
+    },
+
+    stateNames: {ME:'Maine',NH:'New Hampshire',MA:'Massachusetts',RI:'Rhode Island',CT:'Connecticut',NY:'New York',NJ:'New Jersey',DE:'Delaware',MD:'Maryland',VA:'Virginia',NC:'North Carolina',SC:'South Carolina',GA:'Georgia',FL:'Florida',AL:'Alabama',MS:'Mississippi',LA:'Louisiana',TX:'Texas',CA:'California',OR:'Oregon',WA:'Washington',AK:'Alaska',HI:'Hawaiʻi'},
 
     mock: {
       current: {
@@ -166,7 +218,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -177,6 +229,7 @@
         if(Array.isArray(saved.waypoints)) this.state.waypoints=saved.waypoints;
         if(Array.isArray(saved.catches)) this.state.catches=saved.catches;
         if(Number.isFinite(saved.trips)) this.state.trips=saved.trips;
+        if(Array.isArray(saved.savedTripPlans)) this.state.savedTripPlans=saved.savedTripPlans;
       }catch(_){ }
     },
 
@@ -184,9 +237,9 @@
       const payload={
         live:this.state.live,location:this.state.location,radius:this.state.radius,
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
-        waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips
+        waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans
       };
-      try{ localStorage.setItem('coastcast-v8-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v9-state',JSON.stringify(payload)); }catch(_){ }
     },
 
     bindNavigation(){
@@ -218,6 +271,9 @@
       this.$('quickPlanBtn').addEventListener('click',()=>this.openPlanner());
       this.$('plannerBtn').addEventListener('click',()=>this.openPlanner());
       this.$('findBestTripBtn').addEventListener('click',()=>this.findBestTrip());
+      this.$('openRegsBtn')?.addEventListener('click',()=>this.openOfficialRegulations());
+      this.$('openLicenseBtn')?.addEventListener('click',()=>window.open('https://www.fws.gov/initiative/fishing/buy-fishing-license','_blank','noopener'));
+      this.$('speciesRankList')?.addEventListener('click',e=>{const b=e.target.closest('[data-target-ranked-species]');if(b)this.setSpecies(b.dataset.targetRankedSpecies);});
       this.$('useMyLocationSheetBtn').addEventListener('click',()=>this.useMyLocation());
       this.$('locationSearchGoBtn').addEventListener('click',()=>this.searchLocations());
       this.$('locationSearchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();this.searchLocations();}});
@@ -258,7 +314,7 @@
 
     openPlanner(){
       this.$('tripSpecies').value=this.state.targetSpecies;
-      this.$('plannerResult').textContent='Choose your preferences and CoastCast will rank the week.';
+      this.$('plannerResult').textContent='Choose your preferences and CoastCast will rank the week for that species.';
       this.openDialog('plannerDialog');
     },
 
@@ -623,20 +679,115 @@
       }else d.current.score=d.days[0]?.score||80;
     },
 
-    calculateScore(c){
-      const config=this.species[this.state.targetSpecies]||this.species['Red Drum'];
-      let score=58;
+    calculateScore(c,speciesName=this.state.targetSpecies,includeHistory=true){
+      const config=this.species[speciesName]||this.species['Red Drum'];
+      let score=32;
       const wind=this.num(c.wind,8),rain=this.num(c.rain,0),wave=this.num(c.wave,2),water=this.num(c.water,72);
-      if(wind<=6)score+=15;else if(wind<=10)score+=11;else if(wind<=14)score+=5;else if(wind<=18)score-=5;else score-=18;
-      if(rain<=15)score+=6;else if(rain<=35)score+=2;else if(rain>=65)score-=12;else score-=4;
-      if(wave>=config.waveIdeal[0]&&wave<=config.waveIdeal[1])score+=9;else if(wave>5)score-=14;else score+=2;
-      if(water>=config.water[0]&&water<=config.water[1])score+=8;else if(water<config.water[0]-8||water>config.water[1]+8)score-=7;
+
+      // Shared trip-quality factors. The lower base avoids every species saturating near 100.
+      if(wind<=6)score+=16;else if(wind<=10)score+=12;else if(wind<=14)score+=6;else if(wind<=18)score-=4;else score-=16;
+      if(rain<=15)score+=7;else if(rain<=35)score+=3;else if(rain>=65)score-=10;else score-=3;
+
+      // Species-specific marine fit: score closeness to each species' preferred surf and water range.
+      const waveMin=config.waveIdeal[0],waveMax=config.waveIdeal[1],waveMid=(waveMin+waveMax)/2,waveHalf=Math.max(.25,(waveMax-waveMin)/2);
+      if(wave>=waveMin&&wave<=waveMax){
+        const closeness=Math.max(0,1-Math.abs(wave-waveMid)/waveHalf);score+=5+Math.round(closeness*5);
+      }else if(wave>waveMax){score-=Math.min(16,Math.round(3+(wave-waveMax)*4));}
+      else score+=1;
+
+      const waterMin=config.water[0],waterMax=config.water[1],waterMid=(waterMin+waterMax)/2,waterHalf=Math.max(2,(waterMax-waterMin)/2);
+      if(water>=waterMin&&water<=waterMax){
+        const closeness=Math.max(0,1-Math.abs(water-waterMid)/waterHalf);score+=5+Math.round(closeness*9);
+      }else{
+        const delta=water<waterMin?waterMin-water:water-waterMax;score-=Math.min(12,Math.round(2+delta*.8));
+      }
+
       const tide=String(c.tide||'').toLowerCase(); if(/rising|falling|moving/.test(tide))score+=config.tideBias; if(/slack/.test(tide))score-=4;
       const hour=this.extractHour(c.time); if(hour>=5&&hour<=9)score+=8;else if(hour>=17&&hour<=20)score+=6;else if(hour>=11&&hour<=15)score-=3;
-      const pressure=this.num(c.pressure,1015); if(pressure>=1008&&pressure<=1024)score+=3;
+      const pressure=this.num(c.pressure,1015); if(pressure>=1008&&pressure<=1024)score+=4;
       if(this.state.fishingStyle==='Surf fishing'&&wind<=10)score+=3;
       if(this.state.fishingStyle==='Pier fishing'&&wave<=4.5)score+=2;
+      if(includeHistory) score+=this.historyAdjustment(speciesName,{wind,wave,water});
       return Math.round(Math.max(25,Math.min(98,score)));
+    },
+
+
+    parseCatchConditions(text){
+      const s=String(text||'');
+      const wind=Number((s.match(/([0-9.]+)\\s*mph wind/i)||[])[1]);
+      const wave=Number((s.match(/([0-9.]+)\\s*ft surf/i)||[])[1]);
+      const water=Number((s.match(/([0-9.]+)°F water/i)||[])[1]);
+      return {wind:Number.isFinite(wind)?wind:null,wave:Number.isFinite(wave)?wave:null,water:Number.isFinite(water)?water:null};
+    },
+
+    historyAdjustment(speciesName,condition){
+      const catches=this.state.catches.filter(c=>c.species===speciesName).slice(0,12);
+      if(!catches.length) return 0;
+      let best=0;
+      catches.forEach(c=>{
+        const p=this.parseCatchConditions(c.conditions);let sim=0,parts=0;
+        if(Number.isFinite(p.wind)){parts++;sim+=Math.max(0,1-Math.abs(p.wind-condition.wind)/10);}
+        if(Number.isFinite(p.wave)){parts++;sim+=Math.max(0,1-Math.abs(p.wave-condition.wave)/3);}
+        if(Number.isFinite(p.water)){parts++;sim+=Math.max(0,1-Math.abs(p.water-condition.water)/14);}
+        if(parts) best=Math.max(best,sim/parts);
+      });
+      const catchConfidence=Math.min(1,catches.length/5);
+      return Math.round(best*catchConfidence*5);
+    },
+
+    speciesTodayScore(name){
+      const d=this.state.data;if(!d)return 50;
+      const hours=d.hours.filter(h=>h.dateIndex===0).slice(0,18);
+      if(!hours.length){const c=d.current;return this.calculateScore({wind:c.windSpeed,rain:c.rain,wave:c.waveHeight,water:c.waterTemp,tide:this.currentTideLabel(),time:new Date(),pressure:c.pressure},name);}
+      const scores=hours.map(h=>this.calculateScore({wind:h.wind,rain:h.rain,wave:h.wave,water:h.water??d.current.waterTemp,tide:h.tide,time:h.rawTime||h.time,pressure:h.pressure??d.current.pressure},name));
+      scores.sort((a,b)=>b-a);return Math.round(this.average(scores.slice(0,Math.min(4,scores.length))));
+    },
+
+    rankSpecies(){
+      const regional=this.coastRegionSpecies();
+      return regional.map(name=>{
+        const cfg=this.species[name],extra=this.speciesExtras[name]||{bait:[],habitat:'coastal structure'};
+        const score=this.speciesTodayScore(name);
+        const h=this.historyAdjustment(name,{wind:this.state.data.current.windSpeed,wave:this.state.data.current.waveHeight,water:this.state.data.current.waterTemp});
+        const water=this.state.data.current.waterTemp;
+        const waterFit=water>=cfg.water[0]&&water<=cfg.water[1];
+        return {name,score,history:h,waterFit,bait:extra.bait,habitat:extra.habitat};
+      }).sort((a,b)=>b.score-a.score);
+    },
+
+    renderSpeciesRankings(){
+      const box=this.$('speciesRankList');if(!box)return;
+      const ranked=this.rankSpecies();
+      this.$('regionSpeciesLabel').textContent=this.coastRegion();
+      box.innerHTML=ranked.slice(0,5).map((r,i)=>{const g=this.grade(r.score);const reason=[r.waterFit?'water temp in range':'water temp outside peak',r.history?`your catch history +${r.history}`:'live-condition match',r.bait?.length?`try ${r.bait.slice(0,2).join(' / ')}`:''].filter(Boolean).join(' • ');return `<article class="species-rank-card ${i===0?'top':''}"><div class="species-rank-number">${i+1}</div><div class="species-rank-copy"><div class="species-rank-name">${this.escape(r.name)}</div><div class="species-rank-reason">${this.escape(reason)}</div><div class="species-rank-habitat">${this.escape(r.habitat)}</div></div><div class="species-rank-score ${g.className}"><strong>${r.score}</strong><span>${g.short}</span></div><button type="button" class="mini-button species-target-button" data-target-ranked-species="${this.escape(r.name)}">Target</button></article>`;}).join('');
+    },
+
+    detectStateCode(){
+      const name=String(this.state.location?.name||'');
+      const aliases={ME:['Maine',' ME'],NH:['New Hampshire',' NH'],MA:['Massachusetts',' MA'],RI:['Rhode Island',' RI'],CT:['Connecticut',' CT'],NY:['New York',' NY'],NJ:['New Jersey',' NJ'],DE:['Delaware',' DE'],MD:['Maryland',' MD'],VA:['Virginia',' VA'],NC:['North Carolina',' NC'],SC:['South Carolina',' SC'],GA:['Georgia',' GA'],FL:['Florida',' FL'],AL:['Alabama',' AL'],MS:['Mississippi',' MS'],LA:['Louisiana',' LA'],TX:['Texas',' TX'],CA:['California',' CA'],OR:['Oregon',' OR'],WA:['Washington',' WA'],AK:['Alaska',' AK'],HI:['Hawaii','Hawaiʻi',' HI']};
+      for(const [code,vals] of Object.entries(aliases)) if(vals.some(v=>new RegExp(v.length<=3?`(?:,|\\s)${v.trim()}(?:,|\\s|$)`:`${v}`,'i').test(name))) return code;
+      const lat=Number(this.state.location?.lat),lon=Number(this.state.location?.lon);
+      if(lat>=18&&lat<=23&&lon>=-161.5&&lon<=-154.5)return'HI';if(lat>=51&&lon<=-130)return'AK';
+      if(lon<=-124&&lat>=32&&lat<=42)return'CA';if(lon<=-116&&lat>42&&lat<=46.4)return'OR';if(lon<=-116&&lat>46.4&&lat<=49.2)return'WA';
+      if(lon>=-97.8&&lon<=-93.4&&lat>=25.7&&lat<=30.1)return'TX';if(lon>-93.4&&lon<=-88.7&&lat<=31.2)return'LA';if(lon>-88.7&&lon<=-88.0&&lat<=31.2)return'MS';if(lon>-88.0&&lon<=-86.3&&lat<=31.5)return'AL';if(lat<=31.2&&lon>-86.3&&lon<=-80.0)return'FL';
+      if(lat>=30.3&&lat<=32.3&&lon>=-81.7&&lon<=-80.7)return'GA';if(lat>=32.0&&lat<=35.2&&lon>=-81.5&&lon<=-78.3)return'SC';if(lat>=33.7&&lat<=36.7&&lon>=-78.8&&lon<=-75.2)return'NC';if(lat>=36.5&&lat<=38.0&&lon>=-76.6&&lon<=-75.1)return'VA';
+      return null;
+    },
+
+    renderRegulations(){
+      const code=this.detectStateCode(),src=code?this.regulationSources[code]:null;
+      this.state.currentRegSource=src||null;
+      if(this.$('regSpeciesName'))this.$('regSpeciesName').textContent=this.state.targetSpecies;
+      if(this.$('regStateCode'))this.$('regStateCode').textContent=code?`${this.stateNames[code]} (${code})`:'State not detected';
+      if(this.$('regStateTitle'))this.$('regStateTitle').textContent=src?`${this.stateNames[code]} official fishing rules`:'Official fishing rules';
+      if(this.$('regSourceBadge'))this.$('regSourceBadge').textContent=src?src.name:'Choose a U.S. coastal state';
+      const msg=this.$('regulationMessage');if(msg)msg.innerHTML=src?`CoastCast detected <strong>${this.escape(this.stateNames[code])}</strong>. Check the official source for current <strong>${this.escape(this.state.targetSpecies)}</strong> size, bag, season, gear and closure rules before keeping fish.`:'CoastCast could not confidently detect the state from this location name. Open/change the destination to include the state before checking regulations.';
+      const b=this.$('openRegsBtn');if(b){b.disabled=!src;b.textContent=src?'Open official regulations':'State not detected';}
+    },
+
+    openOfficialRegulations(){
+      const src=this.state.currentRegSource;if(!src){this.showToast('Choose a U.S. coastal location with a state first.');return;}
+      window.open(src.url,'_blank','noopener');
     },
 
     scoreFactors(){
@@ -658,7 +809,7 @@
 
     renderAll(){
       this.recalculateScores();
-      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderConditions();this.renderFactors();
+      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderRegulations();this.renderConditions();this.renderFactors();
       this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();this.renderSpotIntelligence();
       if(this.state.view==='map') this.renderMapLayers();
     },
@@ -892,17 +1043,32 @@
     },
 
     findBestTrip(){
-      const species=this.$('tripSpecies').value||this.state.targetSpecies,session=this.$('tripSession').value,maxWind=Number(this.$('tripMaxWind').value)||15;
-      const days=this.state.data.days.map((d,i)=>({...d,index:i,adjusted:d.score-(d.wind>maxWind?Math.min(25,(d.wind-maxWind)*3):0)}));
-      const best=days.reduce((a,b)=>b.adjusted>a.adjusted?b:a,days[0]);
-      const hours=this.state.data.hours.filter(h=>h.dateIndex===best.index&&h.wind<=maxWind);
-      let bestHour=hours.reduce((a,b)=>!a||b.score>a.score?b:a,null);
-      if(session!=='Any time'){
-        const filtered=hours.filter(h=>this.matchesSession(h.time,session));
-        if(filtered.length) bestHour=filtered.reduce((a,b)=>b.score>a.score?b:a,filtered[0]);
-      }
-      this.state.trips+=1;this.save();this.$('tripCount').textContent=this.state.trips;
-      this.$('plannerResult').innerHTML=`<strong>${this.escape(best.day)} is your best match — ${best.adjusted}/100 adjusted.</strong><br>${this.escape(species)} • ${this.escape(session)} • ${best.icon} ${this.fmt(best.high,0)}°/${this.fmt(best.low,0)}° • ${this.fmt(best.wind,0)} mph avg wind • ${this.fmt(best.wave,1)} ft surf.${bestHour?`<br><strong>Best hour:</strong> ${this.escape(bestHour.time)} (${bestHour.score}/100).`:''}`;
+      const species=this.$('tripSpecies').value||this.state.targetSpecies,session=this.$('tripSession').value,maxWind=Number(this.$('tripMaxWind').value)||15,priority=this.$('tripPriority')?.value||'bite';
+      const d=this.state.data;
+      const days=d.days.map((day,i)=>{
+        let hours=d.hours.filter(h=>h.dateIndex===i).slice(0,24);
+        if(session!=='Any time') hours=hours.filter(h=>this.matchesSession(h.time,session));
+        if(!hours.length) hours=d.hours.filter(h=>h.dateIndex===i).slice(0,24);
+        const scored=hours.map(h=>({...h,speciesScore:this.calculateScore({wind:h.wind,rain:h.rain,wave:h.wave,water:h.water??day.water??d.current.waterTemp,tide:h.tide,time:h.rawTime||h.time,pressure:h.pressure??d.current.pressure},species)}));
+        const eligible=scored.filter(h=>h.wind<=maxWind);const pool=eligible.length?eligible:scored;
+        const bestHour=pool.reduce((a,b)=>!a||b.speciesScore>a.speciesScore?b:a,null);
+        const top=[...pool].sort((a,b)=>b.speciesScore-a.speciesScore).slice(0,Math.min(4,pool.length));
+        let adjusted=Math.round(this.average(top.map(x=>x.speciesScore)));
+        if(day.wind>maxWind) adjusted-=Math.min(25,(day.wind-maxWind)*3);
+        if(priority==='calm') adjusted+=Math.max(-12,10-(Number(day.wave)||2)*3);
+        if(priority==='dry') adjusted+=Math.max(-10,8-(Number(day.rain)||0)/5);
+        if(priority==='dawn'&&bestHour&&this.extractHour(bestHour.time)>=4&&this.extractHour(bestHour.time)<=9) adjusted+=6;
+        adjusted=Math.max(25,Math.min(98,Math.round(adjusted)));
+        return {...day,index:i,adjusted,bestHour};
+      });
+      const best=days.reduce((a,b)=>b.adjusted>a.adjusted?b:a,days[0]);const bestHour=best.bestHour;
+      const extras=this.speciesExtras[species]||{bait:[],habitat:''};const stateCode=this.detectStateCode(),stateName=stateCode?this.stateNames[stateCode]:'local';
+      const windowHours=d.hours.filter(h=>h.dateIndex===best.index).map(h=>({...h,speciesScore:this.calculateScore({wind:h.wind,rain:h.rain,wave:h.wave,water:h.water??best.water??d.current.waterTemp,tide:h.tide,time:h.rawTime||h.time,pressure:h.pressure??d.current.pressure},species)}));
+      const window=this.findBestWindow(windowHours.map(h=>({...h,score:h.speciesScore})));
+      this.state.trips+=1;
+      const plan={id:Date.now(),location:this.state.location.name,species,day:best.day,score:best.adjusted,window:window.label,priority,created:new Date().toISOString()};this.state.savedTripPlans.unshift(plan);this.state.savedTripPlans=this.state.savedTripPlans.slice(0,20);this.save();this.$('tripCount').textContent=this.state.trips;
+      const shop=(d.shops||[])[0];
+      this.$('plannerResult').innerHTML=`<div class="trip-plan-score"><span>BEST MATCH</span><strong>${best.adjusted}/100</strong></div><strong>${this.escape(best.day)} • ${this.escape(species)}</strong><br><span>${best.icon||''} ${this.fmt(best.high,0)}°/${this.fmt(best.low,0)}° • ${this.fmt(best.wind,0)} mph avg wind • ${this.fmt(best.wave,1)} ft surf • ${this.fmt(best.rain,0)}% rain</span><div class="trip-itinerary"><div><b>1</b><span><strong>Prep</strong>${extras.bait?.length?`Bring ${this.escape(extras.bait.slice(0,2).join(' or '))}.`:''}</span></div>${shop?`<div><b>2</b><span><strong>Bait stop</strong>${this.escape(shop.name)} • ${this.fmt(shop.distance,1)} mi from the fishing spot</span></div>`:''}<div><b>${shop?'3':'2'}</b><span><strong>Fish</strong>${this.escape(window.label)} • ${this.escape(window.reason)}</span></div><div><b>${shop?'4':'3'}</b><span><strong>Rules</strong>Verify ${this.escape(stateName)} regulations before keeping fish.</span></div></div>${bestHour?`<div class="planner-best-hour"><strong>Peak hour:</strong> ${this.escape(bestHour.time)} • ${bestHour.speciesScore}/100 species score</div>`:''}`;
     },
 
     matchesSession(time,session){const h=this.extractHour(time);if(session==='Morning')return h>=4&&h<11;if(session==='Afternoon')return h>=11&&h<17;if(session==='Evening')return h>=17&&h<=22;return true;},
@@ -1209,8 +1375,8 @@
 
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
-      try{localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{localStorage.removeItem('coastcast-v8-state');}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      try{localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
+      this.state.live=false;try{localStorage.removeItem('coastcast-v8-state');}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 
     snapshotConditions(){

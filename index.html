@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a fishing-first coastal trip planner with live weather, marine conditions, tides, fishing scores, species mode, maps, bait shops and a personal catch logbook." />
+  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, official regulation links, smart trip planning, maps, bait shops and a personal catch logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=0.8.0" />
+  <link rel="stylesheet" href="styles.css?v=0.9.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -109,6 +109,19 @@
           <div id="speciesInsight" class="insight-strip"></div>
         </section>
 
+
+        <section class="panel species-intelligence-panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">SPECIES INTELLIGENCE</div>
+              <h2>Best targets for these conditions</h2>
+            </div>
+            <span id="regionSpeciesLabel" class="tiny-pill">Regional ranking</span>
+          </div>
+          <p class="section-note species-rank-note">Ranks likely coastal targets using your live water temperature, tide, wind, surf, time of day and your own successful catch history.</p>
+          <div id="speciesRankList" class="species-rank-list"></div>
+        </section>
+
         <section class="best-window panel accent-panel">
           <div class="best-window-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 13 16 10M9 2h6M12 2v4"/></svg></div>
           <div class="best-window-copy">
@@ -161,6 +174,33 @@
             <span id="intelConfidence" class="tiny-pill">High confidence</span>
           </div>
           <div id="scoreFactors" class="factor-list"></div>
+        </section>
+
+
+        <section class="panel regulations-panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">REGULATIONS WATCH</div>
+              <h2 id="regStateTitle">Official fishing rules</h2>
+            </div>
+            <span id="regSourceBadge" class="tiny-pill">Official source</span>
+          </div>
+          <div class="regulation-grid">
+            <div class="regulation-target">
+              <span>Target species</span>
+              <strong id="regSpeciesName">Red Drum</strong>
+            </div>
+            <div class="regulation-target">
+              <span>Fishing area</span>
+              <strong id="regStateCode">Detecting…</strong>
+            </div>
+          </div>
+          <div id="regulationMessage" class="regulation-message">CoastCast links you to the official state source because size, bag, season, gear and closure rules can change during the year.</div>
+          <div class="regulation-actions">
+            <button id="openRegsBtn" class="primary-button" type="button">Open official regulations</button>
+            <button id="openLicenseBtn" class="secondary-button" type="button">License information</button>
+          </div>
+          <p class="micro-note">Always verify the official rules at the time and exact place you fish. Federal waters, marine protected areas and emergency closures can have additional rules.</p>
         </section>
 
         <section class="panel">
@@ -571,9 +611,12 @@
         <label class="field-group"><span>Target species</span><select id="tripSpecies" class="select-control"></select></label>
         <label class="field-group"><span>Preferred session</span><select id="tripSession" class="select-control"><option>Any time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></label>
       </div>
-      <label class="field-group"><span>Maximum wind you want to fish</span><select id="tripMaxWind" class="select-control"><option value="10">10 mph</option><option value="15" selected>15 mph</option><option value="20">20 mph</option></select></label>
-      <button id="findBestTripBtn" class="primary-button full" type="button">Find best day</button>
-      <div id="plannerResult" class="planner-result">Choose your preferences and CoastCast will rank the week.</div>
+      <div class="two-col">
+        <label class="field-group"><span>Maximum wind</span><select id="tripMaxWind" class="select-control"><option value="8">8 mph</option><option value="10">10 mph</option><option value="15" selected>15 mph</option><option value="20">20 mph</option></select></label>
+        <label class="field-group"><span>Priority</span><select id="tripPriority" class="select-control"><option value="bite">Best bite</option><option value="calm">Calmest surf</option><option value="dry">Lowest rain</option><option value="dawn">Sunrise session</option></select></label>
+      </div>
+      <button id="findBestTripBtn" class="primary-button full" type="button">Build smart trip plan</button>
+      <div id="plannerResult" class="planner-result">Choose your preferences and CoastCast will rank the week for that species.</div>
     </form>
   </dialog>
 
@@ -587,7 +630,7 @@
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
       <label class="field-group"><span>Nearby shop radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <div class="settings-note">CoastCast v0.5.1 is an active development build. Fishing scores are planning guidance, not a guarantee of fish activity or marine safety.</div>
+      <div class="settings-note">CoastCast v0.9 is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -614,6 +657,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=0.8.0"></script>
+  <script src="app.js?v=0.9.0"></script>
 </body>
 </html>

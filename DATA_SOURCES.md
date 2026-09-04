@@ -1,16 +1,16 @@
-# CoastCast v0.8.0 Data Sources
+# CoastCast v0.9 Data Sources
 
-## Nationwide forecast core
-- Open-Meteo Weather API — weather, temperature, rain, pressure, wind and related forecast fields.
-- Open-Meteo Marine API — waves, swell, sea-surface temperature and marine forecast fields where model coverage is available.
-- NOAA CO-OPS Tides & Currents — nearest tide-prediction station discovery and tide predictions across U.S. coasts.
+## Forecast
+- Open-Meteo Weather API — weather, temperature, precipitation, pressure, wind and related forecast fields.
+- Open-Meteo Marine API — waves, swell, sea-surface temperature and supported current fields.
+- NOAA CO-OPS — U.S. tide predictions and tide-station data.
 
-## Nationwide location / map discovery
-- OpenStreetMap / Overpass — indexed fishing access, beaches, piers, marinas, ramps and related places.
-- Nominatim and Photon — location search and fallback discovery.
-- State/local official access providers — optional provider adapters. NC Division of Coastal Management is currently integrated as an official state layer.
+## Places / map
+- OpenStreetMap / Leaflet and the existing CoastCast provider/fallback registry from v0.8.
+- State/official public-access datasets can be added through the provider registry without changing the nationwide forecast core.
 
-## National access-data strategy
-There is no single open, documented, browser-friendly public-access API that provides complete legal beach/pier/shore access for every U.S. coastline. NOAA Fisheries maintains a large Public Fishing Access Site Register for much of the Atlantic/Gulf plus Hawaiʻi, and USGS publishes a nationwide public boat-ramp dataset, but production integration should respect each source's access method and update process.
+## Regulations
+Regulations Watch contains official state-agency links for the 23 U.S. saltwater coastal states (Atlantic, Gulf, Pacific, Alaska and Hawaiʻi). CoastCast intentionally does not cache legal size/bag/season numbers in v0.9 because regulations can change in-season and by sub-area. Always use the linked official source for the current rule.
 
-CoastCast therefore separates **forecast coverage** from **verified access coverage**. A forecast can be calculated at a coastal coordinate even when no public-access site is returned. Unverified coordinates are never labeled as legal/public access.
+## Species Intelligence
+Species scores are CoastCast planning estimates based on live forecast conditions, prototype species preference ranges, fishing style, tide state, daylight and a small optional personal-history signal from catches stored only on the user's device. They are not biological guarantees.
