@@ -1,19 +1,14 @@
-# CoastCast v1.2 — Android / GitHub Pages Update
+# CoastCast v1.3 — Android update
 
-1. Download `coastcast_v1.2_scout_big_beta.zip`.
-2. Extract it with Android My Files.
-3. Open the extracted `coastcast_v1.2` folder.
-4. Upload all files inside it to the root of your existing CoastCast GitHub repository.
-5. Replace matching files and commit to `main`.
-6. Wait for GitHub Pages to redeploy.
-7. Completely close CoastCast and reopen it. If v1.1 remains cached, open the website in Chrome and refresh once.
+1. Extract this ZIP on your Android phone.
+2. Open the extracted `coastcast_v1.3` folder.
+3. Upload the files inside it to the root of your existing CoastCast GitHub repository.
+4. Replace matching v1.2 files and commit to `main`.
+5. Wait for GitHub Pages to deploy, fully close CoastCast, then reopen it.
 
 ## First test
-- Open **Scout** (the Map tab).
-- Choose a target species, 25 miles, and Today.
-- Tap **Run CoastCast Scout**.
-- Add 2–3 results to Compare and open **Compare spots**.
-- Pick the winner and Analyze it.
-- Open **Trips** and start **Go Fishing Mode**.
+- Home → Personal Pattern Match.
+- Logbook → Catch Intelligence.
+- Trips → Start fishing trip → Catch now → save a catch → confirm the live session catch count updates.
 
-Scout uses multiple live requests. Free public APIs can occasionally rate-limit or time out. CoastCast labels preview results instead of pretending they are live.
+Your v1.2 profile, catches, favorites, trips, Scout data and alert rules migrate forward automatically.

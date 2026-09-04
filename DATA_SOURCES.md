@@ -30,3 +30,7 @@ Scout performs lightweight location-specific forecast checks using:
 - Open-Meteo Marine API
 
 Candidate locations can come from the selected coastal point, CoastCast public-map discovery, saved private waypoints, and nearby CoastCast preset coast locations. Scout currently treats tide movement as a regional moving-water factor during multi-spot screening; after the angler taps Analyze, the normal exact-location CoastCast workflow loads the nearest NOAA tide source for that selected destination.
+
+
+## v1.3 personal intelligence
+Catch Intelligence and Personal Pattern Match are calculated locally from the angler's own CoastCast logbook. No external AI service or third-party personal-data processor is required for these features. New catches store a structured local conditions snapshot in addition to the readable conditions text.

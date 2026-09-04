@@ -1,28 +1,24 @@
-# CoastCast v1.2 — Big Beta
+# CoastCast v1.3 — Catch Intelligence + Live Session
 
-## Signature feature: CoastCast Scout
-- Rank nearby coastal spots for a target species.
-- Choose 10, 25, or 50 mile search radius.
-- Rank Today, Tomorrow, or This Weekend.
-- Uses nearby map discoveries, saved private favorites, the selected coast, and known CoastCast coastal destinations.
-- Tries spot-specific Open-Meteo weather + marine requests for up to six candidates.
-- Falls back to clearly labeled preview scoring when a live source fails.
-- Shows score, wind, surf, water temperature, rain, distance, and best hour for every candidate.
+## Personal Pattern Match
+- Home now compares current conditions with your own successful catches for the selected species.
+- Shows a 0–100 similarity score, confidence, top bait, best session and number of catches used.
+- Existing v1.2 catch history still contributes; new catches store a richer structured conditions snapshot.
 
-## Spot Compare
-- Add up to three Scout results to a compare tray.
-- Compare score, distance, best time, wind, surf, water temperature, and rain side-by-side.
-- Analyze the Scout winner live or send the winner straight into Smart Trip Planner.
+## Catch Intelligence
+- New Logbook intelligence dashboard.
+- Learns top bait/lure, best time of day, strongest tide signal and current personal match.
+- Bait success bars become more useful as your logbook grows.
+- Species-specific model automatically follows Species Mode.
 
-## Go Fishing Mode
-- Start an active trip from the Trips screen.
-- Keeps current score, wind, surf, water temperature and checklist together.
-- One-tap bait-shop and fishing-spot routing.
-- Tracks trip start/end time and counts completed trips locally.
-- Checklist state is saved on-device.
+## Live Fishing Session
+- Go Fishing Mode is now a true live session.
+- Session timer, live catch count and last-catch status.
+- One-tap “Catch now” opens a prefilled catch log and reuses your recent bait when useful.
+- Catches logged during a session are linked to that exact trip.
+- Ending a trip saves duration and session catch count to trip history.
 
-## Data / compatibility
-- Migrates v1.1 local data forward.
-- Backup export now includes Scout and Go Fishing state.
-- Cloud sync payload inherits the expanded app backup data through the existing v1.1 sync path.
-- GitHub Pages / Android PWA deployment is unchanged.
+## Compatibility
+- Migrates v1.2 local data forward automatically.
+- Backup and optional cloud sync continue to include catches and Go Fishing state.
+- GitHub Pages / Android PWA deployment process is unchanged.
