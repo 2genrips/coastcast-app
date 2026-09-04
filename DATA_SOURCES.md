@@ -1,16 +1,18 @@
-# CoastCast v0.5 data sources
+# CoastCast v0.6 Data Sources
 
-## Live weather
-Open-Meteo Forecast API provides temperature, feels-like temperature, precipitation probability, wind, gusts, pressure, humidity, cloud cover, visibility, UV and sunrise/sunset data.
+## Weather
+Open-Meteo Weather API: temperature, feels-like, weather code, rain probability, humidity, visibility, UV, wind, gusts, pressure, sunrise and sunset.
 
-## Marine forecast
-Open-Meteo Marine API provides wave height/direction/period, swell data, sea-surface temperature and ocean-current fields when the model has coverage. Marine forecasts are model guidance and must not be treated as navigation data.
+## Marine
+Open-Meteo Marine API: wave height/direction/period, swell height/direction/period, sea-surface temperature and ocean-current model data where available. CoastCast requests imperial wave lengths, selects a sea grid cell, converts SST from °C to °F, and converts current velocity from km/h to mph. Marine model resolution can be coarse near shore and must not be used for navigation.
 
 ## Tides
-NOAA CO-OPS Data API provides tide predictions. CoastCast finds a nearby NOAA tide-prediction station and requests high/low predictions in English units.
+NOAA CO-OPS Data API for high/low tide predictions. NOAA station metadata is used for station discovery, with a small verified southeastern-NC seed list as a reliability fallback.
 
-## Places
-OpenStreetMap Nominatim is used for location search/reverse geocoding. OpenStreetMap Overpass is used for nearby fishing/outdoor/bait/tackle results. Coverage varies by area.
+## Bait & tackle
+OpenStreetMap / Overpass results around the selected fishing destination. CoastCast tries two public Overpass endpoints before falling back to demo listings. Store hours/services should be confirmed before driving.
 
-## Fallback behavior
-CoastCast keeps demo/fallback values when a live service is unavailable, and v0.5 displays source-status chips so you can see which categories are actually live.
+## Map
+Leaflet + OpenStreetMap map tiles.
+
+No forecast should be treated as a guarantee of fishing success or as navigation/surf-safety guidance.

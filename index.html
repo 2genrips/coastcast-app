@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=0.5.1" />
+  <link rel="stylesheet" href="styles.css?v=0.6.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -69,6 +69,7 @@
             <span id="lastUpdated" class="muted-xs">Updated now</span>
           </div>
           <div id="sourceHealth" class="source-health" aria-label="Forecast data sources"></div>
+          <div id="dataQualityMessage" class="data-quality-message">Demo values are shown until live feeds confirm.</div>
         </section>
 
         <section class="score-hero panel">
@@ -102,9 +103,9 @@
               <div class="eyebrow">SPECIES MODE</div>
               <h2>What are you targeting?</h2>
             </div>
-            <button id="speciesInfoBtn" class="link-button" type="button">Why it matters</button>
+            <div class="species-heading-actions"><span class="swipe-hint">Swipe →</span><button id="speciesInfoBtn" class="link-button" type="button">Why it matters</button></div>
           </div>
-          <div id="speciesChips" class="chip-scroll" role="group" aria-label="Target species"></div>
+          <div class="species-scroll-shell"><div id="speciesChips" class="chip-scroll" role="group" aria-label="Target species"></div></div>
           <div id="speciesInsight" class="insight-strip"></div>
         </section>
 
@@ -118,43 +119,37 @@
           <button class="arrow-button" data-nav="forecast" type="button" aria-label="Open full forecast">›</button>
         </section>
 
-        <section class="condition-grid" aria-label="Current fishing conditions">
-          <article class="condition-card panel">
-            <div class="condition-icon">🌡️</div>
-            <div class="condition-label">AIR</div>
-            <div id="airTemp" class="condition-value">72°F</div>
-            <div id="feelsLike" class="condition-sub">Feels 72°F</div>
-          </article>
-          <article class="condition-card panel">
-            <div id="weatherIcon" class="condition-icon">🌤️</div>
-            <div class="condition-label">WEATHER</div>
-            <div id="weatherText" class="condition-value small">Partly cloudy</div>
-            <div id="precipNow" class="condition-sub">Rain 10%</div>
-          </article>
-          <article class="condition-card panel">
-            <div class="condition-icon">🧭</div>
-            <div class="condition-label">WIND</div>
-            <div id="windNow" class="condition-value small">NE 7 mph</div>
-            <div id="gustNow" class="condition-sub">Gusts 10 mph</div>
-          </article>
-          <article class="condition-card panel">
-            <div class="condition-icon">🌊</div>
-            <div class="condition-label">SURF</div>
-            <div id="surfNow" class="condition-value small">2.0 ft</div>
-            <div id="periodNow" class="condition-sub">9 sec period</div>
-          </article>
-          <article class="condition-card panel">
-            <div class="condition-icon">💧</div>
-            <div class="condition-label">WATER</div>
-            <div id="waterTemp" class="condition-value small">75°F</div>
-            <div id="swellNow" class="condition-sub">Swell 1.7 ft</div>
-          </article>
-          <article class="condition-card panel">
-            <div class="condition-icon">📈</div>
-            <div class="condition-label">PRESSURE</div>
-            <div id="pressureNow" class="condition-value small">30.08 in</div>
-            <div id="pressureTrend" class="condition-sub">Stable</div>
-          </article>
+        <section class="conditions-panel panel" aria-label="Current fishing conditions">
+          <div class="section-heading current-conditions-heading">
+            <div><div class="eyebrow">RIGHT NOW</div><h2>Current conditions</h2></div>
+            <span id="conditionsSourceBadge" class="tiny-pill">Demo readings</span>
+          </div>
+          <div class="condition-grid">
+            <article class="condition-card">
+              <div class="condition-icon line-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4a2 2 0 0 1 4 0v9.2a4.5 4.5 0 1 1-4 0Z"/><path d="M12 7v8"/></svg></div>
+              <div class="condition-label">AIR</div><div id="airTemp" class="condition-value">72°F</div><div id="feelsLike" class="condition-sub">Feels 72°F</div>
+            </article>
+            <article class="condition-card">
+              <div id="weatherIcon" class="condition-icon weather-glyph">🌤️</div>
+              <div class="condition-label">WEATHER</div><div id="weatherText" class="condition-value small">Partly cloudy</div><div id="precipNow" class="condition-sub">Rain 10%</div>
+            </article>
+            <article class="condition-card">
+              <div class="condition-icon line-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h10c2 0 2-3 0-3-1 0-1.6.5-2 1"/><path d="M3 12h15c2.5 0 2.5-4 0-4-1.2 0-2 .7-2.3 1.5"/><path d="M3 16h9c2 0 2 3.5 0 3.5-1 0-1.7-.5-2-1.2"/></svg></div>
+              <div class="condition-label">WIND</div><div id="windNow" class="condition-value small">NE 7 mph</div><div id="gustNow" class="condition-sub">Gusts 10 mph</div>
+            </article>
+            <article class="condition-card">
+              <div class="condition-icon line-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 13c3-5 5-5 8 0s5 5 8 0 4-3 4-3"/><path d="M2 18c3-3 5-3 8 0s5 3 8 0 4-2 4-2"/></svg></div>
+              <div class="condition-label">SURF</div><div id="surfNow" class="condition-value small">2.0 ft</div><div id="periodNow" class="condition-sub">9 sec period</div>
+            </article>
+            <article class="condition-card">
+              <div class="condition-icon line-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s6 6.2 6 11a6 6 0 0 1-12 0c0-4.8 6-11 6-11Z"/><path d="M9 15c.6 1.4 1.6 2 3 2"/></svg></div>
+              <div class="condition-label">WATER</div><div id="waterTemp" class="condition-value small">75°F</div><div id="swellNow" class="condition-sub">Swell 1.7 ft</div>
+            </article>
+            <article class="condition-card">
+              <div class="condition-icon line-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18V9M10 18V5M16 18v-7M22 18V3"/><path d="m3 7 6-4 6 5 6-6"/></svg></div>
+              <div class="condition-label">PRESSURE</div><div id="pressureNow" class="condition-value small">30.08 in</div><div id="pressureTrend" class="condition-sub">Stable</div>
+            </article>
+          </div>
         </section>
 
         <section class="panel intel-panel">
@@ -228,6 +223,8 @@
           <button id="plannerBtn" class="primary-button small" type="button">Plan trip</button>
         </div>
 
+        <div id="forecastStatusBar" class="forecast-status-bar" aria-live="polite"><span class="status-dot"></span><strong>Demo forecast</strong><span>Live feeds have not confirmed yet.</span></div>
+
         <section class="panel forecast-summary">
           <div class="forecast-summary-main">
             <div id="forecastSummaryIcon" class="forecast-big-icon">🌤️</div>
@@ -252,7 +249,15 @@
           <div id="forecastDays" class="forecast-days"></div>
         </section>
 
-        <section class="panel">
+        <section class="panel bite-trend-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">BITE TREND</div><h2>Best hours at a glance</h2></div>
+            <span class="tiny-pill">Fishing score</span>
+          </div>
+          <div class="bite-chart-shell"><canvas id="biteTrendCanvas" width="900" height="250" aria-label="Hourly fishing score trend"></canvas></div>
+        </section>
+
+        <section class="panel hourly-forecast-panel">
           <div class="section-heading">
             <div><div class="eyebrow">HOURLY</div><h2 id="selectedForecastDay">Today</h2></div>
             <span id="selectedDayScore" class="grade-badge good">91 / 100</span>
@@ -335,6 +340,7 @@
             <button class="filter-chip" data-map-filter="spots" type="button">Saved spots</button>
             <button class="filter-chip" data-map-filter="catches" type="button">My catches</button>
             <button class="filter-chip" data-map-filter="shops" type="button">Bait shops</button>
+          </div>
           <div id="leafletMap" class="real-map" aria-label="Interactive fishing map"></div>
           <div id="mapFallback" class="map-fallback hidden">
             <div class="map-fallback-icon">🗺️</div>
@@ -560,6 +566,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=0.5.1"></script>
+  <script src="app.js?v=0.6.0"></script>
 </body>
 </html>

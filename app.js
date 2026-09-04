@@ -31,15 +31,21 @@
       myrtle: { name:'Myrtle Beach, SC', lat:33.6891, lon:-78.8867, source:'Popular coast' }
     },
 
+    seedTideStations: [
+      {id:'8658163',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964},
+      {id:'8659414',name:'Varnamtown, Lockwoods Folly River, NC',lat:33.93333,lon:-78.21833},
+      {id:'8659665',name:'Bowen Point, Shallotte Inlet, NC',lat:33.91430,lon:-78.37324}
+    ],
+
     species: {
-      'Red Drum': { icon:'🔴', water:[64,82], tideBias:8, waveIdeal:[1,4], note:'Moving water, beach cuts and inlet edges get extra weight. Water in the mid-60s through low-80s scores best.' },
-      'Speckled Trout': { icon:'✨', water:[58,76], tideBias:6, waveIdeal:[0.5,2.8], note:'Cleaner water, moderate current and lower surf are favored. Dawn and dusk receive a stronger bump.' },
-      'Flounder': { icon:'⬟', water:[62,78], tideBias:7, waveIdeal:[0.5,3], note:'Bottom structure and moving water matter. Moderate conditions score higher than rough surf.' },
-      'Bluefish': { icon:'⚡', water:[60,78], tideBias:5, waveIdeal:[1,4.5], note:'Bait movement, moderate surf and stronger water movement can improve the score.' },
-      'Spanish Mackerel': { icon:'➤', water:[68,82], tideBias:4, waveIdeal:[0.5,3], note:'Warmer, clearer water and lower-to-moderate seas score best for nearshore Spanish mackerel.' },
-      'Black Drum': { icon:'●', water:[55,76], tideBias:7, waveIdeal:[0.5,3.5], note:'Structure and current get extra weight, with a broad cool-to-warm water preference.' },
-      'Sheepshead': { icon:'▦', water:[58,78], tideBias:6, waveIdeal:[0.5,2.5], note:'Moderate current around structure is favored. Excessive surf and wind reduce the score more quickly.' },
-      'Striped Bass': { icon:'↯', water:[48,68], tideBias:7, waveIdeal:[1,4], note:'Cooler water, moving tide and low-light windows receive extra weight.' }
+      'Red Drum': { icon:'🔴', abbr:'RD', water:[64,82], tideBias:8, waveIdeal:[1,4], note:'Moving water, beach cuts and inlet edges get extra weight. Water in the mid-60s through low-80s scores best.' },
+      'Speckled Trout': { icon:'✨', abbr:'ST', water:[58,76], tideBias:6, waveIdeal:[0.5,2.8], note:'Cleaner water, moderate current and lower surf are favored. Dawn and dusk receive a stronger bump.' },
+      'Flounder': { icon:'⬟', abbr:'FL', water:[62,78], tideBias:7, waveIdeal:[0.5,3], note:'Bottom structure and moving water matter. Moderate conditions score higher than rough surf.' },
+      'Bluefish': { icon:'⚡', abbr:'BF', water:[60,78], tideBias:5, waveIdeal:[1,4.5], note:'Bait movement, moderate surf and stronger water movement can improve the score.' },
+      'Spanish Mackerel': { icon:'➤', abbr:'SM', water:[68,82], tideBias:4, waveIdeal:[0.5,3], note:'Warmer, clearer water and lower-to-moderate seas score best for nearshore Spanish mackerel.' },
+      'Black Drum': { icon:'●', abbr:'BD', water:[55,76], tideBias:7, waveIdeal:[0.5,3.5], note:'Structure and current get extra weight, with a broad cool-to-warm water preference.' },
+      'Sheepshead': { icon:'▦', abbr:'SH', water:[58,78], tideBias:6, waveIdeal:[0.5,2.5], note:'Moderate current around structure is favored. Excessive surf and wind reduce the score more quickly.' },
+      'Striped Bass': { icon:'↯', abbr:'SB', water:[48,68], tideBias:7, waveIdeal:[1,4], note:'Cooler water, moving tide and low-light windows receive extra weight.' }
     },
 
     mock: {
@@ -119,7 +125,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -139,7 +145,7 @@
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
         waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips
       };
-      try{ localStorage.setItem('coastcast-v5-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v6-state',JSON.stringify(payload)); }catch(_){ }
     },
 
     bindNavigation(){
@@ -163,7 +169,7 @@
       this.$('mapSearchBtn').addEventListener('click',()=>this.openDialog('locationDialog'));
       this.$('settingsBtn').addEventListener('click',()=>this.openSettings());
       this.$('syncBtn').addEventListener('click',()=>this.state.live?this.loadLiveData():this.showToast('Turn on Live Data to refresh internet forecasts.'));
-      this.$('liveModeBtn').addEventListener('click',()=>this.setLiveMode(!this.state.live));
+      this.$('liveModeBtn').addEventListener('click',()=>{const s=this.overallDataStatus();if(this.state.live&&s!=='live')this.loadLiveData();else this.setLiveMode(!this.state.live);});
       this.$('liveModeToggle').addEventListener('change',e=>this.setLiveMode(e.target.checked));
       this.$('favoriteSpotBtn').addEventListener('click',()=>this.quickSaveSpot());
       this.$('speciesInfoBtn').addEventListener('click',()=>this.openDialog('infoDialog'));
@@ -232,7 +238,7 @@
 
     populateSpeciesControls(){
       const names=Object.keys(this.species);
-      this.$('speciesChips').innerHTML=names.map(name=>`<button type="button" class="species-chip ${name===this.state.targetSpecies?'active':''}" data-species="${this.escape(name)}">${this.species[name].icon} ${this.escape(name)}</button>`).join('');
+      this.$('speciesChips').innerHTML=names.map(name=>`<button type="button" class="species-chip ${name===this.state.targetSpecies?'active':''}" data-species="${this.escape(name)}"><span class="species-chip-mark">${this.escape(this.species[name].abbr||name.slice(0,2).toUpperCase())}</span><span>${this.escape(name)}</span></button>`).join('');
       this.$$('.species-chip').forEach(btn=>btn.addEventListener('click',()=>this.setSpecies(btn.dataset.species)));
       ['targetSpecies','catchSpecies','tripSpecies'].forEach(id=>{
         const el=this.$(id); if(!el) return;
@@ -315,7 +321,7 @@
       this.state.data=this.buildDemoData();
       this.renderAll();
       this.recenterMap();
-      if(this.state.live) this.loadLiveData(); else {this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo'};this.renderSourceHealth();this.showToast('Fishing location updated. Turn on Live Data for real forecasts.');}
+      if(this.state.live) this.loadLiveData(); else {this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo'};this.renderMode();this.renderSourceHealth();this.showToast('Fishing location updated. Turn on Live Data for real forecasts.');}
     },
 
     setLiveMode(enabled){
@@ -329,6 +335,8 @@
     async loadLiveData({quiet=false}={}){
       if(this.state.loading) return;
       this.state.loading=true;
+      this.state.sourceHealth={weather:'loading',marine:'loading',tides:'loading',shops:'loading'};
+      this.renderMode();this.renderSourceHealth();
       this.$('syncBtn').classList.add('spinning');
       if(!quiet) this.showToast('Loading live coastal conditions…');
       const {lat,lon}=this.state.location;
@@ -343,12 +351,13 @@
       const marine=results[1].status==='fulfilled'?results[1].value:null;
       const tideData=results[2].status==='fulfilled'?results[2].value:null;
       const shops=results[3].status==='fulfilled'&&Array.isArray(results[3].value)&&results[3].value.length?results[3].value:null;
-      this.state.sourceHealth={weather:weather?'live':'partial',marine:marine?'live':'partial',tides:tideData?'live':'partial',shops:shops?'live':'partial'};
+      this.state.sourceHealth={weather:weather?'live':'fallback',marine:marine?'live':'fallback',tides:tideData?'live':'fallback',shops:shops?'live':'fallback'};
       this.state.data=this.mergeLiveData(base,weather,marine,tideData,shops);
       this.recalculateScores();
       this.renderAll();
       this.renderMapLayers();
       this.state.loading=false;
+      this.renderMode();this.renderSourceHealth();
       this.$('syncBtn').classList.remove('spinning');
       const liveCount=[weather,marine,tideData,shops].filter(Boolean).length;
       this.$('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
@@ -369,7 +378,7 @@
     async loadMarine(lat,lon){
       const params=new URLSearchParams({
         latitude:String(lat),longitude:String(lon),timezone:'auto',forecast_days:'7',
-        length_unit:'imperial',temperature_unit:'fahrenheit',
+        length_unit:'imperial',cell_selection:'sea',
         current:'wave_height,wave_direction,wave_period,wave_peak_period,swell_wave_height,swell_wave_direction,swell_wave_period,swell_wave_peak_period,sea_surface_temperature,ocean_current_velocity,ocean_current_direction',
         hourly:'wave_height,wave_direction,wave_period,wave_peak_period,swell_wave_height,swell_wave_direction,swell_wave_period,swell_wave_peak_period,sea_surface_temperature,ocean_current_velocity,ocean_current_direction'
       });
@@ -396,6 +405,8 @@
       if(preset?.tideStation){
         return {id:preset.tideStation,name:preset.name.replace(/, NC|, SC/,'')+', NOAA',lat:preset.lat,lon:preset.lon,distance:this.haversine(lat,lon,preset.lat,preset.lon)};
       }
+      const seeded=this.seedTideStations.map(s=>({...s,distance:this.haversine(lat,lon,s.lat,s.lon)})).sort((a,b)=>a.distance-b.distance)[0];
+      if(seeded&&seeded.distance<=35) return seeded;
       const cached=this.readStationCache();
       let stations=cached;
       if(!stations){
@@ -427,8 +438,10 @@
       const radiusMeters=Math.round(this.state.radius*1609.344);
       const query=`[out:json][timeout:18];(node(around:${radiusMeters},${lat},${lon})[shop~"fishing|outdoor"];way(around:${radiusMeters},${lat},${lon})[shop~"fishing|outdoor"];node(around:${radiusMeters},${lat},${lon})[name~"bait|tackle",i];way(around:${radiusMeters},${lat},${lon})[name~"bait|tackle",i];);out center tags;`;
       try{
-        const url='https://overpass-api.de/api/interpreter?data='+encodeURIComponent(query);
-        const data=await this.fetchJSON(url,20000);
+        const endpoints=['https://overpass-api.de/api/interpreter?data=','https://overpass.kumi.systems/api/interpreter?data='];
+        let data=null,lastErr=null;
+        for(const endpoint of endpoints){try{data=await this.fetchJSON(endpoint+encodeURIComponent(query),18000);if(data)break;}catch(err){lastErr=err;}}
+        if(!data) throw lastErr||new Error('No shop search response');
         const shops=(data.elements||[]).map(el=>{
           const slat=Number(el.lat??el.center?.lat),slon=Number(el.lon??el.center?.lon);
           const name=el.tags?.name||'Bait & tackle';
@@ -497,14 +510,15 @@
         out.current.swellHeight=this.num(c.swell_wave_height,out.current.swellHeight);
         out.current.swellDir=this.num(c.swell_wave_direction,out.current.swellDir);
         out.current.swellPeriod=this.num(c.swell_wave_period,out.current.swellPeriod);
-        out.current.waterTemp=this.num(c.sea_surface_temperature,out.current.waterTemp);
-        out.current.oceanCurrent=this.num(c.ocean_current_velocity,out.current.oceanCurrent??0);
+        out.current.waterTemp=Number.isFinite(Number(c.sea_surface_temperature))?this.cToF(Number(c.sea_surface_temperature)):out.current.waterTemp;
+        out.current.oceanCurrent=Number.isFinite(Number(c.ocean_current_velocity))?Number(c.ocean_current_velocity)*0.621371:(out.current.oceanCurrent??0);
+        out.current.oceanCurrentUnit='mph';
         out.current.oceanCurrentDir=this.num(c.ocean_current_direction,out.current.oceanCurrentDir??0);
         out.current.wavePeakPeriod=this.num(c.wave_peak_period,out.current.wavePeakPeriod??out.current.wavePeriod);
         out.current.swellPeakPeriod=this.num(c.swell_wave_peak_period,out.current.swellPeakPeriod??out.current.swellPeriod);
         const mh=marine.hourly||{};
         if(Array.isArray(mh.time)){
-          const marineMap=new Map(mh.time.map((t,i)=>[t,{wave:this.num(mh.wave_height?.[i],2),waveDir:this.num(mh.wave_direction?.[i],0),period:this.num(mh.wave_period?.[i],8),wavePeak:this.num(mh.wave_peak_period?.[i],8),swell:this.num(mh.swell_wave_height?.[i],1.5),swellDir:this.num(mh.swell_wave_direction?.[i],0),swellPeriod:this.num(mh.swell_wave_period?.[i],9),swellPeak:this.num(mh.swell_wave_peak_period?.[i],9),water:this.num(mh.sea_surface_temperature?.[i],out.current.waterTemp),currentVelocity:this.num(mh.ocean_current_velocity?.[i],0),currentDir:this.num(mh.ocean_current_direction?.[i],0)}]));
+          const marineMap=new Map(mh.time.map((t,i)=>[t,{wave:this.num(mh.wave_height?.[i],2),waveDir:this.num(mh.wave_direction?.[i],0),period:this.num(mh.wave_period?.[i],8),wavePeak:this.num(mh.wave_peak_period?.[i],8),swell:this.num(mh.swell_wave_height?.[i],1.5),swellDir:this.num(mh.swell_wave_direction?.[i],0),swellPeriod:this.num(mh.swell_wave_period?.[i],9),swellPeak:this.num(mh.swell_wave_peak_period?.[i],9),water:Number.isFinite(Number(mh.sea_surface_temperature?.[i]))?this.cToF(Number(mh.sea_surface_temperature[i])):out.current.waterTemp,currentVelocity:Number.isFinite(Number(mh.ocean_current_velocity?.[i]))?Number(mh.ocean_current_velocity[i])*0.621371:0,currentDir:this.num(mh.ocean_current_direction?.[i],0)}]));
           out.hours.forEach(h=>{
             const m=marineMap.get(h.rawTime); if(!m) return;
             h.wave=m.wave;h.waveDir=m.waveDir;h.period=m.period;h.wavePeak=m.wavePeak;h.swell=m.swell;h.swellDir=m.swellDir;h.swellPeriod=m.swellPeriod;h.swellPeak=m.swellPeak;h.water=m.water;h.currentVelocity=m.currentVelocity;h.currentDir=m.currentDir;
@@ -585,19 +599,45 @@
       if(this.state.view==='map') this.renderMapLayers();
     },
 
+    overallDataStatus(){
+      if(this.state.loading) return 'loading';
+      if(!this.state.live) return 'demo';
+      const h=this.state.sourceHealth||{};
+      const core=[h.weather,h.marine,h.tides];
+      const liveCount=core.filter(x=>x==='live').length;
+      if(liveCount===3) return 'live';
+      if(liveCount>0) return 'partial';
+      return 'fallback';
+    },
+
+    dataStatusCopy(){
+      const s=this.overallDataStatus();
+      if(s==='loading') return {label:'Updating live data',note:'Checking weather, marine and NOAA tide feeds now.'};
+      if(s==='live') return {label:'Live forecast',note:'Weather, marine and NOAA tide sources are confirmed live.'};
+      if(s==='partial') return {label:'Partial live',note:'Some live sources responded; demo fallbacks fill only the missing pieces.'};
+      if(s==='fallback') return {label:'Demo fallback',note:'Live mode is on, but the core feeds did not confirm. Displayed values are fallback data.'};
+      return {label:'Demo data',note:'Prototype values are shown. Turn on live data when you want internet forecasts.'};
+    },
+
     renderMode(){
-      const badge=this.$('modeBadge');
-      badge.classList.toggle('live',this.state.live);badge.classList.toggle('demo',!this.state.live);
-      this.$('modeText').textContent=this.state.live?'Live data':'Demo data';
-      this.$('liveModeBtn').textContent=this.state.live?'Use demo':'Use live data';
+      const badge=this.$('modeBadge'); const status=this.overallDataStatus(); const copy=this.dataStatusCopy();
+      badge.className='status-pill '+status;
+      this.$('modeText').textContent=copy.label;
+      this.$('liveModeBtn').textContent=!this.state.live?'Use live data':status==='live'?'Use demo':'Retry live';
+      this.$('liveModeBtn').disabled=this.state.loading;
       this.$('liveModeToggle').checked=this.state.live;
+      const message=this.$('dataQualityMessage'); if(message) message.textContent=copy.note;
+      const conditionsBadge=this.$('conditionsSourceBadge'); if(conditionsBadge) conditionsBadge.textContent=status==='live'?'Live readings':status==='partial'?'Mixed live / fallback':status==='loading'?'Updating…':status==='demo'?'Demo readings':'Fallback readings';
+      const forecastBar=this.$('forecastStatusBar');
+      if(forecastBar){forecastBar.className='forecast-status-bar '+status;forecastBar.innerHTML=`<span class="status-dot"></span><strong>${this.escape(copy.label)}</strong><span>${this.escape(copy.note)}</span>`;}
     },
 
     renderSourceHealth(){
       const box=this.$('sourceHealth'); if(!box) return;
       const h=this.state.sourceHealth||{};
-      const items=[['Weather',h.weather],['Marine',h.marine],['NOAA tides',h.tides],['Tackle',h.shops]];
-      box.innerHTML=items.map(([name,status])=>`<span class="source-chip ${status==='live'?'live':status==='partial'?'partial':''}">${this.escape(name)} · ${status==='live'?'Live':status==='partial'?'Fallback':'Demo'}</span>`).join('');
+      const items=[['Weather',h.weather],['Marine',h.marine],['NOAA tides',h.tides],['Tackle shops',h.shops]];
+      const label=s=>s==='live'?'LIVE':s==='loading'?'CHECKING':s==='fallback'||s==='partial'?'FALLBACK':'DEMO';
+      box.innerHTML=items.map(([name,status])=>`<span class="source-chip ${status||'demo'}"><span class="source-chip-name">${this.escape(name)}</span><strong>${label(status)}</strong></span>`).join('');
     },
 
     renderLocation(){
@@ -625,13 +665,13 @@
       this.$('bestWindow').textContent=window.label;
       this.$('bestWindowReason').textContent=window.reason;
       this.$('scoreReason').textContent=`${this.state.targetSpecies} mode: ${window.reason}. ${this.state.fishingStyle} weighting is active.`;
-      this.$('intelConfidence').textContent=this.state.live?'Live-source confidence':'Demo confidence';
+      {const s=this.overallDataStatus();this.$('intelConfidence').textContent=s==='live'?'High · live sources':s==='partial'?'Medium · partial live':s==='loading'?'Checking sources…':'Prototype confidence';}
     },
 
     renderSpecies(){
       this.$$('.species-chip').forEach(b=>b.classList.toggle('active',b.dataset.species===this.state.targetSpecies));
       const cfg=this.species[this.state.targetSpecies];
-      this.$('speciesInsight').innerHTML=`<strong>${cfg.icon} ${this.escape(this.state.targetSpecies)}:</strong> ${this.escape(cfg.note)}`;
+      this.$('speciesInsight').innerHTML=`<strong><span class="insight-species-mark">${this.escape(cfg.abbr||this.state.targetSpecies.slice(0,2).toUpperCase())}</span> ${this.escape(this.state.targetSpecies)}:</strong> ${this.escape(cfg.note)}`;
       this.$('targetSpecies').value=this.state.targetSpecies;
       this.$('logbookTargetTitle').textContent=this.state.targetSpecies;
       this.$('speciesTip').textContent=cfg.note;
@@ -737,12 +777,13 @@
       let hours=d.hours.filter(h=>h.dateIndex===this.state.forecastDay).slice(0,24);
       if(!hours.length) hours=d.hours.slice(0,24).map(h=>({...h,dateIndex:this.state.forecastDay}));
       this.$('hourlyTable').innerHTML=hours.map(h=>`<tr><td><strong>${this.escape(h.time)}</strong></td><td>${h.icon||this.weatherIcon(h.weatherCode)}</td><td>${this.fmt(h.temp,0)}°</td><td>${this.compass(h.windDir)} ${this.fmt(h.wind,0)}</td><td>${this.fmt(h.rain,0)}%</td><td>${this.fmt(h.wave,1)} ft</td><td>${this.escape(h.tide||'—')}</td><td class="${h.score>=80?'score-high':h.score>=65?'score-mid':'score-low'}">${h.score}</td></tr>`).join('');
+      this.drawBiteTrend(this.$('biteTrendCanvas'),hours);
       this.$('detailWave').textContent=`${this.fmt(c.waveHeight,1)} ft`;
       this.$('detailPeriod').textContent=`${this.fmt(c.wavePeriod,0)} sec`;
       this.$('detailWaveDir').textContent=this.compass(c.waveDir);
       this.$('detailSwell').textContent=`${this.fmt(c.swellHeight,1)} ft @ ${this.fmt(c.swellPeriod,0)} sec`;
       this.$('detailSwellDir').textContent=this.compass(c.swellDir);
-      this.$('detailCurrent').textContent=Number.isFinite(c.oceanCurrent)&&c.oceanCurrent>0?`${this.fmt(c.oceanCurrent,1)} mph → ${this.compass(c.oceanCurrentDir)}`:'Not available';
+      this.$('detailCurrent').textContent=Number.isFinite(c.oceanCurrent)&&c.oceanCurrent>0?`${this.fmt(c.oceanCurrent,1)} ${c.oceanCurrentUnit||'mph'} → ${this.compass(c.oceanCurrentDir)}`:'Not available';
       this.$('detailWater').textContent=`${this.fmt(c.waterTemp,0)}°F`;
       this.$('detailSunrise').textContent=selected?.sunrise||d.sun?.sunrise||'—';
       this.$('detailSunset').textContent=selected?.sunset||d.sun?.sunset||'—';
@@ -752,6 +793,24 @@
       this.$('detailUV').textContent=Number.isFinite(selected?.uv)?this.fmt(selected.uv,0):Number.isFinite(c.uv)?this.fmt(c.uv,0):'—';
       this.$('detailPressure').textContent=`${this.fmt(this.hpaToInHg(c.pressure),2)} in`;
       this.$('detailMoon').textContent=this.moonPhase();
+    },
+
+    drawBiteTrend(canvas,hours){
+      if(!canvas||!hours?.length) return;
+      const ctx=canvas.getContext('2d'),rect=canvas.getBoundingClientRect(),scale=Math.max(1,window.devicePixelRatio||1);
+      const w=Math.max(300,Math.round(rect.width*scale)),h=Math.max(150,Math.round(rect.height*scale));
+      if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
+      ctx.clearRect(0,0,w,h);ctx.save();ctx.scale(scale,scale);const cw=w/scale,ch=h/scale,padL=28,padR=14,padT=18,padB=25;
+      const values=hours.slice(0,18),min=40,max=100;
+      ctx.strokeStyle='rgba(159,185,201,.11)';ctx.lineWidth=1;
+      [50,70,90].forEach(v=>{const y=padT+(ch-padT-padB)*(1-(v-min)/(max-min));ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(cw-padR,y);ctx.stroke();ctx.fillStyle='#6E8B9D';ctx.font='9px Inter,system-ui';ctx.fillText(String(v),3,y+3);});
+      const pts=values.map((x,i)=>({x:padL+(cw-padL-padR)*(i/Math.max(1,values.length-1)),y:padT+(ch-padT-padB)*(1-(Math.max(min,Math.min(max,x.score))-min)/(max-min)),score:x.score,time:x.time}));
+      const grad=ctx.createLinearGradient(0,padT,0,ch-padB);grad.addColorStop(0,'rgba(79,223,181,.24)');grad.addColorStop(1,'rgba(79,223,181,0)');
+      ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,ch-padB);ctx.lineTo(pts[0].x,ch-padB);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+      ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle='#4FDFB5';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();
+      const best=pts.reduce((a,b)=>b.score>a.score?b:a,pts[0]);ctx.beginPath();ctx.arc(best.x,best.y,4.5,0,Math.PI*2);ctx.fillStyle='#EAF8FF';ctx.fill();ctx.strokeStyle='#4FDFB5';ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='#8FAFC0';ctx.font='9px Inter,system-ui';const step=Math.max(1,Math.ceil(values.length/5));values.forEach((v,i)=>{if(i%step===0||i===values.length-1){ctx.fillText(v.time,Math.min(cw-38,pts[i].x-9),ch-7);}});
+      ctx.fillStyle='#DDF8EE';ctx.font='700 10px Inter,system-ui';ctx.fillText(`Best ${best.score}`,Math.min(cw-55,best.x+7),Math.max(12,best.y-8));ctx.restore();
     },
 
     renderChecklist(){
@@ -904,6 +963,7 @@
     weatherIcon(code){const c=Number(code);if(c===0)return'☀️';if([1,2].includes(c))return'🌤️';if(c===3)return'☁️';if([45,48].includes(c))return'🌫️';if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(c))return'🌧️';if([71,73,75,77,85,86].includes(c))return'🌨️';if([95,96,99].includes(c))return'⛈️';return'🌥️';},
     compass(deg){const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];const n=((Number(deg)%360)+360)%360;return dirs[Math.round(n/22.5)%16];},
     hpaToInHg(hpa){return Number(hpa)*0.0295299830714;},
+    cToF(c){return c*9/5+32;},
     num(v,fallback=0){const n=Number(v);return Number.isFinite(n)?n:fallback;},
     round(v,fallback=0){const n=Number(v);return Number.isFinite(n)?Math.round(n):fallback;},
     fmt(v,digits=0){const n=Number(v);return Number.isFinite(n)?n.toFixed(digits):'—';},

@@ -1,7 +1,7 @@
 {
   "name": "CoastCast Fishing Forecast",
   "short_name": "CoastCast",
-  "description": "Professional coastal fishing planner with live weather, wind, tides, surf, water temperature, species scoring, trip planning, maps, bait shops and catch logbook.",
+  "description": "Premium coastal fishing planner with truthful live-data status, weather, marine forecasts, NOAA tides, species scoring, trip planning, fishing map, bait shops and catch logbook.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
