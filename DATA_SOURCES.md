@@ -1,20 +1,25 @@
-# CoastCast v1.8 Data & Community Sources
+# CoastCast v2.0.2 Data Sources
 
-CoastCast keeps the nationwide live-data stack from v1.7:
-- Open-Meteo weather and marine forecasts
+## Forecast and marine
+- Open-Meteo weather forecast
+- Open-Meteo marine forecast
 - NOAA CO-OPS tide predictions
 - National Weather Service point alerts
-- OpenStreetMap / public place discovery fallbacks
-- CoastCast verified/local fallback catalogs where applicable
 
-## Community Beta
-Community content comes from three clearly different sources:
-1. **Local Preview** — catches you explicitly publish on this device plus clearly simulated demo posts.
-2. **Supabase Community Beta** — posts explicitly published by signed-in CoastCast users when the v1.8 Community tables are installed.
-3. **Your private Logbook** — never treated as public Community data merely because it exists locally or in private Cloud Sync.
+## Fishing access / map discovery
+- Official/state public coastal-access datasets where integrated
+- OpenStreetMap / Overpass
+- Nominatim / Photon as secondary location discovery
+- CoastCast verified regional access catalogs where available
 
-Community Beta is separate from forecast data. User-generated catch reports are anecdotal and should not be treated as verified fishing or safety information.
+## Bait & tackle intelligence
+CoastCast v2.0.2 uses a multi-source merge:
+1. **Geoapify Places** (optional key) — dedicated `commercial.outdoor_and_sport.fishing` category.
+2. **OpenStreetMap / Overpass** — fishing-store tags plus fishing-specific names/descriptions/products.
+3. **Nominatim / Photon** — strict text discovery, never accepted solely because a geocoder returned a nearby business.
+4. **CoastCast verified regional catalogs** — high-confidence local fallbacks built from current official/business sources.
 
+Every tackle result must pass a fishing-business validation rule or be explicitly marked as a verified fishing-supply business. CoastCast prefers showing no pin over knowingly showing an unrelated business.
 
-## CoastCast 2.0 Decision Layer
-Command Center, Opportunity Matrix, Mission Control and Angler Analytics are local CoastCast calculations built from the already-loaded live/fallback sources and the user's private logbook. They are not additional external forecast providers.
+## Important limitation
+Business openings, closures, inventory and category data can change. CoastCast cannot guarantee that every existing shop is indexed or that every indexed shop is still open. A dedicated commercial Places provider improves nationwide completeness, but final navigation/business details should still be verified before driving.

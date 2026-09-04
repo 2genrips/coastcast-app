@@ -1269,8 +1269,14 @@
       </div>
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
-      <label class="field-group"><span>Nearby shop radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <div class="settings-note">CoastCast v2.0 Launch Candidate is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
+      <label class="field-group"><span>Fishing-area scan radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
+      <div class="settings-note"><strong>BAIT & TACKLE ACCURACY</strong><br/>CoastCast now merges multiple shop sources and keeps public fishing-access pins separate from tackle-store pins.</div>
+      <label class="field-group"><span>Tackle-shop search radius</span><select id="tackleRadiusSetting" class="select-control"><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option><option value="50">50 miles</option></select></label>
+      <label class="field-group"><span>Geoapify Places key <small>(optional — nationwide accuracy)</small></span><input id="geoapifyKeySetting" class="text-control" type="password" autocomplete="off" placeholder="Paste free Geoapify API key" /></label>
+      <div id="placesProviderStatus" class="settings-note">Open-data mode. CoastCast is using OpenStreetMap plus verified local catalogs.</div>
+      <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
+      <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CoastCast backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
+      <div class="settings-note">CoastCast v2.0.2 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>

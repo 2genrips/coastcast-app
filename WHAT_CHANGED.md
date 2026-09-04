@@ -1,25 +1,20 @@
-# CoastCast v2.0 — Command Center Launch Candidate
+# CoastCast v2.0.2 — Multi-Source Tackle Intelligence
 
-## Big additions
-- CoastCast Command Center: one recommendation from species, 7-day forecast, wind, surf, weather, safety and data confidence.
-- Four planning priorities: Max Bite, Calm Water, Best Weather and Most Certain.
-- One-tap Complete Command Plan that connects target species, best day/window, bait plan and Smart Departure.
-- 7-day Opportunity Matrix across the top regional species.
-- Trip Mission Control with plan completeness and guarded one-tap Go Fishing Mode launch.
-- Forecast Data Confidence score based on which live sources actually responded.
-- Angler Analytics dashboard that learns your repeated species, bait, water, time, tide and condition patterns from your private logbook.
-- Command Brief sharing for Android.
-- v2.0 state/backup migration preserves v1.8 data.
+## Why this update exists
+The v2.0.1 strict filter stopped false bait pins such as government offices and libraries, but it also exposed the opposite problem: open map data can be incomplete and may miss legitimate bait/tackle businesses.
 
-## Safety
-Command Center and Mission Control are planning aids. A strong score is not a declaration that surf or weather is safe. Official warnings, local beach flags, access rules and fishing regulations remain authoritative.
+## Tackle-store improvements
+- CoastCast now **merges** shop results from multiple providers instead of stopping after the first source returns something.
+- Optional Geoapify Places integration for a dedicated nationwide fishing-store category.
+- Expanded OpenStreetMap/Overpass search checks names, fishing shop categories, descriptions, and product tags.
+- Nominatim and Photon text searches remain secondary discovery sources with strict validation.
+- Separate **Tackle-shop search radius** from the normal fishing-area scan radius; default is 20 miles.
+- Up to 18 validated shop results can be retained, with up to 8 shown in lists.
+- Results show provenance badges: VERIFIED, PLACES, OSM, or SEARCH.
+- Verified regional catalogs are **merged with** live discovery instead of being used only after total failure.
+- Holden Beach now includes a larger verified fallback catalog sourced from current fishing-store/business and coastal-fishing references.
+- Old v2.0.1 shop cache is bypassed with a new v3 cache key.
+- CoastCast still refuses to place an unrelated business on the Bait layer just to fill the map.
 
-
-## v2.0.1 tackle-shop accuracy hotfix
-- Bait/tackle map pins now require a strict fishing-store match.
-- Explicitly rejects government offices, sheriff/police, libraries, schools, churches, hospitals and other unrelated geocoder results.
-- Live mode no longer leaves demo shops on the map when real shop lookup fails.
-- Shop cache key was versioned so previously cached false-positive businesses are discarded.
-- Overpass search now prefers `shop=fishing` and fishing-specific sports/outdoor stores.
-- Text-geocoder fallbacks are accepted only when the returned business name itself looks like a fishing/bait/tackle store.
-- If CoastCast cannot verify a tackle shop, it now shows no tackle pin rather than a wrong one.
+## Accuracy policy
+No POI/business database is perfectly complete or current. CoastCast now prioritizes dedicated fishing-store categories, verified local evidence, provider provenance, and no-fake-result behavior rather than claiming 100% completeness.
