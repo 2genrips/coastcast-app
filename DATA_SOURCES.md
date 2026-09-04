@@ -18,3 +18,7 @@ Species scores are CoastCast planning estimates based on live forecast condition
 
 ## v1.0 Smart Alerts
 Forecast watches are evaluated locally against the forecast already loaded in CoastCast. They do not introduce a new external data provider. Device notifications, when permitted, are emitted only during an active app/open-refresh check. Continuous background push monitoring requires a future backend/push service.
+
+
+## v1.1 optional cloud sync
+Supabase is not required for forecasts and is not a CoastCast data provider. If the user connects their own Supabase project, CoastCast stores one user-owned JSON sync record protected by Supabase Auth and Row Level Security. The app never needs a service-role key.

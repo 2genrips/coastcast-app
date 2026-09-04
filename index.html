@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, smart trips, favorites, forecast alerts, maps, bait shops and a personal catch logbook." />
+  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, smart trips, favorites, forecast alerts, cloud-ready profiles, maps, bait shops and a personal catch logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=1.0.0" />
+  <link rel="stylesheet" href="styles.css?v=1.1.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -38,6 +38,7 @@
       </div>
       <div class="topbar-actions">
         <button id="syncBtn" class="icon-button" type="button" aria-label="Refresh live data" title="Refresh live data"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>
+        <button id="profileBtn" class="profile-button" type="button" aria-label="Open profile" title="Profile"><span id="profileInitials">CC</span></button>
         <button id="settingsBtn" class="icon-button" type="button" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg></button>
       </div>
     </header>
@@ -563,6 +564,82 @@
         </section>
       </section>
 
+
+      <!-- PROFILE -->
+      <section class="view" data-view="profile" id="view-profile">
+        <div class="page-head profile-page-head">
+          <div>
+            <div class="eyebrow">MY COASTCAST</div>
+            <h1>Profile</h1>
+            <p class="page-subtitle">Personalize your fishing planner and keep your CoastCast data portable.</p>
+          </div>
+          <span id="profileCloudBadge" class="tiny-pill">LOCAL</span>
+        </div>
+
+        <section class="panel profile-identity-panel">
+          <div class="profile-identity-top">
+            <div id="profileAvatar" class="profile-avatar">CC</div>
+            <div class="profile-identity-copy"><div class="eyebrow">ANGLER PROFILE</div><h2 id="profileDisplayHeading">CoastCast Angler</h2><p id="profileHomeSummary">Set a home coast and favorite target to personalize the app.</p></div>
+            <button id="editProfileBtn" class="secondary-button small" type="button">Edit</button>
+          </div>
+          <div class="profile-stat-grid">
+            <div><strong id="profileCatchCount">0</strong><span>Catches</span></div>
+            <div><strong id="profileFavoriteCount">0</strong><span>Favorites</span></div>
+            <div><strong id="profileTripCount">0</strong><span>Trips</span></div>
+            <div><strong id="profileAlertCount">0</strong><span>Alerts</span></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading"><div><div class="eyebrow">PERSONALIZATION</div><h2>Fishing preferences</h2></div><span class="tiny-pill">ON DEVICE</span></div>
+          <div class="profile-preference-grid">
+            <div><span>Home coast</span><strong id="profileHomeCoast">Not set</strong></div>
+            <div><span>Favorite species</span><strong id="profileFavoriteSpecies">Red Drum</strong></div>
+            <div><span>Fishing style</span><strong id="profileFishingStyle">Surf fishing</strong></div>
+            <div><span>Current destination</span><strong id="profileCurrentLocation">Wrightsville Beach, NC</strong></div>
+          </div>
+        </section>
+
+        <section class="panel data-vault-panel">
+          <div class="section-heading"><div><div class="eyebrow">DATA VAULT</div><h2>Backup & restore</h2></div><span class="tiny-pill">PRIVATE</span></div>
+          <p class="section-note">Your catches, saved spots, trips, alert rules and preferences currently live on this device. Export a backup before changing phones or browsers.</p>
+          <div class="vault-actions">
+            <button id="exportBackupBtn" class="primary-button" type="button">Export CoastCast backup</button>
+            <button id="importBackupBtn" class="secondary-button" type="button">Import backup</button>
+            <input id="importBackupInput" type="file" accept="application/json,.json" hidden />
+          </div>
+          <div id="backupStatus" class="vault-status">No backup action yet.</div>
+        </section>
+
+        <section class="panel cloud-sync-panel">
+          <div class="section-heading"><div><div class="eyebrow">CLOUD SYNC BETA</div><h2>Sync across devices</h2></div><span id="cloudConnectionBadge" class="tiny-pill">NOT CONNECTED</span></div>
+          <p class="section-note">Optional Supabase sync can keep one encrypted-by-transport CoastCast data record tied to your account. Your password is never saved by CoastCast.</p>
+          <div id="cloudAccountSummary" class="cloud-account-summary"><strong>Local-only mode</strong><span>Add your own Supabase project when you want cross-device sync.</span></div>
+          <div class="cloud-actions">
+            <button id="cloudSetupBtn" class="secondary-button" type="button">Cloud setup</button>
+            <button id="cloudSyncNowBtn" class="primary-button" type="button" disabled>Sync now</button>
+            <button id="cloudPullBtn" class="secondary-button" type="button" disabled>Restore from cloud</button>
+          </div>
+          <label class="switch-row cloud-auto-row"><span><strong>Auto sync</strong><small>Push local changes after you are signed in</small></span><input id="cloudAutoSyncToggle" type="checkbox" /></label>
+          <div id="cloudSyncStatus" class="vault-status">Cloud sync is optional and off by default.</div>
+        </section>
+
+        <section class="panel background-alert-panel">
+          <div class="section-heading"><div><div class="eyebrow">BACKGROUND ALERTS</div><h2>Launch readiness</h2></div><span class="tiny-pill">NEXT BACKEND STEP</span></div>
+          <div class="readiness-list">
+            <div class="ready"><span>✓</span><div><strong>Alert rules</strong><small>Already stored and evaluated in CoastCast</small></div></div>
+            <div class="ready"><span>✓</span><div><strong>Notification UI</strong><small>Android notification permission supported when the app is active</small></div></div>
+            <div class="ready"><span>✓</span><div><strong>Cloud rule sync</strong><small>Available after optional Supabase connection</small></div></div>
+            <div class="pending"><span>→</span><div><strong>24/7 server checks</strong><small>Requires a scheduled backend worker and push-delivery service before public launch</small></div></div>
+          </div>
+        </section>
+
+        <section class="panel profile-privacy-panel">
+          <div><div class="eyebrow">PRIVACY</div><h2>Your fishing data stays yours</h2><p>Private catch coordinates and private waypoints are never included in the public community feed. Cloud sync uses only the project you choose to connect.</p></div>
+          <button id="profileSettingsBtn" class="secondary-button" type="button">App settings</button>
+        </section>
+      </section>
+
       <!-- COMMUNITY -->
       <section class="view" data-view="community" id="view-community">
         <div class="page-head">
@@ -702,6 +779,35 @@
     </form>
   </dialog>
 
+
+  <!-- PROFILE EDITOR -->
+  <dialog id="profileDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head"><div><div class="eyebrow">ANGLER PROFILE</div><h2>Edit profile</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <label class="field-group"><span>Display name</span><input id="profileNameInput" class="text-control" maxlength="40" placeholder="CoastCast Angler" /></label>
+      <label class="field-group"><span>Home coast / home water</span><input id="profileHomeInput" class="text-control" maxlength="80" placeholder="Example: Cape Fear Coast, NC" /></label>
+      <label class="field-group"><span>Favorite target species</span><select id="profileSpeciesInput" class="select-control"></select></label>
+      <label class="field-group"><span>Default fishing style</span><select id="profileStyleInput" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
+      <button id="saveProfileBtn" class="primary-button full" type="button">Save profile</button>
+    </form>
+  </dialog>
+
+  <!-- CLOUD SYNC SETUP -->
+  <dialog id="cloudDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head"><div><div class="eyebrow">CLOUD SYNC BETA</div><h2>Connect Supabase</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="cloud-warning"><strong>Use your own CoastCast Supabase project.</strong><span>The project URL and anon key are public client configuration. Do not paste a service-role key here.</span></div>
+      <label class="field-group"><span>Supabase project URL</span><input id="cloudUrlInput" class="text-control" type="url" placeholder="https://your-project.supabase.co" autocapitalize="off" /></label>
+      <label class="field-group"><span>Supabase anon / publishable key</span><textarea id="cloudKeyInput" class="text-control textarea compact-textarea" placeholder="Paste anon key"></textarea></label>
+      <label class="field-group"><span>Email</span><input id="cloudEmailInput" class="text-control" type="email" autocomplete="email" placeholder="you@example.com" /></label>
+      <label class="field-group"><span>Password</span><input id="cloudPasswordInput" class="text-control" type="password" autocomplete="current-password" placeholder="Password" /></label>
+      <label class="switch-row"><span><strong>Remember project connection</strong><small>Saves URL, anon key and email on this device; never saves your password</small></span><input id="rememberCloudToggle" type="checkbox" checked /></label>
+      <div class="cloud-auth-actions"><button id="cloudSignInBtn" class="primary-button" type="button">Sign in</button><button id="cloudSignUpBtn" class="secondary-button" type="button">Create account</button></div>
+      <button id="cloudSignOutBtn" class="danger-button full" type="button">Sign out / disconnect session</button>
+      <div id="cloudDialogStatus" class="vault-status">Run SUPABASE_SETUP.sql in your project before first sync.</div>
+    </form>
+  </dialog>
+
   <!-- SETTINGS DIALOG -->
   <dialog id="settingsDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
@@ -712,7 +818,7 @@
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
       <label class="field-group"><span>Nearby shop radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <div class="settings-note">CoastCast v1.0 Beta is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
+      <div class="settings-note">CoastCast v1.1 Beta is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -739,6 +845,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=1.0.0"></script>
+  <script src="app.js?v=1.1.0"></script>
 </body>
 </html>

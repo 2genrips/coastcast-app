@@ -1,16 +1,16 @@
-# CoastCast v1.0 Beta
+# CoastCast v1.1 Beta
 
 ## New in this build
 
-- New **Trips** tab in the main navigation.
-- Saved Smart Trip plans now live in a dedicated trip hub.
-- Favorite fishing spots are surfaced in Trips with **Analyze** and **Plan** actions.
-- New **Smart Forecast Watches** for a location, target species, minimum score, maximum wind and 3/5/7-day lookahead.
-- In-app alert center shows when a loaded live forecast matches a saved rule.
-- Optional device notification permission can show a notification when CoastCast is open or refreshing and a rule matches.
-- Honest limitation: true background push alerts require a future server/push backend.
-- New Home quick actions for Plan, Save, Alert and Map.
-- New Home Smart Watch summary.
-- Community remains available from the Trips hub while the primary bottom navigation is simplified to Home, Forecast, Map, Trips and Logbook.
-- New trip/favorites/alert cards and launch-quality mobile polish.
-- v0.9 saved data migrates automatically into the v1.0 state store.
+- New **Profile** experience accessible from the top-right avatar.
+- Angler display name, home coast, favorite species and default fishing style.
+- Profile dashboard for catches, favorites, trips and alerts.
+- New **Data Vault** to export a portable CoastCast JSON backup and restore it on another device/browser.
+- Optional **Supabase Cloud Sync Beta** with email/password authentication.
+- Manual **Sync now** and **Restore from cloud** controls.
+- Optional auto-sync of local changes after sign-in.
+- Includes `SUPABASE_SETUP.sql` with a single user-owned JSON record table and Row Level Security policies.
+- Includes `CLOUD_SYNC_SETUP.md` with Android-friendly setup steps.
+- Service worker now includes future web-push event hooks so the PWA is ready for a later notification backend.
+- Honest background-alert readiness panel: 24/7 checks still require a scheduled backend worker and push delivery.
+- v1.0 local data migrates automatically into v1.1.

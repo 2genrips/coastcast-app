@@ -17,6 +17,8 @@
       savedTripPlans: [],
       alertRules: [],
       alertMatches: [],
+      profile: {name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'},
+      cloud: {url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null},
       data: null,
       map: null,
       mapLayers: { spots: [], catches: [], shops: [], current: [], recommended: [], access: [] },
@@ -202,6 +204,7 @@
     init(){
       this.restore();
       this.populateSpeciesControls();
+      this.populateProfileControls();
       this.populatePresets();
       this.bindNavigation();
       this.bindControls();
@@ -209,7 +212,7 @@
       this.state.data = this.buildDemoData();
       this.renderAll();
       const startView=(location.hash||'').replace('#','');
-      if(['forecast','map','trips','logbook','community'].includes(startView)) this.navigate(startView);
+      if(['forecast','map','trips','logbook','profile','community'].includes(startView)) this.navigate(startView);
       this.registerServiceWorker();
       if(this.state.live) this.loadLiveData({quiet:true});
     },
@@ -220,7 +223,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -233,6 +236,9 @@
         if(Number.isFinite(saved.trips)) this.state.trips=saved.trips;
         if(Array.isArray(saved.savedTripPlans)) this.state.savedTripPlans=saved.savedTripPlans;
         if(Array.isArray(saved.alertRules)) this.state.alertRules=saved.alertRules;
+        if(saved.profile&&typeof saved.profile==='object') this.state.profile={...this.state.profile,...saved.profile};
+        if(saved.cloud&&typeof saved.cloud==='object') this.state.cloud={...this.state.cloud,...saved.cloud,password:undefined};
+        if(this.state.cloud.session&&this.state.cloud.session.expires_at&&Number(this.state.cloud.session.expires_at)*1000<Date.now()) this.state.cloud.session=null;
       }catch(_){ }
     },
 
@@ -240,9 +246,12 @@
       const payload={
         live:this.state.live,location:this.state.location,radius:this.state.radius,
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
-        waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules
+        waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,
+        profile:this.state.profile,
+        cloud:{url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync}
       };
-      try{ localStorage.setItem('coastcast-v10-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v11-state',JSON.stringify(payload)); }catch(_){ }
+      if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
     bindNavigation(){
@@ -260,12 +269,14 @@
       if(view==='trips') this.renderTrips();
       if(view==='logbook') this.renderLogbook();
       if(view==='community') this.renderCommunity();
+      if(view==='profile') this.renderProfile();
     },
 
     bindControls(){
       this.$('locationTitleBtn').addEventListener('click',()=>this.openDialog('locationDialog'));
       this.$('mapSearchBtn').addEventListener('click',()=>this.openDialog('locationDialog'));
       this.$('settingsBtn').addEventListener('click',()=>this.openSettings());
+      this.$('profileBtn')?.addEventListener('click',()=>this.navigate('profile'));
       this.$('syncBtn').addEventListener('click',()=>this.state.live?this.loadLiveData():this.showToast('Turn on Live Data to refresh internet forecasts.'));
       this.$('liveModeBtn').addEventListener('click',()=>{const s=this.overallDataStatus();if(this.state.live&&s!=='live')this.loadLiveData();else this.setLiveMode(!this.state.live);});
       this.$('liveModeToggle').addEventListener('change',e=>this.setLiveMode(e.target.checked));
@@ -317,6 +328,19 @@
       this.$('radiusSetting').addEventListener('change',e=>{this.state.radius=Number(e.target.value);this.save();});
       this.$('fishingStyleSetting').addEventListener('change',e=>{this.state.fishingStyle=e.target.value;this.save();this.recalculateScores();this.renderAll();});
       this.$('resetAppBtn').addEventListener('click',()=>this.resetApp());
+      this.$('editProfileBtn')?.addEventListener('click',()=>this.openProfileEditor());
+      this.$('saveProfileBtn')?.addEventListener('click',()=>this.saveProfile());
+      this.$('profileSettingsBtn')?.addEventListener('click',()=>this.openSettings());
+      this.$('exportBackupBtn')?.addEventListener('click',()=>this.exportBackup());
+      this.$('importBackupBtn')?.addEventListener('click',()=>this.$('importBackupInput')?.click());
+      this.$('importBackupInput')?.addEventListener('change',e=>this.importBackupFile(e));
+      this.$('cloudSetupBtn')?.addEventListener('click',()=>this.openCloudSetup());
+      this.$('cloudSignInBtn')?.addEventListener('click',()=>this.cloudSignIn());
+      this.$('cloudSignUpBtn')?.addEventListener('click',()=>this.cloudSignUp());
+      this.$('cloudSignOutBtn')?.addEventListener('click',()=>this.cloudSignOut());
+      this.$('cloudSyncNowBtn')?.addEventListener('click',()=>this.cloudPush({manual:true}));
+      this.$('cloudPullBtn')?.addEventListener('click',()=>this.cloudPull());
+      this.$('cloudAutoSyncToggle')?.addEventListener('change',e=>{this.state.cloud.autoSync=!!e.target.checked;this.save();this.renderProfile();});
       this.$$('.filter-chip').forEach(btn=>btn.addEventListener('click',()=>this.setMapFilter(btn.dataset.mapFilter,btn)));
     },
 
@@ -846,7 +870,7 @@
       this.recalculateScores();
       this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderRegulations();this.renderConditions();this.renderFactors();
       this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();this.renderSpotIntelligence();
-      this.evaluateAlerts({notify:true});this.renderTrips();this.renderHomeAlerts();
+      this.evaluateAlerts({notify:true});this.renderTrips();this.renderHomeAlerts();this.renderProfile();
       if(this.state.view==='map') this.renderMapLayers();
     },
 
@@ -1488,8 +1512,125 @@
 
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
-      try{localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{localStorage.removeItem('coastcast-v8-state');}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      try{localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
+      this.state.live=false;try{localStorage.removeItem('coastcast-v8-state');}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+    },
+
+
+    populateProfileControls(){
+      const el=this.$('profileSpeciesInput');if(!el)return;
+      el.innerHTML=Object.keys(this.species).map(name=>`<option value="${this.escape(name)}">${this.escape(name)}</option>`).join('');
+    },
+
+    profileInitials(){
+      const name=(this.state.profile?.name||'CoastCast Angler').trim();
+      const parts=name.split(/\s+/).filter(Boolean);return ((parts[0]?.[0]||'C')+(parts.length>1?(parts[parts.length-1]?.[0]||''):'C')).toUpperCase().slice(0,2);
+    },
+
+    renderProfile(){
+      const p=this.state.profile||{};const initials=this.profileInitials();
+      if(this.$('profileInitials'))this.$('profileInitials').textContent=initials;
+      if(this.$('profileAvatar'))this.$('profileAvatar').textContent=initials;
+      if(this.$('profileDisplayHeading'))this.$('profileDisplayHeading').textContent=p.name||'CoastCast Angler';
+      if(this.$('profileHomeSummary'))this.$('profileHomeSummary').textContent=p.homeCoast?`${p.homeCoast} • Favorite target: ${p.favoriteSpecies||this.state.targetSpecies}`:'Set a home coast and favorite target to personalize the app.';
+      if(this.$('profileHomeCoast'))this.$('profileHomeCoast').textContent=p.homeCoast||'Not set';
+      if(this.$('profileFavoriteSpecies'))this.$('profileFavoriteSpecies').textContent=p.favoriteSpecies||this.state.targetSpecies;
+      if(this.$('profileFishingStyle'))this.$('profileFishingStyle').textContent=this.state.fishingStyle;
+      if(this.$('profileCurrentLocation'))this.$('profileCurrentLocation').textContent=this.state.location.name;
+      if(this.$('profileCatchCount'))this.$('profileCatchCount').textContent=String(this.state.catches.length);
+      if(this.$('profileFavoriteCount'))this.$('profileFavoriteCount').textContent=String(this.state.waypoints.length);
+      if(this.$('profileTripCount'))this.$('profileTripCount').textContent=String(this.state.savedTripPlans.length);
+      if(this.$('profileAlertCount'))this.$('profileAlertCount').textContent=String(this.state.alertRules.length);
+      const signed=this.cloudSignedIn();
+      if(this.$('profileCloudBadge'))this.$('profileCloudBadge').textContent=signed?'CLOUD CONNECTED':'LOCAL';
+      if(this.$('cloudConnectionBadge'))this.$('cloudConnectionBadge').textContent=signed?'CONNECTED':'NOT CONNECTED';
+      if(this.$('cloudAccountSummary'))this.$('cloudAccountSummary').innerHTML=signed?`<strong>${this.escape(this.state.cloud.email||'Signed in')}</strong><span>Cloud sync is connected to your Supabase project.</span>`:`<strong>Local-only mode</strong><span>Add your own Supabase project when you want cross-device sync.</span>`;
+      if(this.$('cloudSyncNowBtn'))this.$('cloudSyncNowBtn').disabled=!signed;
+      if(this.$('cloudPullBtn'))this.$('cloudPullBtn').disabled=!signed;
+      if(this.$('cloudAutoSyncToggle'))this.$('cloudAutoSyncToggle').checked=!!this.state.cloud.autoSync;
+      if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent=this.state.cloud.lastSync?`Last cloud sync: ${new Date(this.state.cloud.lastSync).toLocaleString()}`:(signed?'Connected. Run Sync now to create your first cloud backup.':'Cloud sync is optional and off by default.');
+    },
+
+    openProfileEditor(){
+      const p=this.state.profile||{};this.$('profileNameInput').value=p.name||'CoastCast Angler';this.$('profileHomeInput').value=p.homeCoast||'';this.$('profileSpeciesInput').value=p.favoriteSpecies||this.state.targetSpecies;this.$('profileStyleInput').value=this.state.fishingStyle;this.openDialog('profileDialog');
+    },
+
+    saveProfile(){
+      const name=(this.$('profileNameInput').value||'').trim().slice(0,40)||'CoastCast Angler';const home=(this.$('profileHomeInput').value||'').trim().slice(0,80);const species=this.$('profileSpeciesInput').value;const style=this.$('profileStyleInput').value;
+      this.state.profile={name,homeCoast:home,favoriteSpecies:species};this.state.fishingStyle=style;this.save();this.closeDialog('profileDialog');this.recalculateScores();this.renderAll();this.showToast('Profile updated.');
+    },
+
+    backupPayload(){
+      return {format:'coastcast-backup',version:'1.1.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile}};
+    },
+
+    exportBackup(){
+      try{const payload=this.backupPayload();const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`coastcast-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},300);if(this.$('backupStatus'))this.$('backupStatus').textContent=`Backup exported ${new Date().toLocaleString()}.`;this.showToast('CoastCast backup exported.');}catch(_){this.showToast('Could not export backup.');}
+    },
+
+    async importBackupFile(event){
+      const file=event.target.files?.[0];if(!file)return;
+      try{const text=await file.text();const parsed=JSON.parse(text);const d=parsed?.appState||parsed;if(!d||typeof d!=='object')throw new Error('Invalid');if(!confirm('Restore this CoastCast backup? Current local saved data will be replaced.'))return;
+        if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};
+        this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();if(this.$('backupStatus'))this.$('backupStatus').textContent=`Backup restored from ${this.escape(file.name)}.`;this.showToast('Backup restored. Refresh live data for the restored destination.');
+      }catch(_){this.showToast('That file is not a valid CoastCast backup.');}finally{event.target.value='';}
+    },
+
+    openCloudSetup(){
+      const c=this.state.cloud||{};this.$('cloudUrlInput').value=c.url||'';this.$('cloudKeyInput').value=c.anonKey||'';this.$('cloudEmailInput').value=c.email||'';this.$('cloudPasswordInput').value='';this.$('rememberCloudToggle').checked=true;this.$('cloudDialogStatus').textContent=this.cloudSignedIn()?'Signed in. You can update project settings or sign out.':'Run SUPABASE_SETUP.sql in your project before first sync.';this.openDialog('cloudDialog');
+    },
+
+    normalizeCloudUrl(url){return String(url||'').trim().replace(/\/+$/,'');},
+    cloudSignedIn(){return !!(this.state.cloud?.session?.access_token&&this.state.cloud?.session?.user?.id);},
+    cloudConfigFromForm(){
+      const url=this.normalizeCloudUrl(this.$('cloudUrlInput').value),anonKey=(this.$('cloudKeyInput').value||'').trim(),email=(this.$('cloudEmailInput').value||'').trim(),password=this.$('cloudPasswordInput').value||'';
+      if(!/^https:\/\/.+\.supabase\.co$/i.test(url))throw new Error('Enter a valid Supabase project URL.');if(anonKey.length<20)throw new Error('Enter the Supabase anon / publishable key.');if(!/^\S+@\S+\.\S+$/.test(email))throw new Error('Enter a valid email.');if(password.length<6)throw new Error('Password must be at least 6 characters.');return{url,anonKey,email,password};
+    },
+
+    cloudHeaders(token){const c=this.state.cloud;return{'apikey':c.anonKey,'Authorization':`Bearer ${token||c.anonKey}`,'Content-Type':'application/json'};},
+
+    async cloudSignIn(){
+      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Signing in…';const r=await fetch(`${cfg.url}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign in failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent='Signed in successfully.';this.renderProfile();this.showToast('Cloud account connected.');}
+      catch(err){this.$('cloudDialogStatus').textContent=err.message||'Could not sign in.';this.showToast(err.message||'Could not sign in.');}
+    },
+
+    async cloudSignUp(){
+      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Creating account…';const r=await fetch(`${cfg.url}/auth/v1/signup`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign up failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body?.access_token?body:null};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent=body?.access_token?'Account created and signed in.':'Account created. Check your email if confirmation is enabled, then sign in.';this.renderProfile();this.showToast('Cloud account created.');}
+      catch(err){this.$('cloudDialogStatus').textContent=err.message||'Could not create account.';this.showToast(err.message||'Could not create account.');}
+    },
+
+    async cloudSignOut(){
+      const c=this.state.cloud;try{if(c?.session?.access_token)await fetch(`${c.url}/auth/v1/logout`,{method:'POST',headers:this.cloudHeaders(c.session.access_token)});}catch(_){ }
+      this.state.cloud.session=null;this.state.cloud.autoSync=false;this.save();this.renderProfile();if(this.$('cloudDialogStatus'))this.$('cloudDialogStatus').textContent='Signed out. Project settings remain on this device.';this.showToast('Cloud session disconnected.');
+    },
+
+    async refreshCloudSession(){
+      const c=this.state.cloud;if(!c?.session?.refresh_token)return false;try{const r=await fetch(`${c.url}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{'apikey':c.anonKey,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:c.session.refresh_token})});const b=await r.json();if(!r.ok)return false;this.state.cloud.session=b;this.save();return true;}catch(_){return false;}
+    },
+
+    cloudStatePayload(){
+      const b=this.backupPayload();return {...b.appState,cloud:undefined};
+    },
+
+    async cloudRequest(url,options={},retry=true){
+      const c=this.state.cloud;if(!this.cloudSignedIn())throw new Error('Sign in to cloud sync first.');const headers={...this.cloudHeaders(c.session.access_token),...(options.headers||{})};let r=await fetch(url,{...options,headers});if(r.status===401&&retry&&await this.refreshCloudSession()){return this.cloudRequest(url,options,false);}return r;
+    },
+
+    queueCloudSync(){clearTimeout(this._cloudSyncTimer);this._cloudSyncTimer=setTimeout(()=>this.cloudPush({quiet:true}),1800);},
+
+    async cloudPush({manual=false,quiet=false}={}){
+      if(!this.cloudSignedIn())return;if(this._cloudSyncing)return;this._cloudSyncing=true;const c=this.state.cloud;try{if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent='Syncing local data to cloud…';const uid=c.session.user.id;const row={user_id:uid,data:this.cloudStatePayload(),updated_at:new Date().toISOString()};const r=await this.cloudRequest(`${c.url}/rest/v1/coastcast_user_data?on_conflict=user_id`,{method:'POST',headers:{'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(row)});if(!r.ok){let msg='Cloud sync failed';try{const b=await r.json();msg=b?.message||b?.hint||msg;}catch(_){ }throw new Error(msg);}this.state.cloud.lastSync=new Date().toISOString();this.saveCloudMetaOnly();this.renderProfile();if(manual&&!quiet)this.showToast('Cloud sync complete.');}
+      catch(err){if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent=err.message||'Cloud sync failed.';if(manual&&!quiet)this.showToast(err.message||'Cloud sync failed.');}
+      finally{this._cloudSyncing=false;}
+    },
+
+    saveCloudMetaOnly(){
+      try{const raw=localStorage.getItem('coastcast-v11-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v11-state',JSON.stringify(p));}catch(_){ }
+    },
+
+    async cloudPull(){
+      if(!this.cloudSignedIn()){this.showToast('Sign in to cloud sync first.');return;}if(!confirm('Restore your cloud copy onto this device? Current local fishing data will be replaced.'))return;const c=this.state.cloud;try{if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent='Downloading cloud data…';const uid=c.session.user.id;const r=await this.cloudRequest(`${c.url}/rest/v1/coastcast_user_data?user_id=eq.${encodeURIComponent(uid)}&select=data,updated_at&limit=1`,{method:'GET'});const rows=await r.json();if(!r.ok)throw new Error(rows?.message||'Could not download cloud data.');if(!Array.isArray(rows)||!rows.length)throw new Error('No cloud backup exists yet.');const d=rows[0].data||{};if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};this.state.cloud.lastSync=rows[0].updated_at||new Date().toISOString();this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();this.showToast('Cloud data restored. Refresh live data for this destination.');}
+      catch(err){if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent=err.message||'Cloud restore failed.';this.showToast(err.message||'Cloud restore failed.');}
     },
 
     snapshotConditions(){

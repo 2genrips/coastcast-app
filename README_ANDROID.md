@@ -1,20 +1,17 @@
-# CoastCast v1.0 Beta — Android / GitHub Pages
+# CoastCast v1.1 Beta — Android / GitHub Pages
 
 1. Extract this ZIP on your Android phone.
 2. Open your existing CoastCast GitHub repository.
-3. Upload **all files and the branding folder from inside this folder** into the repository root.
+3. Upload **all files and the branding folder from inside `coastcast_v1.1`** to the repository root.
 4. Replace matching files and commit to `main`.
 5. Wait for GitHub Pages to redeploy.
-6. Fully close CoastCast and reopen it. If the old build remains, open the GitHub Pages URL in Chrome and refresh once.
+6. Fully close CoastCast and reopen it. If v1.0 remains, open the Pages URL in Chrome and refresh once.
 
-## What to test
+## First things to test
 
-- Home → Quick actions → **Alert**.
-- Create a forecast watch for the current location and target species.
-- Trips → confirm the alert appears under Smart Alerts.
-- Build a Smart Trip and confirm it appears in **Saved Trips**.
-- Save the current fishing location and confirm it appears under **Favorites**.
-- Tap Analyze on a favorite to reload the forecast for that spot.
-- Optional: enable device notification permission. CoastCast v1.0 checks rules when the app opens or live data refreshes; it does not yet have a server-powered background push service.
+- Tap the new **CC profile avatar** in the top-right.
+- Edit your angler profile.
+- Tap **Export CoastCast backup** and confirm Android downloads a JSON file.
+- Cloud sync is optional. If you want it, follow `CLOUD_SYNC_SETUP.md` and run `SUPABASE_SETUP.sql` in your own Supabase project.
 
-Existing v0.9 catches, favorites, settings and trip plans are migrated locally.
+Your v1.0 catches, favorites, trip plans and alerts migrate forward automatically.
