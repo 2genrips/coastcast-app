@@ -1,21 +1,9 @@
-# CoastCast v0.7 Data Sources
+# CoastCast v0.7.2 data sources
 
-## Weather
-Open-Meteo Weather API.
+Forecast sources remain Open-Meteo weather/marine and NOAA CO-OPS tides.
 
-## Marine
-Open-Meteo Marine API. Coastal model data can be coarse close to shore and is not navigation guidance.
+Map place discovery uses OpenStreetMap Overpass first. For Holden Beach, CoastCast now has a verified fallback catalog based on the Town of Holden Beach / Brunswick Islands public-access information and NC Wildlife Resources Commission fishing-access data. Address-only verified places are geocoded with Nominatim, then Photon as a fallback.
 
-## Tides
-NOAA CO-OPS tide predictions.
+The Holden Beach Boating Access Area is anchored with NCWRC's published coordinates: 33.91625683, -78.26749257.
 
-## Public fishing places and access
-OpenStreetMap place data queried through public Overpass endpoints. CoastCast looks for mapped fishing access, named beaches, piers, marinas, boat ramps/slipways and docks. Map presence does **not** prove public fishing permission, current access, safety or operating hours.
-
-## Bait & tackle
-OpenStreetMap / Overpass business data with bounded OpenStreetMap/Nominatim search as a fallback. Successful real results are cached for six hours.
-
-## Map
-Leaflet + OpenStreetMap tiles.
-
-Always verify local access, closures, regulations, tides and surf safety independently.
+Tackle search uses Overpass first, then verified Holden Beach shop addresses if needed.

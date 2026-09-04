@@ -1,22 +1,9 @@
-# CoastCast v0.7.1 — Android Hotfix
+# CoastCast v0.7.2 — Android / GitHub Pages update
 
-This hotfix repairs the **Scan Fishing Area** and bait/tackle discovery requests seen as `Places 0 • Search unavailable` on some Android/GitHub Pages installs.
+1. Extract this ZIP on Android.
+2. Upload all files inside this folder to the root of your existing CoastCast GitHub repository.
+3. Replace matching files and commit to `main`.
+4. Wait for GitHub Pages to redeploy.
+5. Fully close CoastCast, reopen it, then go to **Map → Scan fishing area**.
 
-## Install
-1. Download `coastcast_v0.7.1_map_search_hotfix.zip`.
-2. Extract it on Android.
-3. Open your existing CoastCast GitHub repository.
-4. Upload every file from inside the extracted folder.
-5. Replace matching files and commit to `main`.
-6. Wait for GitHub Pages to redeploy.
-7. Close CoastCast completely, reopen it, then go to **Map → Scan fishing area**.
-
-No new repository or Pages site is needed. Saved local CoastCast data remains compatible.
-
-## What changed
-- Replaced stale public Overpass endpoints.
-- Uses current public Overpass servers first.
-- Sends map/place queries with POST instead of very long GET URLs, which is more reliable on mobile browsers and proxies.
-- Uses the same fix for nearby bait/tackle discovery.
-- Removed the old Nominatim POI-search fallback from this path.
-- Bumped the PWA cache to v0.7.1 so Android receives the fix.
+For Holden Beach, the scanner now falls back to a verified local access catalog when public OpenStreetMap place discovery returns zero. You should no longer get a hard zero solely because an Overpass server or OSM tagging is sparse.

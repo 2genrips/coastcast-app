@@ -451,7 +451,7 @@
       const cacheKey=this.shopCacheKey();
       if(!forceToast){const cached=this.readPlaceCache(cacheKey);if(cached?.length){return cached.map(x=>({...x,cached:true}));}}
       const radiusMeters=Math.min(40000,Math.max(5000,Math.round(this.state.radius*1609.344)));
-      const query=`[out:json][timeout:20];(nwr(around:${radiusMeters},${lat},${lon})[shop="fishing"];nwr(around:${radiusMeters},${lat},${lon})[name~"bait|tackle|angler|outfitter",i];nwr(around:${radiusMeters},${lat},${lon})[shop~"outdoor|sports"][name~"fish|bait|tackle|angler",i];);out center tags;`;
+      const query=`[out:json][timeout:12];(nwr(around:${radiusMeters},${lat},${lon})[shop="fishing"];nwr(around:${radiusMeters},${lat},${lon})[name~"bait|tackle|angler|outfitter",i];nwr(around:${radiusMeters},${lat},${lon})[shop~"outdoor|sports"][name~"fish|bait|tackle|angler",i];);out center tags;`;
       const normalized=[];
       const seen=new Set();
       const add=(name,slat,slon,tags=[],source='OpenStreetMap')=>{
@@ -459,17 +459,19 @@
         const key=(name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,24))+':'+slat.toFixed(3)+':'+slon.toFixed(3);if(seen.has(key))return;seen.add(key);
         normalized.push({name,lat:slat,lon:slon,distance:this.haversine(lat,lon,slat,slon),rating:null,tags,source,demo:false});
       };
-      try{
-        const endpoints=['https://overpass.private.coffee/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass-api.de/api/interpreter'];
-        for(const endpoint of endpoints){
-          try{const data=await this.fetchOverpass(endpoint,query,18000);(data?.elements||[]).forEach(el=>{const t=el.tags||{};const slat=el.lat??el.center?.lat,slon=el.lon??el.center?.lon;add(t.name||'',slat,slon,[t.shop==='fishing'?'Fishing shop':'Bait / tackle',t.opening_hours||'Hours not listed'].filter(Boolean),'OpenStreetMap');});if(normalized.length)break;}catch(_){ }
-        }
-        normalized.sort((a,b)=>a.distance-b.distance);
-        const shops=normalized.slice(0,10);if(shops.length)this.writePlaceCache(cacheKey,shops);
-        if(shops.length){if(this.state.data)this.state.data.shops=shops;if(forceToast){this.state.sourceHealth.shops='live';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.showToast(`Found ${shops.length} real nearby shop${shops.length===1?'':'s'}.`);}return shops;}
-        if(forceToast)this.showToast('No mapped bait/tackle shops were found in that radius.');
-        return [];
-      }catch(err){if(forceToast)this.showToast('Shop search did not respond. Cached or fallback listings remain available.');throw err;}
+      const endpoints=['https://overpass.private.coffee/api/interpreter','https://overpass-api.de/api/interpreter'];
+      for(const endpoint of endpoints){
+        try{const data=await this.fetchOverpass(endpoint,query,7000);(data?.elements||[]).forEach(el=>{const t=el.tags||{};const slat=el.lat??el.center?.lat,slon=el.lon??el.center?.lon;add(t.name||'',slat,slon,[t.shop==='fishing'?'Fishing shop':'Bait / tackle',t.opening_hours||'Hours not listed'].filter(Boolean),'OpenStreetMap');});if(normalized.length)break;}catch(_){ }
+      }
+      if(!normalized.length&&this.isHoldenArea()){
+        const verified=await this.verifiedHoldenShops();
+        verified.forEach(s=>add(s.name,s.lat,s.lon,s.tags,s.source));
+      }
+      normalized.sort((a,b)=>a.distance-b.distance);
+      const shops=normalized.slice(0,10);if(shops.length)this.writePlaceCache(cacheKey,shops);
+      if(shops.length){if(this.state.data)this.state.data.shops=shops;if(forceToast){this.state.sourceHealth.shops=shops.some(x=>/Verified/.test(x.source))?'verified':'live';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.showToast(`Found ${shops.length} nearby tackle shop${shops.length===1?'':'s'}.`);}return shops;}
+      if(forceToast)this.showToast('No tackle shops were returned. Forecast and map tools still work.');
+      return [];
     },
 
     mergeLiveData(base,weather,marine,tideData,shops){
@@ -647,7 +649,7 @@
       const box=this.$('sourceHealth'); if(!box) return;
       const h=this.state.sourceHealth||{};
       const items=[['Weather',h.weather],['Marine',h.marine],['NOAA tides',h.tides],['Tackle shops',h.shops]];
-      const label=s=>s==='live'?'LIVE':s==='loading'?'CHECKING':s==='fallback'||s==='partial'?'FALLBACK':'DEMO';
+      const label=s=>s==='live'?'LIVE':s==='verified'?'VERIFIED':s==='loading'?'CHECKING':s==='fallback'||s==='partial'?'FALLBACK':'DEMO';
       box.innerHTML=items.map(([name,status])=>`<span class="source-chip ${status||'demo'}"><span class="source-chip-name">${this.escape(name)}</span><strong>${label(status)}</strong></span>`).join('');
     },
 
@@ -914,16 +916,66 @@
       if(!forceToast){const cached=this.readPlaceCache(cacheKey);if(cached?.length){this.state.mapPOIs=cached;this.state.mapPlacesStatus='cached';this.renderSpotIntelligence();this.renderMapLayers();return cached;}}
       this.state.mapPlacesStatus='loading';this.renderSpotIntelligence();
       const radiusMeters=Math.min(32000,Math.max(5000,Math.round(this.state.radius*1609.344)));
-      const query=`[out:json][timeout:22];(nwr(around:${radiusMeters},${lat},${lon})["leisure"="fishing"];nwr(around:${radiusMeters},${lat},${lon})["sport"="fishing"];nwr(around:${radiusMeters},${lat},${lon})["man_made"="pier"]["name"];nwr(around:${radiusMeters},${lat},${lon})["leisure"="marina"]["name"];nwr(around:${radiusMeters},${lat},${lon})["leisure"="slipway"]["name"];nwr(around:${radiusMeters},${lat},${lon})["natural"="beach"]["name"];nwr(around:${radiusMeters},${lat},${lon})["waterway"="dock"]["name"];);out center tags;`;
-      try{
-        let data=null;for(const endpoint of ['https://overpass.private.coffee/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass-api.de/api/interpreter']){try{data=await this.fetchOverpass(endpoint,query,20000);if(data)break;}catch(_){ }}
-        if(!data)throw new Error('No map-place response');
-        const seen=new Set(),items=[];
-        (data.elements||[]).forEach(el=>{const tags=el.tags||{};const plat=Number(el.lat??el.center?.lat),plon=Number(el.lon??el.center?.lon);if(!Number.isFinite(plat)||!Number.isFinite(plon))return;const type=this.classifyMapPlace(tags);const name=(tags.name||'').trim();if(!name&&type!=='Fishing access')return;const display=name||'Fishing access';const key=display.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,28)+':'+plat.toFixed(3)+':'+plon.toFixed(3);if(seen.has(key))return;seen.add(key);items.push({id:`osm-${el.type||'x'}-${el.id}`,name:display,type,lat:plat,lon:plon,distance:this.haversine(lat,lon,plat,plon),tags:{access:tags.access||'',surface:tags.surface||'',operator:tags.operator||''}});});
-        items.forEach(p=>{p.match=this.mapPlaceMatchScore(p);p.reason=this.mapPlaceReason(p);});items.sort((a,b)=>b.match-a.match||a.distance-b.distance);
-        this.state.mapPOIs=items.slice(0,35);this.state.mapPlacesStatus='live';this.writePlaceCache(cacheKey,this.state.mapPOIs);this.renderSpotIntelligence();this.renderMapLayers();if(forceToast)this.showToast(`Scanned ${this.state.mapPOIs.length} public fishing/access place${this.state.mapPOIs.length===1?'':'s'}.`);return this.state.mapPOIs;
-      }catch(_){this.state.mapPlacesStatus='fallback';this.state.mapPOIs=[];this.renderSpotIntelligence();if(forceToast)this.showToast('Public map-place search did not respond. Saved spots and forecast map still work.');return [];}
+      const query=`[out:json][timeout:12];(nwr(around:${radiusMeters},${lat},${lon})["leisure"="fishing"];nwr(around:${radiusMeters},${lat},${lon})["sport"="fishing"];nwr(around:${radiusMeters},${lat},${lon})["man_made"="pier"]["name"];nwr(around:${radiusMeters},${lat},${lon})["leisure"="marina"]["name"];nwr(around:${radiusMeters},${lat},${lon})["leisure"="slipway"]["name"];nwr(around:${radiusMeters},${lat},${lon})["natural"="beach"]["name"];nwr(around:${radiusMeters},${lat},${lon})["waterway"="dock"]["name"];);out center tags;`;
+      const seen=new Set(),items=[];
+      const addItem=(item)=>{
+        const plat=Number(item.lat),plon=Number(item.lon);if(!Number.isFinite(plat)||!Number.isFinite(plon))return;
+        const display=(item.name||'Public access').trim();const key=display.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,28)+':'+plat.toFixed(3)+':'+plon.toFixed(3);if(seen.has(key))return;seen.add(key);
+        const p={id:item.id||`verified-${seen.size}`,name:display,type:item.type||'Public access',lat:plat,lon:plon,distance:this.haversine(lat,lon,plat,plon),tags:item.tags||{},source:item.source||'OpenStreetMap'};
+        p.match=this.mapPlaceMatchScore(p);p.reason=item.reason||this.mapPlaceReason(p);items.push(p);
+      };
+      for(const endpoint of ['https://overpass.private.coffee/api/interpreter','https://overpass-api.de/api/interpreter']){
+        try{
+          const data=await this.fetchOverpass(endpoint,query,7000);
+          (data?.elements||[]).forEach(el=>{const tags=el.tags||{};const plat=Number(el.lat??el.center?.lat),plon=Number(el.lon??el.center?.lon);if(!Number.isFinite(plat)||!Number.isFinite(plon))return;const type=this.classifyMapPlace(tags);const name=(tags.name||'').trim();if(!name&&type!=='Fishing access')return;addItem({id:`osm-${el.type||'x'}-${el.id}`,name:name||'Fishing access',type,lat:plat,lon:plon,tags:{access:tags.access||'',surface:tags.surface||'',operator:tags.operator||''},source:'OpenStreetMap'});});
+          if(items.length)break;
+        }catch(_){ }
+      }
+      let usedVerified=false;
+      if(!items.length&&this.isHoldenArea()){
+        const verified=await this.verifiedHoldenMapPlaces();verified.forEach(addItem);usedVerified=items.length>0;
+      }
+      items.sort((a,b)=>b.match-a.match||a.distance-b.distance);
+      this.state.mapPOIs=items.slice(0,35);
+      if(this.state.mapPOIs.length){this.state.mapPlacesStatus=usedVerified?'verified':'live';this.writePlaceCache(cacheKey,this.state.mapPOIs);this.renderSpotIntelligence();this.renderMapLayers();if(forceToast)this.showToast(usedVerified?`Loaded ${this.state.mapPOIs.length} verified Holden Beach access point${this.state.mapPOIs.length===1?'':'s'}.`:`Scanned ${this.state.mapPOIs.length} public fishing/access place${this.state.mapPOIs.length===1?'':'s'}.`);return this.state.mapPOIs;}
+      this.state.mapPlacesStatus='fallback';this.state.mapPOIs=[];this.renderSpotIntelligence();if(forceToast)this.showToast('Public place providers returned no usable places. Saved spots and live forecasts still work.');return [];
     },
+
+    isHoldenArea(){const l=this.state.location||{};return /holden beach/i.test(String(l.name||''))||this.haversine(Number(l.lat)||0,Number(l.lon)||0,33.9135061,-78.3038892)<=18;},
+
+    async geocodePlace(query){
+      const q=encodeURIComponent(query);
+      try{const a=await this.fetchJSON(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us&q=${q}`,7000);const x=Array.isArray(a)?a[0]:null;if(x&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon)))return{lat:Number(x.lat),lon:Number(x.lon)};}catch(_){ }
+      try{const p=await this.fetchJSON(`https://photon.komoot.io/api/?limit=1&q=${q}`,7000);const c=p?.features?.[0]?.geometry?.coordinates;if(Array.isArray(c)&&c.length>=2&&Number.isFinite(Number(c[1]))&&Number.isFinite(Number(c[0])))return{lat:Number(c[1]),lon:Number(c[0])};}catch(_){ }
+      return null;
+    },
+
+    async verifiedHoldenMapPlaces(){
+      const catalog=[
+        {id:'ncwrc-holden-ramp',name:'Holden Beach Boating Access Area',type:'Boat ramp',lat:33.91625683,lon:-78.26749257,source:'Verified • NCWRC',reason:'NCWRC public boating access • 99 S Shore Dr • Red Drum, Speckled Trout and Flounder access'},
+        {id:'hb-quinton',name:'Quinton Street Beach Access',type:'Beach',query:'Quinton Street and Ocean Boulevard East, Holden Beach, NC 28462',source:'Verified • Town / Brunswick Islands',reason:'Public CAMA beach access • accessible ramp and parking'},
+        {id:'hb-pw200',name:'PW200 / Jordan Boulevard Beach Access',type:'Beach',query:'102 Ocean Boulevard West, Holden Beach, NC 28462',source:'Verified • Brunswick Islands',reason:'Public beach access near Jordan Boulevard • accessible access'},
+        {id:'hb-east-end',name:'East End / McCray Street Beach Access',type:'Beach',query:'McCray Street, Holden Beach, NC 28462',source:'Verified • Town / Brunswick Islands',reason:'Public east-end beach access • popular surf-fishing area'},
+        {id:'hb-pw140',name:'PW140 / Ferry Road Beach Access',type:'Beach',query:'173 Ocean Boulevard East, Holden Beach, NC 28462',source:'Verified • Brunswick Islands',reason:'Public beach access near Ferry Road'},
+        {id:'hb-pw100',name:'PW100 / 220 Ocean Boulevard East',type:'Beach',query:'220 Ocean Boulevard East, Holden Beach, NC 28462',source:'Verified • Local access guide',reason:'Public beach access with nearby public parking'}
+      ];
+      const out=[];
+      for(const item of catalog){
+        if(Number.isFinite(Number(item.lat))&&Number.isFinite(Number(item.lon))){out.push(item);continue;}
+        const g=await this.geocodePlace(item.query);if(g)out.push({...item,...g});await this.sleep(350);
+      }
+      return out;
+    },
+
+    async verifiedHoldenShops(){
+      const catalog=[
+        {name:'Rigged & Ready Bait & Tackle',query:'1096-7 Sabbath Home Road SW, Supply, NC 28462',source:'Verified local shop',tags:['Bait & tackle','Official shop website']},
+        {name:'The Rod & Reel Shop',query:'3401 Holden Beach Road SW, Holden Beach, NC 28462',source:'Verified local shop',tags:['Bait & tackle','Fishing supplies']}
+      ];
+      const out=[];for(const item of catalog){const g=await this.geocodePlace(item.query);if(g)out.push({...item,...g});await this.sleep(350);}return out;
+    },
+
+    sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));},
 
     classifyMapPlace(tags){if(tags.leisure==='fishing'||tags.sport==='fishing')return'Fishing access';if(tags.man_made==='pier')return'Pier';if(tags.leisure==='slipway')return'Boat ramp';if(tags.leisure==='marina')return'Marina';if(tags.natural==='beach')return'Beach';if(tags.waterway==='dock')return'Dock';return'Public access';},
     mapPlaceMatchScore(p){let score=this.currentScore();const style=this.state.fishingStyle;const type=p.type;let bonus=0;if(type==='Fishing access')bonus+=3;if(type==='Beach'&&style==='Surf fishing')bonus+=4;if(type==='Pier'&&style==='Pier fishing')bonus+=5;if(type==='Pier')bonus+=2;if(type==='Boat ramp')bonus-=2;if(type==='Marina')bonus-=3;const distPenalty=Math.min(9,Math.max(0,p.distance-1)*.65);return Math.round(Math.max(35,Math.min(98,score+bonus-distPenalty)));},
@@ -934,7 +986,7 @@
       if(this.$('mapCurrentScore'))this.$('mapCurrentScore').textContent=score;if(this.$('mapScoreSpecies'))this.$('mapScoreSpecies').textContent=this.state.targetSpecies;
       if(this.$('mapBestDay'))this.$('mapBestDay').textContent=bestDay?.day||'--';if(this.$('mapBestDayScore'))this.$('mapBestDayScore').textContent=bestDay?`${bestDay.score}/100 • ${this.fmt(bestDay.wind,0)} mph wind`:'7-day outlook';
       if(this.$('mapPlacesCount'))this.$('mapPlacesCount').textContent=this.state.mapPOIs.length;
-      const statusCopy={idle:'Not scanned',loading:'Scanning…',live:'Live public map',cached:'Cached map data',fallback:'Search unavailable'};if(this.$('spotIntelStatus'))this.$('spotIntelStatus').textContent=statusCopy[this.state.mapPlacesStatus]||'Not scanned';
+      const statusCopy={idle:'Not scanned',loading:'Scanning…',live:'Live public map',verified:'Verified local catalog',cached:'Cached map data',fallback:'Search unavailable'};if(this.$('spotIntelStatus'))this.$('spotIntelStatus').textContent=statusCopy[this.state.mapPlacesStatus]||'Not scanned';
       if(this.$('mapCenterLabel'))this.$('mapCenterLabel').textContent=this.state.location.name;
       const places=[...this.state.mapPOIs].sort((a,b)=>b.match-a.match||a.distance-b.distance);const top=places[0]||null;this.state.selectedIntelSpot=top;
       const analyze=this.$('topSpotAnalyzeBtn'),save=this.$('topSpotSaveBtn');if(analyze)analyze.disabled=!top;if(save)save.disabled=!top;
