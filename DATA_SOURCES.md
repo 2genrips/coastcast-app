@@ -38,3 +38,9 @@ Catch Intelligence and Personal Pattern Match are calculated locally from the an
 
 ## v1.4 intelligence note
 Bait, rig and gear suggestions are CoastCast planning heuristics built from loaded conditions, fishing style, species profiles and the user’s own catch history. They are not a substitute for local tackle-shop advice, safety judgment or official regulations. The Regulation Guard records only that the user says they reviewed the official source that day.
+
+
+## v1.5 additional source — National Weather Service alerts
+When Live Data is enabled, CoastCast requests the NWS active-alert endpoint for the selected point. An empty successful response means no active NWS point alerts were returned at that moment; it does **not** prove a beach is hazard-free. CoastCast also applies local planning thresholds to loaded surf, gust and thunderstorm conditions.
+
+NOAA tide prediction requests now load approximately seven days of high/low predictions for the Tide Planner.

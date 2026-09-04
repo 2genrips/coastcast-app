@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, bait and rig intelligence, regulation guard, smart gear planning, Scout spot ranking, Catch Intelligence, live fishing sessions, trips, alerts, maps, bait shops and a private catch logbook." />
+  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, NWS safety alerts, tide intelligence, moon and light context, species and bait intelligence, regulation guard, smart gear planning, Scout spot ranking, live fishing sessions, trips and a private catch logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=1.4.0" />
+  <link rel="stylesheet" href="styles.css?v=1.5.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -232,6 +232,40 @@
         </section>
 
 
+        <section class="panel ocean-iq-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">OCEAN IQ</div><h2>Tide, moon & beach safety</h2></div>
+            <span id="oceanIqBadge" class="tiny-pill">ANALYZING</span>
+          </div>
+          <div class="ocean-iq-grid">
+            <article class="ocean-iq-card tide-iq-card">
+              <div class="ocean-iq-label">TIDE INTELLIGENCE</div>
+              <strong id="tideStageNow">Moving tide</strong>
+              <div id="tideTurnDetail" class="ocean-iq-primary">Next turn loading…</div>
+              <div class="ocean-iq-mini"><span>Movement</span><b id="tideMovementStrength">—</b></div>
+              <div class="ocean-iq-mini"><span>Strongest upcoming</span><b id="tideStrongWindow">—</b></div>
+            </article>
+            <article class="ocean-iq-card moon-iq-card">
+              <div class="ocean-iq-label">MOON & LIGHT</div>
+              <strong id="moonPhaseIq">—</strong>
+              <div id="moonIllumination" class="ocean-iq-primary">— illuminated</div>
+              <div class="ocean-iq-mini"><span>Sunrise</span><b id="moonSunrise">—</b></div>
+              <div class="ocean-iq-mini"><span>Sunset</span><b id="moonSunset">—</b></div>
+            </article>
+          </div>
+          <div id="tideWindowList" class="tide-window-list"></div>
+          <div class="safety-guard-card" id="homeSafetyGuard">
+            <div class="safety-guard-head">
+              <div><span class="eyebrow">BEACH SAFETY GUARD</span><strong id="safetyStatusTitle">Checking conditions…</strong></div>
+              <span id="safetyStatusBadge" class="safety-status-badge">CHECKING</span>
+            </div>
+            <p id="safetyStatusDetail">CoastCast combines NWS point alerts with loaded surf, wind and weather conditions.</p>
+            <div id="safetyAlertList" class="safety-alert-list"></div>
+            <div class="safety-actions"><button id="refreshSafetyBtn" class="primary-button small" type="button">Refresh safety</button><button id="openNwsBtn" class="secondary-button small" type="button">NWS safety info</button></div>
+          </div>
+          <p class="micro-note">Moon phase is secondary context, not a promise of fish activity. Safety Guard cannot see every local hazard—always observe surf, access conditions and official beach warnings in person.</p>
+        </section>
+
         <section class="panel regulations-panel">
           <div class="section-heading">
             <div>
@@ -327,7 +361,7 @@
             <h1>Forecast</h1>
             <p id="forecastLocation" class="page-subtitle">Wrightsville Beach, NC</p>
           </div>
-          <button id="plannerBtn" class="primary-button small" type="button">Plan trip</button>
+          <div class="forecast-head-actions"><div class="destination-clock"><span>DESTINATION TIME</span><strong id="destinationClock">—</strong></div><button id="plannerBtn" class="primary-button small" type="button">Plan trip</button></div>
         </div>
 
         <div id="forecastStatusBar" class="forecast-status-bar" aria-live="polite"><span class="status-dot"></span><strong>Demo forecast</strong><span>Live feeds have not confirmed yet.</span></div>
@@ -415,6 +449,15 @@
           </div>
           <div id="forecastTideEvents" class="tide-events"></div>
           <div class="chart-shell large"><canvas id="forecastTideCanvas" width="900" height="320" aria-label="Detailed tide curve"></canvas></div>
+        </section>
+
+        <section class="panel tide-week-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">7-DAY TIDE PLANNER</div><h2>Highs, lows & movement windows</h2></div>
+            <span id="tideWeekSource" class="tiny-pill">NOAA</span>
+          </div>
+          <p class="section-note">Times are shown in the fishing destination's local time. CoastCast highlights mid-cycle movement windows between NOAA high and low predictions.</p>
+          <div id="tideWeekGrid" class="tide-week-grid"></div>
         </section>
 
         <section class="panel">
@@ -569,6 +612,17 @@
           <div class="launch-panel-top"><div><div class="eyebrow">TRIP COMMAND CENTER</div><h2 id="tripHubHeadline">Ready when the coast lines up</h2></div><span id="tripHubBadge" class="tiny-pill">BETA</span></div>
           <div id="tripHubRecommendation" class="trip-hub-recommendation">CoastCast will combine your live forecast, target species, favorites and alert rules here.</div>
           <div class="trip-hub-actions"><button id="tripHubPlanBtn" class="primary-button" type="button">Build best trip</button><button id="tripHubAlertBtn" class="secondary-button" type="button">Create smart alert</button></div>
+        </section>
+
+        <section class="panel departure-safety-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">DEPARTURE CHECK</div><h2>Go / caution briefing</h2></div>
+            <span id="tripSafetyBadge" class="tiny-pill">CHECKING</span>
+          </div>
+          <div id="tripSafetySummary" class="trip-safety-summary">CoastCast is checking NWS alerts, surf, wind, regulations and your pack list.</div>
+          <div id="tripSafetyChecklist" class="trip-safety-checklist"></div>
+          <button id="tripSafetyRefreshBtn" class="secondary-button full" type="button">Refresh departure check</button>
+          <p class="micro-note">This is a planning aid, not a declaration that conditions are safe. Follow lifeguards, posted warnings, NWS alerts and local authorities.</p>
         </section>
 
         <section class="panel go-mode-panel" id="goModePanel">
@@ -983,6 +1037,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=1.4.0"></script>
+  <script src="app.js?v=1.5.0"></script>
 </body>
 </html>

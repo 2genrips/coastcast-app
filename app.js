@@ -31,7 +31,8 @@
       mapPlacesStatus: 'idle',
       selectedIntelSpot: null,
       selectedTideStation: null,
-      sourceHealth: {weather:'demo',marine:'demo',tides:'demo',shops:'demo'}
+      sourceHealth: {weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'},
+      safetyAlerts: [],
     },
 
     presets: {
@@ -251,7 +252,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v15-state')||localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -286,7 +287,7 @@
         gearPlan:this.state.gearPlan,
         regChecks:this.state.regChecks
       };
-      try{ localStorage.setItem('coastcast-v14-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v15-state',JSON.stringify(payload)); }catch(_){ }
       if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
@@ -300,9 +301,9 @@
       this.$$('.view').forEach(v=>v.classList.toggle('active',v.dataset.view===view));
       this.$$('.nav-button').forEach(b=>b.classList.toggle('active',b.dataset.viewTarget===view));
       window.scrollTo({top:0,behavior:'smooth'});
-      if(view==='forecast'){this.renderForecast();setTimeout(()=>this.renderTides(),20);}
+      if(view==='forecast'){this.renderForecast();this.renderTideWeek();setTimeout(()=>this.renderTides(),20);}
       if(view==='map') setTimeout(()=>{this.ensureMap();this.renderMapLayers();this.renderSpotIntelligence();this.renderScout();if(!this.state.mapPOIs.length&&this.state.mapPlacesStatus==='idle')this.loadMapPlaces(false);},50);
-      if(view==='trips'){this.renderTrips();this.renderGoMode();this.renderGearPlanner();}
+      if(view==='trips'){this.renderTrips();this.renderGoMode();this.renderGearPlanner();this.renderTripSafety();}
       if(view==='logbook') this.renderLogbook();
       if(view==='community') this.renderCommunity();
       if(view==='profile') this.renderProfile();
@@ -346,6 +347,9 @@
       this.$('gearUseBaitBtn')?.addEventListener('click',()=>this.useBaitPlanForTrip());
       this.$('gearResetBtn')?.addEventListener('click',()=>this.resetGearChecks());
       this.$('gearPlanList')?.addEventListener('change',e=>this.handleGearCheck(e));
+      this.$('refreshSafetyBtn')?.addEventListener('click',()=>this.refreshSafety());
+      this.$('tripSafetyRefreshBtn')?.addEventListener('click',()=>this.refreshSafety());
+      this.$('openNwsBtn')?.addEventListener('click',()=>window.open('https://www.weather.gov/','_blank','noopener'));
       this.$('speciesRankList')?.addEventListener('click',e=>{const b=e.target.closest('[data-target-ranked-species]');if(b)this.setSpecies(b.dataset.targetRankedSpecies);});
       this.$('useMyLocationSheetBtn').addEventListener('click',()=>this.useMyLocation());
       this.$('locationSearchGoBtn').addEventListener('click',()=>this.searchLocations());
@@ -547,7 +551,7 @@
       this.state.data=this.buildDemoData();
       this.renderAll();
       this.recenterMap();
-      if(this.state.live) this.loadLiveData(); else {this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo'};this.renderMode();this.renderSourceHealth();this.showToast('Fishing location updated. Turn on Live Data for real forecasts.');}
+      if(this.state.live) this.loadLiveData(); else {this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'};this.state.safetyAlerts=[];this.renderMode();this.renderSourceHealth();this.showToast('Fishing location updated. Turn on Live Data for real forecasts.');}
     },
 
     setLiveMode(enabled){
@@ -555,13 +559,13 @@
       this.$('liveModeToggle').checked=this.state.live;
       this.renderMode();
       if(this.state.live) this.loadLiveData();
-      else{this.state.data=this.buildDemoData();this.state.selectedTideStation=null;this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo'};this.recalculateScores();this.renderAll();this.showToast('Demo Data is on.');}
+      else{this.state.data=this.buildDemoData();this.state.selectedTideStation=null;this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'};this.state.safetyAlerts=[];this.recalculateScores();this.renderAll();this.showToast('Demo Data is on.');}
     },
 
     async loadLiveData({quiet=false}={}){
       if(this.state.loading) return;
       this.state.loading=true;
-      this.state.sourceHealth={weather:'loading',marine:'loading',tides:'loading',shops:'loading'};
+      this.state.sourceHealth={weather:'loading',marine:'loading',tides:'loading',shops:'loading',alerts:'loading'};
       this.renderMode();this.renderSourceHealth();
       this.$('syncBtn').classList.add('spinning');
       if(!quiet) this.showToast('Loading live coastal conditions…');
@@ -571,13 +575,16 @@
         this.loadWeather(lat,lon),
         this.loadMarine(lat,lon),
         this.loadTides(lat,lon),
-        this.loadNearbyShops(false)
+        this.loadNearbyShops(false),
+        this.loadNWSAlerts(lat,lon)
       ]);
       const weather=results[0].status==='fulfilled'?results[0].value:null;
       const marine=results[1].status==='fulfilled'?results[1].value:null;
       const tideData=results[2].status==='fulfilled'?results[2].value:null;
       const shops=results[3].status==='fulfilled'&&Array.isArray(results[3].value)&&results[3].value.length?results[3].value:null;
-      this.state.sourceHealth={weather:weather?'live':'fallback',marine:marine?'live':'fallback',tides:tideData?'live':'fallback',shops:shops?'live':'fallback'};
+      const alertData=results[4].status==='fulfilled'?results[4].value:null;
+      this.state.safetyAlerts=alertData?.alerts||[];
+      this.state.sourceHealth={weather:weather?'live':'fallback',marine:marine?'live':'fallback',tides:tideData?'live':'fallback',shops:shops?'live':'fallback',alerts:alertData?'live':'fallback'};
       this.state.data=this.mergeLiveData(base,weather,marine,tideData,shops);
       this.recalculateScores();
       this.renderAll();
@@ -585,9 +592,9 @@
       this.state.loading=false;
       this.renderMode();this.renderSourceHealth();
       this.$('syncBtn').classList.remove('spinning');
-      const liveCount=[weather,marine,tideData,shops].filter(Boolean).length;
+      const liveCount=[weather,marine,tideData,shops,alertData].filter(Boolean).length;
       this.$('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-      if(!quiet) this.showToast(liveCount>=3?'Live coastal data updated.':`Live data partially updated (${liveCount}/4 sources). Demo fallbacks filled the gaps.`);
+      if(!quiet) this.showToast(liveCount>=3?'Live coastal data updated.':`Live data partially updated (${liveCount}/5 sources). Fallbacks filled the gaps.`);
     },
 
     async loadWeather(lat,lon){
@@ -611,11 +618,25 @@
       return this.fetchJSON('https://marine-api.open-meteo.com/v1/marine?'+params.toString(),14000);
     },
 
+    async loadNWSAlerts(lat,lon){
+      const url=`https://api.weather.gov/alerts/active?point=${encodeURIComponent(Number(lat).toFixed(4)+','+Number(lon).toFixed(4))}`;
+      const data=await this.fetchJSON(url,12000);
+      const alerts=(data?.features||[]).map(f=>{const p=f?.properties||{};return{id:f.id||p.id||'',event:p.event||'Weather alert',severity:p.severity||'Unknown',certainty:p.certainty||'',urgency:p.urgency||'',headline:p.headline||p.event||'Active NWS alert',description:p.description||'',instruction:p.instruction||'',areaDesc:p.areaDesc||'',expires:p.expires||'',senderName:p.senderName||'National Weather Service'};});
+      return {alerts,checkedAt:new Date().toISOString()};
+    },
+
+    async refreshSafety(){
+      if(!this.state.live){this.showToast('Turn on Live Data to check NWS point alerts.');return;}
+      const {lat,lon}=this.state.location;this.state.sourceHealth.alerts='loading';this.renderSourceHealth();this.renderSafetyGuard();
+      try{const data=await this.loadNWSAlerts(lat,lon);this.state.safetyAlerts=data.alerts||[];this.state.sourceHealth.alerts='live';this.renderSourceHealth();this.renderSafetyGuard();this.renderTripSafety();this.showToast(this.state.safetyAlerts.length?`${this.state.safetyAlerts.length} active NWS alert${this.state.safetyAlerts.length===1?'':'s'} found.`:'No active NWS point alerts returned.');}
+      catch(_){this.state.sourceHealth.alerts='fallback';this.renderSourceHealth();this.renderSafetyGuard();this.renderTripSafety();this.showToast('NWS alerts could not refresh. Use official sources before travel.');}
+    },
+
     async loadTides(lat,lon){
       const station=await this.findNearestTideStation(lat,lon);
       if(!station) throw new Error('No NOAA tide station');
       this.state.selectedTideStation=station;
-      const start=new Date(),end=new Date(); end.setDate(end.getDate()+2);
+      const start=new Date(),end=new Date(); end.setDate(end.getDate()+7);
       const params=new URLSearchParams({
         product:'predictions',application:'CoastCast',begin_date:this.formatDateYYYYMMDD(start),end_date:this.formatDateYYYYMMDD(end),
         datum:'MLLW',station:station.id,time_zone:'lst_ldt',units:'english',interval:'hilo',format:'json'
@@ -700,7 +721,10 @@
     mergeLiveData(base,weather,marine,tideData,shops){
       const out=base;
       if(weather){
+        out.timezone=weather.timezone||out.timezone||null;
+        out.utcOffsetSeconds=Number.isFinite(Number(weather.utc_offset_seconds))?Number(weather.utc_offset_seconds):out.utcOffsetSeconds;
         const c=weather.current||{};
+        out.localDate=String(c.time||weather.hourly?.time?.[0]||'').slice(0,10)||out.localDate;
         out.current.temp=this.num(c.temperature_2m,out.current.temp);
         out.current.feels=this.num(c.apparent_temperature,out.current.feels);
         out.current.weatherCode=this.num(c.weather_code,out.current.weatherCode);
@@ -714,14 +738,14 @@
         const h=weather.hourly||{};
         if(Array.isArray(h.time)&&h.time.length){
           out.hours=h.time.slice(0,Math.min(h.time.length,168)).map((time,i)=>({
-            rawTime:time,time:this.hourFromIso(time),dateIndex:this.dateIndexForIso(time),icon:this.weatherIcon(h.weather_code?.[i]),
+            rawTime:time,time:this.hourFromIso(time),dateIndex:this.localDateDiff(time,out.localDate),icon:this.weatherIcon(h.weather_code?.[i]),
             temp:this.num(h.temperature_2m?.[i],72),feels:this.num(h.apparent_temperature?.[i],72),
             weatherCode:this.num(h.weather_code?.[i],2),rain:this.num(h.precipitation_probability?.[i],0),
             wind:this.num(h.wind_speed_10m?.[i],0),windDir:this.num(h.wind_direction_10m?.[i],0),gust:this.num(h.wind_gusts_10m?.[i],0),
             pressure:this.num(h.pressure_msl?.[i],1015),humidity:this.num(h.relative_humidity_2m?.[i],65),cloudCover:this.num(h.cloud_cover?.[i],30),visibility:this.num(h.visibility?.[i],16000),uv:this.num(h.uv_index?.[i],0),wave:2,period:8,tide:'Moving',score:70
           }));
-          const nowHour=new Date(); nowHour.setMinutes(0,0,0);
-          const firstFuture=out.hours.findIndex(x=>new Date(x.rawTime)>=nowHour);
+          const localNow=String(c.time||'');
+          const firstFuture=localNow?out.hours.findIndex(x=>String(x.rawTime)>=localNow):-1;
           if(firstFuture>0) out.hours=out.hours.slice(firstFuture);
           out.current.rain=out.hours[0]?.rain??0;
           out.current.visibility=out.hours[0]?.visibility??16000;out.current.uv=out.hours[0]?.uv??0;
@@ -767,7 +791,7 @@
       }
       if(tideData){
         out.tideStation={...tideData.station};
-        out.tides=tideData.predictions.slice(0,8).map(p=>({
+        out.tides=tideData.predictions.slice(0,32).map(p=>({
           type:String(p.type||'').toUpperCase()==='H'?'High':'Low',time:this.noaaTime(p.t),height:this.num(p.v,0),rawTime:String(p.t).replace(' ','T')
         }));
       }
@@ -988,6 +1012,76 @@
     handleGearCheck(e){const el=e.target.closest('[data-gear-key]');if(!el)return;this.state.gearPlan.checked[el.dataset.gearKey]=!!el.checked;this.save();this.renderGearPlanner();},
     resetGearChecks(){this.state.gearPlan.checked={};this.save();this.renderGearPlanner();this.showToast('Gear checklist reset.');},
 
+    localDateDiff(value,baseDate){
+      const d=String(value||'').slice(0,10),b=String(baseDate||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!/^\d{4}-\d{2}-\d{2}$/.test(b))return this.dateIndexForIso(value);
+      const [y,m,day]=d.split('-').map(Number),[by,bm,bd]=b.split('-').map(Number);return Math.round((Date.UTC(y,m-1,day)-Date.UTC(by,bm-1,bd))/86400000);
+    },
+    literalClock(value){
+      const s=String(value||'');const m=s.match(/(?:T|\s)(\d{1,2}):(\d{2})/);if(!m)return'';let h=Number(m[1]),min=m[2],ap=h>=12?'PM':'AM';h=h%12||12;return `${h}:${min} ${ap}`;
+    },
+    parseLocationDate(value){
+      const s=String(value||'');const m=s.match(/(\d{4})-(\d{2})-(\d{2})(?:T|\s)(\d{2}):(\d{2})(?::(\d{2}))?/);if(!m)return new Date(NaN);
+      const offset=Number(this.state.data?.utcOffsetSeconds);if(Number.isFinite(offset))return new Date(Date.UTC(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]),Number(m[6]||0))-offset*1000);
+      return new Date(s.replace(' ','T'));
+    },
+    destinationNow(){return new Date();},
+    destinationClockText(){
+      const tz=this.state.data?.timezone;try{return new Intl.DateTimeFormat([],{timeZone:tz||undefined,hour:'numeric',minute:'2-digit'}).format(new Date());}catch(_){return new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}
+    },
+    formatDestinationDate(date,opts={}){const tz=this.state.data?.timezone;try{return new Intl.DateTimeFormat([],{timeZone:tz||undefined,...opts}).format(date);}catch(_){return date.toLocaleString([],opts);}},
+    lunarInfo(date=new Date()){
+      const synodic=29.530588853,newMoon=Date.UTC(2000,0,6,18,14,0),days=(date.getTime()-newMoon)/86400000;let age=((days%synodic)+synodic)%synodic;const phase=age/synodic,illum=Math.round((1-Math.cos(phase*2*Math.PI))/2*100);
+      let name='New moon';if(phase>=.03&&phase<.22)name='Waxing crescent';else if(phase<.28)name='First quarter';else if(phase<.47)name='Waxing gibbous';else if(phase<.53)name='Full moon';else if(phase<.72)name='Waning gibbous';else if(phase<.78)name='Last quarter';else if(phase<.97)name='Waning crescent';
+      return{name,illumination:illum,age,phase};
+    },
+    tideIntel(){
+      const tides=(this.state.data?.tides||[]).map(t=>({...t,date:this.parseLocationDate(t.rawTime)})).filter(t=>!isNaN(t.date)).sort((x,y)=>x.date-y.date),now=new Date();
+      if(tides.length<2)return{stage:this.currentTideLabel(),next:null,strength:'Unknown',windows:[]};
+      let nextIndex=tides.findIndex(t=>t.date>now);if(nextIndex<0)nextIndex=tides.length-1;const next=tides[nextIndex],prev=nextIndex>0?tides[nextIndex-1]:null;
+      let strength='Moderate';if(prev&&next){const total=next.date-prev.date,progress=Math.max(0,Math.min(1,(now-prev.date)/total)),velocity=Math.sin(progress*Math.PI);strength=velocity<.28?'Slack / turning':velocity<.72?'Moderate':'Strong';}
+      const stage=next?.type==='High'?'Rising tide':next?.type==='Low'?'Falling tide':this.currentTideLabel();
+      const windows=[];for(let i=Math.max(0,nextIndex-1);i<Math.min(tides.length-1,nextIndex+4);i++){const x=tides[i],y=tides[i+1],mid=new Date((x.date.getTime()+y.date.getTime())/2);if(mid<new Date(now.getTime()-30*60000))continue;const start=new Date(mid.getTime()-60*60000),end=new Date(mid.getTime()+60*60000);windows.push({label:`${this.formatDestinationDate(start,{hour:'numeric',minute:'2-digit'})} – ${this.formatDestinationDate(end,{hour:'numeric',minute:'2-digit'})}`,direction:y.type==='High'?'Strong incoming movement':'Strong outgoing movement',date:mid});if(windows.length>=3)break;}
+      return{stage,next,prev,strength,windows};
+    },
+    safetyAssessment(){
+      const c=this.state.data?.current||{},alerts=this.state.safetyAlerts||[];let level=0,reasons=[];
+      const severeWords=/Hurricane|Tropical Storm|Storm Surge|Tornado|Severe Thunderstorm|High Surf Warning|Extreme Wind|Tsunami/i;
+      const cautionWords=/Rip Current|Beach Hazards|High Surf|Coastal Flood|Small Craft|Gale|Dense Fog|Heat Advisory|Flood/i;
+      for(const al of alerts){if(severeWords.test(al.event||'')){level=Math.max(level,2);reasons.push(al.event);}else if(cautionWords.test(al.event||'')){level=Math.max(level,1);reasons.push(al.event);}else if(/Extreme|Severe/.test(al.severity||'')){level=Math.max(level,2);reasons.push(al.event);}else{level=Math.max(level,1);reasons.push(al.event);}}
+      if(Number(c.waveHeight)>=6){level=Math.max(level,2);reasons.push(`${this.fmt(c.waveHeight,1)} ft surf`);}else if(Number(c.waveHeight)>=4){level=Math.max(level,1);reasons.push(`${this.fmt(c.waveHeight,1)} ft surf`);}
+      if(Number(c.windGust)>=35){level=Math.max(level,2);reasons.push(`${this.fmt(c.windGust,0)} mph gusts`);}else if(Number(c.windGust)>=22){level=Math.max(level,1);reasons.push(`${this.fmt(c.windGust,0)} mph gusts`);}
+      if([95,96,99].includes(Number(c.weatherCode))){level=Math.max(level,2);reasons.push('Thunderstorms');}
+      const live=this.state.sourceHealth?.alerts==='live';
+      if(level>=2)return{level,status:'HIGH RISK',title:'Hazardous conditions flagged',detail:reasons.slice(0,3).join(' • ')||'Serious coastal hazards are present.',className:'high'};
+      if(level===1)return{level,status:'CAUTION',title:'Extra caution before you go',detail:reasons.slice(0,3).join(' • ')||'Review conditions before leaving.',className:'caution'};
+      return{level,status:live?'LOWER RISK':'VERIFY',title:live?'No major point alert found':'Official alert check not confirmed',detail:live?'NWS returned no active point alerts, and loaded surf/wind are below CoastCast caution thresholds. Local hazards can still exist.':'Refresh Live Data and check posted local warnings before departure.',className:live?'lower':'verify'};
+    },
+    renderOceanIntelligence(){
+      if(!this.$('tideStageNow'))return;const ti=this.tideIntel(),moon=this.lunarInfo(),sun=this.state.data?.sun||{};
+      this.$('tideStageNow').textContent=ti.stage;this.$('tideMovementStrength').textContent=ti.strength;
+      if(ti.next){const diff=ti.next.date-new Date(),mins=Math.max(0,Math.round(diff/60000)),dur=mins>=60?`${Math.floor(mins/60)}h ${mins%60}m`:`${mins}m`;this.$('tideTurnDetail').textContent=`Next ${ti.next.type.toLowerCase()} ${ti.next.time} • ${dur}`;}else this.$('tideTurnDetail').textContent='No upcoming NOAA turn loaded';
+      this.$('tideStrongWindow').textContent=ti.windows[0]?.label||'—';
+      this.$('moonPhaseIq').textContent=moon.name;this.$('moonIllumination').textContent=`${moon.illumination}% illuminated`;this.$('moonSunrise').textContent=sun.sunrise||'—';this.$('moonSunset').textContent=sun.sunset||'—';
+      this.$('tideWindowList').innerHTML=ti.windows.length?ti.windows.map((w,i)=>`<div class="tide-window-row"><span>${i===0?'NEXT':'LATER'}</span><strong>${this.escape(w.label)}</strong><small>${this.escape(w.direction)}</small></div>`).join(''):'<div class="empty-state compact-empty">Load live NOAA tides to calculate movement windows.</div>';
+      this.$('oceanIqBadge').textContent=this.state.sourceHealth?.tides==='live'?'NOAA + LOCAL TIME':'TIDE FALLBACK';
+      this.renderSafetyGuard();
+    },
+    renderSafetyGuard(){
+      if(!this.$('safetyStatusBadge'))return;const s=this.safetyAssessment(),alerts=this.state.safetyAlerts||[];this.$('safetyStatusBadge').className=`safety-status-badge ${s.className}`;this.$('safetyStatusBadge').textContent=s.status;this.$('safetyStatusTitle').textContent=s.title;this.$('safetyStatusDetail').textContent=s.detail;
+      this.$('safetyAlertList').innerHTML=alerts.length?alerts.slice(0,4).map(a=>`<div class="safety-alert-row"><strong>${this.escape(a.event)}</strong><span>${this.escape(a.severity||'NWS alert')}</span><small>${this.escape(a.headline||'')}</small></div>`).join(''):`<div class="safety-clear-row"><strong>${this.state.sourceHealth?.alerts==='live'?'No active NWS point alerts returned':'NWS alert feed not confirmed'}</strong><small>Always check local beach flags, lifeguards and posted warnings.</small></div>`;
+    },
+    renderTideWeek(){
+      const box=this.$('tideWeekGrid');if(!box)return;const tides=(this.state.data?.tides||[]).map(t=>({...t,date:this.parseLocationDate(t.rawTime)})).filter(t=>!isNaN(t.date)).sort((a,b)=>a.date-b.date);if(!tides.length){box.innerHTML='<div class="empty-state">No NOAA tide predictions loaded.</div>';return;}
+      const groups=[];for(const t of tides){const key=this.formatDestinationDate(t.date,{year:'numeric',month:'2-digit',day:'2-digit'});let g=groups.find(x=>x.key===key);if(!g){g={key,date:t.date,items:[]};groups.push(g);}g.items.push(t);}this.$('tideWeekSource').textContent=this.state.sourceHealth?.tides==='live'?'NOAA LIVE':'TIDE FALLBACK';
+      box.innerHTML=groups.slice(0,7).map(g=>`<article class="tide-day-card"><span>${this.formatDestinationDate(g.date,{weekday:'short'}).toUpperCase()}</span><strong>${this.formatDestinationDate(g.date,{month:'short',day:'numeric'})}</strong>${g.items.slice(0,4).map(t=>`<div><b>${this.escape(t.type)}</b><em>${this.escape(t.time)}</em><small>${this.fmt(t.height,1)} ft</small></div>`).join('')}</article>`).join('');
+    },
+    renderTripSafety(){
+      if(!this.$('tripSafetyBadge'))return;const s=this.safetyAssessment(),regKey=this.regulationCheckKey?.(),regOk=!!(regKey&&this.state.regChecks?.[regKey]?.date===this.localDateKey(new Date())),items=this.gearItems?.()||[],checked=this.state.gearPlan?.checked||{},gearPct=items.length?Math.round(items.filter(i=>checked[i.key]).length/items.length*100):0;
+      const rows=[{ok:s.level===0,label:'Beach/weather hazards',detail:s.status==='LOWER RISK'?'No major NWS point alert found; still verify local flags.':s.detail,warn:s.level>0},{ok:regOk,label:'Regulations review',detail:regOk?'Marked checked today.':'Official regulations have not been marked checked today.',warn:!regOk},{ok:gearPct>=75,label:'Gear readiness',detail:`${gearPct}% of Smart Gear Planner checked.`,warn:gearPct<75},{ok:this.state.sourceHealth?.weather==='live'&&this.state.sourceHealth?.marine==='live'&&this.state.sourceHealth?.tides==='live',label:'Forecast sources',detail:'Weather, marine and tide feeds '+((this.state.sourceHealth?.weather==='live'&&this.state.sourceHealth?.marine==='live'&&this.state.sourceHealth?.tides==='live')?'are live.':'need a refresh or are using fallback.'),warn:false}];
+      const caution=rows.some(r=>r.warn);this.$('tripSafetyBadge').textContent=s.level>=2?'HOLD / REVIEW':caution?'CAUTION':'READY CHECK';this.$('tripSafetyBadge').className=`tiny-pill ${s.level>=2?'danger-pill':caution?'caution-pill':'ready-pill'}`;this.$('tripSafetySummary').textContent=s.level>=2?'Do not rely on the fishing score until the flagged hazards are resolved and official warnings are reviewed.':caution?'The trip may be fishable, but one or more planning checks still need attention.':'Core CoastCast departure checks look favorable. Verify the beach in person before entering the water.';
+      this.$('tripSafetyChecklist').innerHTML=rows.map(r=>`<div class="trip-safety-row ${r.ok?'ok':r.warn?'warn':'info'}"><span>${r.ok?'✓':r.warn?'!':'i'}</span><div><strong>${this.escape(r.label)}</strong><small>${this.escape(r.detail)}</small></div></div>`).join('');
+    },
+
     scoreFactors(){
       const d=this.state.data,c=d.current,config=this.species[this.state.targetSpecies];
       const wind=c.windSpeed<=10?['positive','Favorable',`Wind ${this.compass(c.windDir)} ${this.fmt(c.windSpeed,0)} mph is manageable for ${this.state.fishingStyle.toLowerCase()}.`]:c.windSpeed<=16?['neutral','Mixed',`Wind ${this.fmt(c.windSpeed,0)} mph may affect casting and surface conditions.`]:['negative','Poor',`Strong ${this.fmt(c.windSpeed,0)} mph wind is a major penalty.`];
@@ -1007,9 +1101,9 @@
 
     renderAll(){
       this.recalculateScores();
-      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderBaitIntelligence();this.renderRegulations();this.renderConditions();this.renderFactors();
-      this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();this.renderSpotIntelligence();
-      this.evaluateAlerts({notify:true});this.renderTrips();this.renderHomeAlerts();this.renderProfile();this.renderScout();this.renderGoMode();this.renderGearPlanner();this.renderPatternMatch();this.renderCatchIntelligence();
+      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderBaitIntelligence();this.renderRegulations();this.renderConditions();this.renderFactors();this.renderOceanIntelligence();
+      this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderTideWeek();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();this.renderSpotIntelligence();
+      this.evaluateAlerts({notify:true});this.renderTrips();this.renderHomeAlerts();this.renderProfile();this.renderScout();this.renderGoMode();this.renderGearPlanner();this.renderTripSafety();this.renderPatternMatch();this.renderCatchIntelligence();
       if(this.state.view==='map') this.renderMapLayers();
     },
 
@@ -1049,7 +1143,7 @@
     renderSourceHealth(){
       const box=this.$('sourceHealth'); if(!box) return;
       const h=this.state.sourceHealth||{};
-      const items=[['Weather',h.weather],['Marine',h.marine],['NOAA tides',h.tides],['Tackle shops',h.shops]];
+      const items=[['Weather',h.weather],['Marine',h.marine],['NOAA tides',h.tides],['NWS alerts',h.alerts],['Tackle shops',h.shops]];
       const label=s=>s==='live'?'LIVE':s==='verified'?'VERIFIED':s==='loading'?'CHECKING':s==='fallback'||s==='partial'?'FALLBACK':'DEMO';
       box.innerHTML=items.map(([name,status])=>`<span class="source-chip ${status||'demo'}"><span class="source-chip-name">${this.escape(name)}</span><strong>${label(status)}</strong></span>`).join('');
     },
@@ -1175,6 +1269,7 @@
     bindShopLinks(){},
 
     renderForecast(){
+      if(this.$('destinationClock'))this.$('destinationClock').textContent=this.destinationClockText();
       const d=this.state.data,c=d.current; const days=d.days.slice(0,7);
       this.$('forecastSummaryIcon').textContent=this.weatherIcon(c.weatherCode);
       this.$('forecastSummaryTemp').textContent=`${this.fmt(c.temp,0)}°F`;
@@ -1810,7 +1905,7 @@
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
       try{localStorage.removeItem('coastcast-v12-state');localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{['coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.regChecks={};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      this.state.live=false;try{['coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.regChecks={};this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 
 
@@ -1858,7 +1953,7 @@
     },
 
     backupPayload(){
-      return {format:'coastcast-backup',version:'1.4.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,regChecks:this.state.regChecks}};
+      return {format:'coastcast-backup',version:'1.5.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,regChecks:this.state.regChecks}};
     },
 
     exportBackup(){
@@ -1922,7 +2017,7 @@
     },
 
     saveCloudMetaOnly(){
-      try{const raw=localStorage.getItem('coastcast-v14-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v14-state',JSON.stringify(p));}catch(_){ }
+      try{const raw=localStorage.getItem('coastcast-v15-state')||localStorage.getItem('coastcast-v14-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v15-state',JSON.stringify(p));}catch(_){ }
     },
 
     async cloudPull(){
@@ -1972,13 +2067,13 @@
     average(arr){const nums=arr.map(Number).filter(Number.isFinite);return nums.length?nums.reduce((a,b)=>a+b,0)/nums.length:0;},
     mode(arr){const counts=new Map();let best=null,bestN=0;for(const x of arr){if(!x)continue;const n=(counts.get(x)||0)+1;counts.set(x,n);if(n>bestN){best=x;bestN=n;}}return best;},
     extractHour(value){if(value instanceof Date)return value.getHours();const s=String(value||'');if(/T\d{2}:/.test(s))return Number(s.match(/T(\d{2}):/)[1]);const m=s.match(/(\d{1,2})\s*(AM|PM)/i);if(m){let h=Number(m[1])%12;if(m[2].toUpperCase()==='PM')h+=12;return h;}return 12;},
-    hourFromIso(s){const d=new Date(s);return isNaN(d)?String(s):d.toLocaleTimeString([],{hour:'numeric'});},
-    timeFromIso(s){if(!s)return'';const d=new Date(s);return isNaN(d)?'':d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});},
+    hourFromIso(s){const m=String(s||'').match(/T(\d{1,2}):(\d{2})/);if(m){let h=Number(m[1]),ap=h>=12?'PM':'AM';h=h%12||12;return `${h} ${ap}`;}return String(s||'');},
+    timeFromIso(s){if(!s)return'';return this.literalClock(s)||String(s);},
     dateIndexForIso(s){const d=new Date(s),today=new Date();d.setHours(0,0,0,0);today.setHours(0,0,0,0);return Math.round((d-today)/86400000);},
     dayName(s){const d=new Date(String(s)+'T12:00:00');return isNaN(d)?'DAY':d.toLocaleDateString([],{weekday:'short'}).toUpperCase();},
     shortDate(s){const d=new Date(String(s)+'T12:00:00');return isNaN(d)?String(s):d.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});},
-    noaaTime(s){const str=String(s||'').replace(' ','T');const d=new Date(str);return isNaN(d)?String(s):d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});},
-    parseTideDate(s){if(!s)return new Date(NaN);return new Date(String(s).replace(' ','T'));},
+    noaaTime(s){return this.literalClock(s)||String(s||'');},
+    parseTideDate(s){return this.parseLocationDate(s);},
     formatDateYYYYMMDD(d){return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;},
     prettyDate(s){const d=new Date(s);return isNaN(d)?String(s):d.toLocaleDateString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});},
     moonPhase(){const d=new Date();const lp=2551443;const newMoon=new Date(Date.UTC(2001,0,24,13,35,0));const phase=((d-newMoon)/1000)%lp/lp;const p=(phase+1)%1;if(p<.03||p>.97)return'New moon';if(p<.22)return'Waxing crescent';if(p<.28)return'First quarter';if(p<.47)return'Waxing gibbous';if(p<.53)return'Full moon';if(p<.72)return'Waning gibbous';if(p<.78)return'Last quarter';return'Waning crescent';},

@@ -1,5 +1,5 @@
-const CACHE='coastcast-v1.4.0';
-const CORE=['./','./index.html','./styles.css?v=1.4.0','./app.js?v=1.4.0','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./favicon-32.png','./og-image.png'];
+const CACHE='coastcast-v1.5.0';
+const CORE=['./','./index.html','./styles.css?v=1.5.0','./app.js?v=1.5.0','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./favicon-32.png','./og-image.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
 });

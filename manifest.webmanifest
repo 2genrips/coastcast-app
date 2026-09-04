@@ -1,7 +1,7 @@
 {
   "name": "CoastCast Fishing Forecast",
   "short_name": "CoastCast",
-  "description": "Nationwide coastal fishing planner with live forecasts, species and bait intelligence, regulation guard, smart gear planning, Scout, trips and catch intelligence.",
+  "description": "Nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, NWS safety alerts, Ocean IQ, species and bait intelligence, Scout, trips and catch intelligence.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",

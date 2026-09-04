@@ -1,28 +1,26 @@
-# CoastCast v1.4.0 — What Changed
+# CoastCast v1.5.0 — Ocean IQ + Safety Guard
 
-## Bait & Rig Intelligence
-- New Home card answers **What should I throw?** for the selected species.
-- Ranks a top bait/lure and backup option from species, tide, wind, surf, fishing style and your logged catch history.
-- Recommends a starting rig, presentation and terminal-tackle approach.
-- One tap sends the bait plan into Go Fishing Mode.
-- One tap opens the closest loaded bait/tackle option or starts a map shop search.
+## Ocean IQ
+- New Home intelligence panel combines tide stage, next NOAA turn, tide-movement strength and the next three strongest movement windows.
+- New Moon & Light context shows moon phase, approximate illumination, sunrise and sunset.
+- Moon data is deliberately treated as secondary context rather than a guaranteed bite predictor.
 
-## Regulation Guard
-- Keeps the official state regulations link from v0.9+.
-- Adds a user-controlled **Checked today** record for the current state + target species.
-- CoastCast does not claim regulations are automatically verified and does not replace official rules.
-- Smart Gear Planner shows whether today’s regulation review has been recorded.
+## NWS Safety Guard
+- CoastCast now requests active National Weather Service alerts for the exact fishing point when Live Data refreshes.
+- The Safety Guard combines NWS alerts with loaded wave height, wind gusts and thunderstorm conditions.
+- Statuses are **LOWER RISK**, **CAUTION**, **HIGH RISK**, or **VERIFY**. None should be read as a declaration that a beach is safe.
+- NWS alert health appears in the source-status chips.
 
-## Smart Gear Planner
-- Builds a pack list from target species, fishing style, loaded weather/marine conditions and the bait plan.
-- Adds conditional rain, UV, wind/surf, low-light, warmth and enhanced safety items.
-- Tracks packing progress on-device.
-- Reset checks without affecting catches, trips or favorites.
+## 7-Day Tide Planner
+- NOAA high/low prediction request expanded from roughly 2 days to 7 days.
+- Forecast now groups high/low events into a horizontally scrollable week view.
+- Mid-cycle water-movement windows are calculated between adjacent high/low predictions.
 
-## Go Fishing Mode
-- Carries the current bait/rig plan into the live fishing session.
-- Quick Catch pre-fills the recommended bait when there is no more recent session bait.
+## Nationwide destination-local time fix
+- Open-Meteo destination timezone and UTC offset are retained in CoastCast.
+- Hourly weather labels, sunrise/sunset, NOAA tide labels and Tide Intelligence are handled as fishing-destination local time instead of blindly converting them to the phone's timezone.
+- This is especially important when planning trips across U.S. time zones.
 
-## Data portability
-- v1.4 backups/cloud payloads include gear checklist state and regulation-check records.
-- Existing v1.3 data migrates forward automatically.
+## Departure Check
+- Trips now has a pre-departure briefing combining NWS hazards, regulation-review status, Smart Gear progress and live forecast-source health.
+- This remains a planning aid; local authorities, lifeguards, posted warnings and official alerts control.

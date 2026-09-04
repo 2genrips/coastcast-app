@@ -1,2 +1,2 @@
-CoastCast v1.4.0
-Bait Intelligence + Regulation Guard + Smart Gear Planner
+CoastCast v1.5.0
+Ocean IQ + Safety Guard + 7-Day Tide Planner
