@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, Scout, trips, tackle inventory, offline packs, catch photos, shareable catch cards, Community Beta and a private logbook." />
+  <meta name="description" content="CoastCast 2.0 is a nationwide coastal fishing command center with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,8 +16,8 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=1.8.0" />
-  <title>CoastCast</title>
+  <link rel="stylesheet" href="styles.css?v=2.0.0" />
+  <title>CoastCast 2.0</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -33,7 +33,7 @@
         </svg>
         <div class="brand-copy">
           <div class="brand-name"><span>COAST</span><b>CAST</b></div>
-          <div class="brand-kicker">FISHING FORECAST</div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">2.0</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -78,6 +78,46 @@
           <button id="homeSaveBtn" class="home-action" type="button"><span class="home-action-icon">☆</span><span><strong>Save</strong><small>Favorite</small></span></button>
           <button id="homeAlertBtn" class="home-action" type="button"><span class="home-action-icon">◉</span><span><strong>Alert</strong><small>Watch score</small></span></button>
           <button id="homeMapBtn" class="home-action scout-home-action" type="button"><span class="home-action-icon">◎</span><span><strong>Scout</strong><small>Rank spots</small></span></button>
+        </section>
+
+        <section class="panel command-center-panel" id="commandCenterPanel">
+          <div class="command-center-top">
+            <div>
+              <div class="eyebrow">COASTCAST COMMAND CENTER</div>
+              <h2>What is the best move?</h2>
+            </div>
+            <span id="commandBadge" class="command-badge">ANALYZING</span>
+          </div>
+          <div class="command-mode-row" role="group" aria-label="Command Center priority">
+            <button type="button" class="command-mode active" data-command-mode="bite">Max Bite</button>
+            <button type="button" class="command-mode" data-command-mode="calm">Calm Water</button>
+            <button type="button" class="command-mode" data-command-mode="weather">Best Weather</button>
+            <button type="button" class="command-mode" data-command-mode="confidence">Most Certain</button>
+          </div>
+          <div class="command-hero">
+            <div class="command-call-wrap">
+              <span class="command-kicker">TODAY'S CALL</span>
+              <strong id="commandCall">BUILDING PLAN</strong>
+              <h3 id="commandHeadline">CoastCast is combining the coast for you.</h3>
+              <p id="commandSummary">Target species, tide movement, wind, surf, weather and forecast confidence are being ranked together.</p>
+            </div>
+            <div class="command-confidence-ring" aria-label="Forecast confidence">
+              <strong id="commandConfidence">—</strong><span>%</span><small>DATA<br/>CONFIDENCE</small>
+            </div>
+          </div>
+          <div class="command-metric-grid">
+            <article><span>BEST TARGET</span><strong id="commandSpecies">—</strong><small id="commandSpeciesScore">—</small></article>
+            <article><span>BEST DAY</span><strong id="commandDay">—</strong><small id="commandDayScore">—</small></article>
+            <article><span>BEST WINDOW</span><strong id="commandWindow">—</strong><small id="commandWindowScore">—</small></article>
+            <article><span>READINESS</span><strong id="commandReadiness">—</strong><small id="commandReadinessCall">—</small></article>
+          </div>
+          <div id="commandFactors" class="command-factor-row"></div>
+          <div id="commandPlanStatus" class="command-plan-status">No Command Plan saved yet.</div>
+          <div class="command-actions">
+            <button id="commandBuildBtn" class="primary-button" type="button">Build my complete plan</button>
+            <button id="commandScoutBtn" class="secondary-button" type="button">Scout a better spot</button>
+          </div>
+          <p class="micro-note">Command Center is a planning recommendation, not a safety guarantee. Recheck live conditions, local beach flags, access and regulations before fishing.</p>
         </section>
 
         <section class="score-hero panel">
@@ -405,6 +445,16 @@
           <div id="forecastDays" class="forecast-days"></div>
         </section>
 
+        <section class="panel opportunity-matrix-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">OPPORTUNITY MATRIX</div><h2>7 days × top species</h2></div>
+            <span id="matrixConfidenceBadge" class="tiny-pill">CALCULATING</span>
+          </div>
+          <p class="section-note">A fast scan of the strongest target/day combinations at this destination. Tap any score to load that species and day into Forecast.</p>
+          <div id="opportunityMatrix" class="opportunity-matrix"></div>
+          <div id="matrixBestCall" class="matrix-best-call">CoastCast is ranking the week.</div>
+        </section>
+
         <section class="panel bite-trend-panel">
           <div class="section-heading">
             <div><div class="eyebrow">BITE TREND</div><h2>Best hours at a glance</h2></div>
@@ -639,6 +689,24 @@
           <div class="trip-hub-actions"><button id="tripHubPlanBtn" class="primary-button" type="button">Build best trip</button><button id="tripHubAlertBtn" class="secondary-button" type="button">Create smart alert</button></div>
         </section>
 
+        <section class="panel mission-control-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">TRIP MISSION CONTROL</div><h2>One-tap launch readiness</h2></div>
+            <span id="missionBadge" class="tiny-pill">CHECKING</span>
+          </div>
+          <div class="mission-hero">
+            <div><span>PLAN COMPLETENESS</span><strong id="missionPercent">0%</strong><p id="missionHeadline">Build a Command Plan to connect the whole trip.</p></div>
+            <div class="mission-progress"><span id="missionProgressBar"></span></div>
+          </div>
+          <div id="missionChecklist" class="mission-checklist"></div>
+          <div class="mission-actions">
+            <button id="missionBuildBtn" class="primary-button" type="button">Auto-build full trip</button>
+            <button id="missionLaunchBtn" class="primary-button launch-button" type="button">Start Go Fishing Mode</button>
+            <button id="missionShareBtn" class="secondary-button" type="button">Share command brief</button>
+          </div>
+          <p class="micro-note">Starting Go Fishing Mode does not mean conditions are safe. CoastCast blocks its one-tap launch when a high-level Safety Guard condition is loaded.</p>
+        </section>
+
         <section class="panel smart-departure-panel">
           <div class="section-heading">
             <div><div class="eyebrow">SMART DEPARTURE</div><h2>When should I leave?</h2></div>
@@ -805,6 +873,20 @@
           <div id="catchIntelBars" class="catch-intel-bars"></div>
         </section>
 
+
+        <section class="panel angler-analytics-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">ANGLER ANALYTICS</div><h2>Your winning pattern</h2></div>
+            <span id="analyticsConfidence" class="tiny-pill">LEARNING</span>
+          </div>
+          <p id="analyticsHeadline" class="section-note">Log catches with bait and conditions to unlock personal pattern analysis.</p>
+          <div id="analyticsMetrics" class="analytics-metrics"></div>
+          <div id="analyticsPatterns" class="analytics-patterns"></div>
+          <div class="analytics-learning">
+            <div><span>PERSONALIZATION DEPTH</span><strong id="analyticsLearningText">0%</strong></div>
+            <div class="analytics-learning-track"><span id="analyticsLearningBar"></span></div>
+          </div>
+        </section>
 
         <section class="panel photo-memory-panel">
           <div class="section-heading">
@@ -1188,7 +1270,7 @@
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
       <label class="field-group"><span>Nearby shop radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <div class="settings-note">CoastCast v1.8 Beta is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
+      <div class="settings-note">CoastCast v2.0 Launch Candidate is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -1215,6 +1297,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=1.8.0"></script>
+  <script src="app.js?v=2.0.0"></script>
 </body>
 </html>

@@ -1,20 +1,20 @@
-# CoastCast v1.8 — Android Update
+# CoastCast v2.0 — Android / GitHub Pages
 
-1. Extract the CoastCast v1.8 ZIP in **My Files**.
-2. Open your existing CoastCast GitHub repository in Chrome.
-3. Choose **Add file → Upload files**.
-4. Upload everything inside the `coastcast_v1.8` folder and replace matching files.
-5. Commit to `main`.
-6. Wait for GitHub Pages to redeploy.
-7. Fully close CoastCast and reopen it.
+1. Extract the ZIP on Android.
+2. Upload everything inside `coastcast_v2.0` to the root of your existing CoastCast GitHub repository.
+3. Replace matching files and commit to `main`.
+4. Wait for GitHub Pages to redeploy.
+5. Fully close CoastCast and reopen it. If the old UI remains, open the Pages URL in Chrome and refresh once.
 
-Your v1.7 catches, tackle box, offline packs, photos, trips, profile and cloud settings migrate forward.
+Your v1.8 catches, profile, favorites, trips, tackle, community, alerts and backups migrate forward.
 
-## First test
-- Open **Community** from Trips.
-- Tap **Create catch card**.
-- Pick a logged catch.
-- Keep **General water area** selected.
-- Tap **Generate card → Share image**.
-- Tap **Publish to Community**. Without Supabase this appears in Local Preview; with the v1.8 SQL installed it publishes to Cloud Community Beta.
-- Open **Challenges** to see progress and badges from your existing logbook.
+## First v2.0 test
+- Home → Command Center → switch Max Bite / Calm Water / Best Weather.
+- Tap **Build my complete plan**.
+- Trips → Mission Control.
+- Forecast → Opportunity Matrix.
+- Logbook → Angler Analytics.
+
+
+### v2.0.1 note
+This build includes the tackle-shop map accuracy hotfix. Install v2.0.1 instead of the original v2.0.0 package. Old bad shop-cache entries are bypassed automatically.

@@ -1,4 +1,4 @@
-# CoastCast v1.8 — Cloud Sync + Community Beta
+# CoastCast v2.0 — Cloud Sync + Community Beta
 
 Cloud Sync is optional. CoastCast still works locally without Supabase.
 

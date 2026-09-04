@@ -14,3 +14,7 @@ Community content comes from three clearly different sources:
 3. **Your private Logbook** — never treated as public Community data merely because it exists locally or in private Cloud Sync.
 
 Community Beta is separate from forecast data. User-generated catch reports are anecdotal and should not be treated as verified fishing or safety information.
+
+
+## CoastCast 2.0 Decision Layer
+Command Center, Opportunity Matrix, Mission Control and Angler Analytics are local CoastCast calculations built from the already-loaded live/fallback sources and the user's private logbook. They are not additional external forecast providers.

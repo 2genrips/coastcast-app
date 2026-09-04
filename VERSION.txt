@@ -1,2 +1,1 @@
-CoastCast v1.8.0
-Community + Catch Cards + Challenges
+CoastCast v2.0.1 — Command Center + Tackle Shop Accuracy Hotfix
