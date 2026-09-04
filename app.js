@@ -20,7 +20,9 @@
       profile: {name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'},
       cloud: {url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null},
       scout: {running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null},
-      goMode: {active:false,startedAt:null,sessionId:null,location:null,species:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]},
+      goMode: {active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]},
+      gearPlan: {checked:{},lastBuilt:null},
+      regChecks: {},
       data: null,
       map: null,
       mapLayers: { spots: [], catches: [], shops: [], current: [], recommended: [], access: [] },
@@ -117,6 +119,28 @@
       'Salmon': {bait:['herring','spoon','spinner'],habitat:'coastal current seams, bait lanes and migration routes'},
       'Bonefish': {bait:['shrimp','crab','small fly'],habitat:'shallow flats, channels and moving water'},
       'Trevally': {bait:['topwater','live bait','stickbait'],habitat:'reefs, points, channels and current-washed structure'}
+    },
+
+    baitPlaybook: {
+      'Red Drum': {rigs:{'Surf fishing':'Fish-finder / Carolina rig','Pier fishing':'Carolina rig or jighead','Inlet / jetty':'Jighead or Carolina rig'},presentation:'Keep natural bait close to the bottom in moving water; work paddletails across cuts and current seams.',terminal:'30–40 lb leader • 3/0–6/0 circle hook for bait'},
+      'Speckled Trout': {rigs:{'Surf fishing':'1/8–1/4 oz jighead','Pier fishing':'Popping cork or jighead','Inlet / jetty':'Jighead / suspending plug'},presentation:'Work clean current seams slowly; low light favors topwater and suspending presentations.',terminal:'15–25 lb fluorocarbon leader'},
+      'Flounder': {rigs:{'Surf fishing':'Carolina rig','Pier fishing':'Carolina rig / dropper','Inlet / jetty':'Bucktail + trailer'},presentation:'Stay near bottom and work drop-offs, channel edges and structure with slow controlled movement.',terminal:'20–30 lb leader • 2/0–4/0 hook'},
+      'Bluefish': {rigs:{'Surf fishing':'Metal / bait rig','Pier fishing':'Metal spoon / float rig','Inlet / jetty':'Metal jig / plug'},presentation:'Cover water quickly around bait; use a faster retrieve when fish are actively chasing.',terminal:'30–50 lb abrasion-resistant leader; wire only when needed'},
+      'Spanish Mackerel': {rigs:{'Surf fishing':'Casting spoon / Got-Cha','Pier fishing':'Got-Cha / spoon','Inlet / jetty':'Fast metal jig'},presentation:'Fast, steady retrieves through clean water and bait schools.',terminal:'20–30 lb fluorocarbon or light wire when cut-offs are frequent'},
+      'Black Drum': {rigs:{'Surf fishing':'Fish-finder rig','Pier fishing':'Carolina / bottom rig','Inlet / jetty':'Bottom rig near structure'},presentation:'Keep crab, shrimp or clam on bottom and let scent work in current.',terminal:'30–50 lb leader • strong circle hook'},
+      'Sheepshead': {rigs:{'Surf fishing':'Compact bottom rig','Pier fishing':'Short leader / jig','Inlet / jetty':'Jig or short Carolina rig'},presentation:'Present bait tight to pilings, rocks or jetty structure with minimal slack.',terminal:'20–40 lb fluorocarbon • small strong hook'},
+      'Striped Bass': {rigs:{'Surf fishing':'Fish-finder / bucktail','Pier fishing':'Live-bait rig / plug','Inlet / jetty':'Bucktail / swimbait'},presentation:'Work rips and current edges; low-light periods favor plugs and moving baits.',terminal:'30–50 lb leader'},
+      'Pompano': {rigs:{'Surf fishing':'Double-drop pompano rig','Pier fishing':'Double-drop bottom rig','Inlet / jetty':'Light bottom rig'},presentation:'Fish clean sandy troughs and bars; keep baits compact and near bottom.',terminal:'15–25 lb leader • small circle hooks'},
+      'Snook': {rigs:{'Surf fishing':'Free-line / jighead','Pier fishing':'Live-bait rig','Inlet / jetty':'Jighead / live bait'},presentation:'Present naturally with the current near passes, troughs and structure.',terminal:'30–50 lb fluorocarbon leader'},
+      'Tarpon': {rigs:{'Surf fishing':'Free-line live bait','Pier fishing':'Live-bait rig','Inlet / jetty':'Free-line crab / swimbait'},presentation:'Match bait movement and current; avoid overworking the presentation.',terminal:'50–80 lb leader sized to fish and structure'},
+      'Surfperch': {rigs:{'Surf fishing':'Carolina / high-low rig','Pier fishing':'High-low rig','Inlet / jetty':'Light Carolina rig'},presentation:'Work sandy troughs and cuts; keep the bait moving slowly with the wash.',terminal:'10–20 lb leader'},
+      'California Halibut': {rigs:{'Surf fishing':'Drop-shot / Carolina rig','Pier fishing':'Live-bait rig','Inlet / jetty':'Swimbait / drop-shot'},presentation:'Work sandy edges and channels close to bottom with a slow retrieve.',terminal:'20–30 lb fluorocarbon leader'},
+      'Lingcod': {rigs:{'Surf fishing':'Heavy jig','Pier fishing':'Heavy swimbait / jig','Inlet / jetty':'Heavy jig / swimbait'},presentation:'Keep the lure near rocky structure and work deliberately without excessive speed.',terminal:'40–60 lb abrasion-resistant leader'},
+      'Rockfish': {rigs:{'Surf fishing':'Jig / high-low rig','Pier fishing':'High-low / jig','Inlet / jetty':'Jig / shrimp fly'},presentation:'Stay close to rocky structure and vary depth until fish are located.',terminal:'25–50 lb leader depending on structure'},
+      'Pacific Halibut': {rigs:{'Surf fishing':'Heavy bottom rig','Pier fishing':'Heavy bottom rig','Inlet / jetty':'Heavy bottom rig'},presentation:'Keep bait near bottom and maintain contact in current.',terminal:'Heavy leader and terminal tackle matched to depth/current'},
+      'Salmon': {rigs:{'Surf fishing':'Casting spoon / spinner','Pier fishing':'Herring / spinner','Inlet / jetty':'Spinner / spoon'},presentation:'Cover travel lanes and current seams; vary speed and depth.',terminal:'15–30 lb leader'},
+      'Bonefish': {rigs:{'Surf fishing':'Light shrimp/crab presentation','Pier fishing':'Light bait rig','Inlet / jetty':'Light jig / shrimp'},presentation:'Lead moving fish and keep presentations subtle in shallow clear water.',terminal:'8–16 lb fluorocarbon leader'},
+      'Trevally': {rigs:{'Surf fishing':'Stickbait / topwater','Pier fishing':'Live-bait / plug','Inlet / jetty':'Stickbait / jig'},presentation:'Work current-washed points and structure with assertive retrieves when fish are active.',terminal:'40–80 lb leader matched to structure'}
     },
 
     regulationSources: {
@@ -227,7 +251,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -244,6 +268,8 @@
         if(saved.cloud&&typeof saved.cloud==='object') this.state.cloud={...this.state.cloud,...saved.cloud,password:undefined};
         if(saved.scout&&typeof saved.scout==='object') this.state.scout={...this.state.scout,...saved.scout,running:false};
         if(saved.goMode&&typeof saved.goMode==='object') this.state.goMode={...this.state.goMode,...saved.goMode,checks:{...this.state.goMode.checks,...(saved.goMode.checks||{})},history:Array.isArray(saved.goMode.history)?saved.goMode.history:[]};
+        if(saved.gearPlan&&typeof saved.gearPlan==='object') this.state.gearPlan={checked:{},lastBuilt:null,...saved.gearPlan,checked:{...(saved.gearPlan.checked||{})}};
+        if(saved.regChecks&&typeof saved.regChecks==='object') this.state.regChecks={...saved.regChecks};
         if(this.state.cloud.session&&this.state.cloud.session.expires_at&&Number(this.state.cloud.session.expires_at)*1000<Date.now()) this.state.cloud.session=null;
       }catch(_){ }
     },
@@ -256,9 +282,11 @@
         profile:this.state.profile,
         cloud:{url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync},
         scout:{radius:this.state.scout.radius,period:this.state.scout.period,species:this.state.scout.species,results:this.state.scout.results,compareIds:this.state.scout.compareIds,lastRun:this.state.scout.lastRun},
-        goMode:this.state.goMode
+        goMode:this.state.goMode,
+        gearPlan:this.state.gearPlan,
+        regChecks:this.state.regChecks
       };
-      try{ localStorage.setItem('coastcast-v13-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v14-state',JSON.stringify(payload)); }catch(_){ }
       if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
@@ -274,7 +302,7 @@
       window.scrollTo({top:0,behavior:'smooth'});
       if(view==='forecast'){this.renderForecast();setTimeout(()=>this.renderTides(),20);}
       if(view==='map') setTimeout(()=>{this.ensureMap();this.renderMapLayers();this.renderSpotIntelligence();this.renderScout();if(!this.state.mapPOIs.length&&this.state.mapPlacesStatus==='idle')this.loadMapPlaces(false);},50);
-      if(view==='trips'){this.renderTrips();this.renderGoMode();}
+      if(view==='trips'){this.renderTrips();this.renderGoMode();this.renderGearPlanner();}
       if(view==='logbook') this.renderLogbook();
       if(view==='community') this.renderCommunity();
       if(view==='profile') this.renderProfile();
@@ -312,6 +340,12 @@
       this.$('alertRuleList')?.addEventListener('click',e=>this.handleTripHubClick(e));
       this.$('openRegsBtn')?.addEventListener('click',()=>this.openOfficialRegulations());
       this.$('openLicenseBtn')?.addEventListener('click',()=>window.open('https://www.fws.gov/initiative/fishing/buy-fishing-license','_blank','noopener'));
+      this.$('markRegsCheckedBtn')?.addEventListener('click',()=>this.markRegulationsChecked());
+      this.$('baitUseTripBtn')?.addEventListener('click',()=>this.useBaitPlanForTrip());
+      this.$('baitShopShortcutBtn')?.addEventListener('click',()=>this.openBaitShopShortcut());
+      this.$('gearUseBaitBtn')?.addEventListener('click',()=>this.useBaitPlanForTrip());
+      this.$('gearResetBtn')?.addEventListener('click',()=>this.resetGearChecks());
+      this.$('gearPlanList')?.addEventListener('change',e=>this.handleGearCheck(e));
       this.$('speciesRankList')?.addEventListener('click',e=>{const b=e.target.closest('[data-target-ranked-species]');if(b)this.setSpecies(b.dataset.targetRankedSpecies);});
       this.$('useMyLocationSheetBtn').addEventListener('click',()=>this.useMyLocation());
       this.$('locationSearchGoBtn').addEventListener('click',()=>this.searchLocations());
@@ -865,12 +899,94 @@
       if(this.$('regSourceBadge'))this.$('regSourceBadge').textContent=src?src.name:'Choose a U.S. coastal state';
       const msg=this.$('regulationMessage');if(msg)msg.innerHTML=src?`CoastCast detected <strong>${this.escape(this.stateNames[code])}</strong>. Check the official source for current <strong>${this.escape(this.state.targetSpecies)}</strong> size, bag, season, gear and closure rules before keeping fish.`:'CoastCast could not confidently detect the state from this location name. Open/change the destination to include the state before checking regulations.';
       const b=this.$('openRegsBtn');if(b){b.disabled=!src;b.textContent=src?'Open official regulations':'State not detected';}
+      const key=this.regulationCheckKey(),check=key?this.state.regChecks?.[key]:null,today=this.localDateKey(new Date());
+      const fresh=!!(check&&check.date===today);
+      if(this.$('regGuardBadge')){this.$('regGuardBadge').textContent=fresh?'CHECKED TODAY':'NEEDS CHECK';this.$('regGuardBadge').classList.toggle('checked',fresh);}
+      if(this.$('regGuardTitle'))this.$('regGuardTitle').textContent=fresh?`You reviewed ${this.state.targetSpecies} rules today`:'Verify before you keep fish';
+      if(this.$('regGuardTime'))this.$('regGuardTime').textContent=fresh?`Recorded ${new Date(check.at).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})} • ${src?.name||'official source'}`:'Open the official source, review current rules, then mark checked.';
+      const mark=this.$('markRegsCheckedBtn');if(mark){mark.disabled=!src;mark.textContent=fresh?'Checked today ✓':'Mark checked today';}
+    },
+
+    regulationCheckKey(){const code=this.detectStateCode();return code?`${code}|${this.state.targetSpecies}`:null;},
+    localDateKey(d){const x=d instanceof Date?d:new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;},
+    markRegulationsChecked(){
+      const key=this.regulationCheckKey(),src=this.state.currentRegSource;if(!key||!src){this.showToast('Choose a coastal state before recording a regulation check.');return;}
+      this.state.regChecks[key]={date:this.localDateKey(new Date()),at:new Date().toISOString(),state:this.detectStateCode(),species:this.state.targetSpecies,source:src.name,location:this.state.location.name};this.save();this.renderRegulations();this.renderGearPlanner();this.showToast('Regulation review recorded for today.');
     },
 
     openOfficialRegulations(){
       const src=this.state.currentRegSource;if(!src){this.showToast('Choose a U.S. coastal location with a state first.');return;}
       window.open(src.url,'_blank','noopener');
+      this.showToast('Review the current rules, then return and tap “Mark checked today.”');
     },
+
+    baitHistoryForSpecies(species){
+      const list=this.state.catches.filter(c=>c.species===species&&String(c.bait||'').trim());const counts={};
+      list.forEach(c=>{const k=String(c.bait).trim().toLowerCase();counts[k]=(counts[k]||0)+1;});
+      return {count:list.length,counts,top:Object.entries(counts).sort((x,y)=>y[1]-x[1])[0]||null};
+    },
+
+    baitIntelligence(species=this.state.targetSpecies){
+      const c=this.state.data?.current||{},extra=this.speciesExtras[species]||{bait:['natural bait','soft plastic'],habitat:'coastal structure'},play=this.baitPlaybook[species]||{};
+      const base=[...(extra.bait||[])];while(base.length<3)base.push(['natural bait','soft plastic','metal lure'][base.length]||'natural bait');
+      const history=this.baitHistoryForSpecies(species),scores=new Map(base.map((b,i)=>[b,30-i*3]));
+      const tide=this.currentTideLabel(),hour=new Date().getHours(),lowLight=hour<9||hour>=17,wave=Number(c.waveHeight)||0,wind=Number(c.windSpeed)||0;
+      for(const [raw,n] of Object.entries(history.counts)){const match=base.find(b=>raw.includes(b.toLowerCase())||b.toLowerCase().includes(raw));if(match)scores.set(match,(scores.get(match)||30)+Math.min(24,n*6));}
+      base.forEach(b=>{const k=b.toLowerCase();if(wave>=3&&(k.includes('cut')||k.includes('fishbites')||k.includes('clam')||k.includes('crab')))scores.set(b,scores.get(b)+8);if(wave<2.2&&(k.includes('live')||k.includes('shrimp')||k.includes('paddletail')||k.includes('swimbait')))scores.set(b,scores.get(b)+5);if(lowLight&&(k.includes('topwater')||k.includes('plug')||k.includes('paddletail')||k.includes('swimbait')))scores.set(b,scores.get(b)+6);if(/Rising|Falling|Moving/.test(tide)&&(k.includes('live')||k.includes('paddletail')||k.includes('spoon')||k.includes('jig')))scores.set(b,scores.get(b)+4);});
+      const ranked=[...scores].sort((x,y)=>y[1]-x[1]).map(x=>x[0]),primary=ranked[0],backup=ranked[1]||base[1];
+      const rig=play.rigs?.[this.state.fishingStyle]||play.rigs?.['Surf fishing']||'Simple bottom or casting rig';
+      let terminal=play.terminal||'Leader and terminal tackle matched to species and structure';
+      if(this.state.fishingStyle==='Surf fishing'){
+        const sinker=wind<=8&&wave<=2.2?'2–3 oz sinker':wind<=15&&wave<=3.5?'3–5 oz sinker':'heavier surf weight only if conditions remain safe';
+        terminal=`${terminal} • ${sinker}`;
+      }
+      const sourceLive=['weather','marine','tides'].filter(k=>this.state.sourceHealth?.[k]==='live').length,confidence=Math.min(99,55+sourceLive*10+Math.min(14,history.count*3));
+      const primaryWhy=history.top&&primary.toLowerCase().includes(history.top[0])?`Your logbook favors ${history.top[0]} for ${species}; current ${tide.toLowerCase()} conditions keep it on top.`:`Best starting match for ${species} with ${this.fmt(c.waveHeight,1)} ft surf, ${this.fmt(c.windSpeed,0)} mph wind and ${tide.toLowerCase()}.`;
+      const backupWhy=`A useful change-up if water clarity, current or bait activity shifts while you fish.`;
+      return {species,primary,backup,rig,presentation:play.presentation||`Present naturally around ${extra.habitat}.`,terminal,confidence,history,primaryWhy,backupWhy};
+    },
+
+    renderBaitIntelligence(){
+      if(!this.$('baitPrimaryName'))return;const p=this.baitIntelligence();
+      this.$('baitConfidence').textContent=`${p.confidence}% MATCH`;this.$('baitPrimaryName').textContent=this.titleCase(p.primary);this.$('baitPrimaryWhy').textContent=p.primaryWhy;this.$('baitBackupName').textContent=this.titleCase(p.backup);this.$('baitBackupWhy').textContent=p.backupWhy;
+      this.$('baitRigName').textContent=p.rig;this.$('baitRigDetail').textContent=`For ${this.state.fishingStyle.toLowerCase()} • ${this.currentTideLabel().toLowerCase()}`;this.$('baitPresentationName').textContent='Approach';this.$('baitPresentationDetail').textContent=p.presentation;this.$('baitTerminalName').textContent='Leader / weight';this.$('baitTerminalDetail').textContent=p.terminal;
+      const note=this.$('personalBaitNote');if(note)note.textContent=p.history.top?`Personal signal: ${this.titleCase(p.history.top[0])} appears in ${p.history.top[1]} of your logged ${p.species} catch${p.history.top[1]===1?'':'es'} with bait details.`:`Personal signal: no ${p.species} bait history yet. Log bait/lure on catches and this plan will become more personal.`;
+    },
+
+    titleCase(v){return String(v||'').replace(/\b\w/g,m=>m.toUpperCase());},
+    useBaitPlanForTrip(){const p=this.baitIntelligence();this.state.goMode.baitPlan={species:p.species,primary:p.primary,backup:p.backup,rig:p.rig,presentation:p.presentation,terminal:p.terminal,created:new Date().toISOString()};this.save();this.renderGoMode();this.renderGearPlanner();this.navigate('trips');this.showToast(`${this.titleCase(p.primary)} plan loaded into your trip.`);},
+    openBaitShopShortcut(){const shops=this.state.data?.shops||[];if(shops.length){const s=shops[0];window.open(this.mapsUrl(s.lat,s.lon,s.name),'_blank','noopener');return;}this.navigate('map');setTimeout(()=>this.loadNearbyShops(true),120);this.showToast('Searching for bait & tackle near the fishing destination.');},
+
+    gearItems(){
+      const c=this.state.data?.current||{},p=this.baitIntelligence(),best=this.state.data?this.findBestWindow(this.state.data.hours.filter(h=>h.dateIndex===0).slice(0,24)):null,items=[];
+      const add=(key,label,group,detail='')=>items.push({key,label,group,detail});
+      add('license','Fishing license / required permits','Rules','Carry the licenses or permits required for this water.');
+      add('regs','Review current regulations','Rules',this.regulationCheckKey()&&this.state.regChecks?.[this.regulationCheckKey()]?.date===this.localDateKey(new Date())?'Marked checked today.':'Open the official source before keeping fish.');
+      add('rod','Rod, reel and spare line','Fishing',this.state.fishingStyle==='Surf fishing'?'Surf setup matched to casting distance and sinker weight.':'Setup matched to your fishing style.');
+      add('bait',`${this.titleCase(p.primary)} + backup ${this.titleCase(p.backup)}`,'Fishing',p.rig);
+      add('terminal','Terminal tackle / spare leaders','Fishing',p.terminal);
+      add('tools','Pliers, dehooker and measuring tool','Fishing','Add a fish-grip or net when appropriate.');
+      if(this.state.fishingStyle==='Surf fishing')add('sand','Sand spike / rod holder','Fishing','Keep rods secure above wash and traffic.');
+      if((c.windSpeed||0)>=12|| (c.waveHeight||0)>=2.8)add('heavy','Wind / surf-ready terminal tackle','Conditions','Bring heavier weights only within safe conditions and your gear limits.');
+      if((c.rain||0)>=25)add('rain','Rain shell + dry storage','Conditions',`${this.fmt(c.rain,0)}% precipitation chance loaded.`);
+      if((c.uv||0)>=5)add('uv','Sun protection','Conditions','Sunscreen, hat, sunglasses and sun shirt.');
+      if((c.temp||70)<60)add('layers','Warm layers','Conditions',`${this.fmt(c.temp,0)}°F current air temperature.`);else add('water','Water / hydration','Conditions','Bring more than you expect to need in heat and sun.');
+      const windowText=String(best?.label||'');if(/AM|PM/.test(windowText)&&(/5:|6:|7:|PM/.test(windowText)))add('light','Headlamp / backup light','Safety','Useful for low-light setup, pack-out and beach access.');
+      if(this.state.fishingStyle==='Inlet / jetty'||(c.waveHeight||0)>=3)add('pfd','PFD / enhanced water safety','Safety','Strongly consider flotation around rocks, jetties, currents or rough water.');
+      add('firstaid','First-aid kit + charged phone','Safety','Share your plan when fishing remote or hazardous access.');
+      add('ice','Cooler / ice as needed','Trip','For drinks, bait and legal kept fish.');
+      return items;
+    },
+
+    renderGearPlanner(){
+      const box=this.$('gearPlanList');if(!box)return;const items=this.gearItems(),checked=this.state.gearPlan?.checked||{};const done=items.filter(i=>checked[i.key]).length,pct=items.length?Math.round(done/items.length*100):0,p=this.baitIntelligence();
+      this.$('gearPlanBadge').textContent=`${items.length} ITEMS`;this.$('gearPlanSummary').innerHTML=`Packing for <strong>${this.escape(this.state.targetSpecies)}</strong> at <strong>${this.escape(this.state.location.name)}</strong> • ${this.escape(this.state.fishingStyle)} • top bait ${this.escape(this.titleCase(p.primary))}.`;
+      this.$('gearPlanProgressBar').style.width=`${pct}%`;this.$('gearPlanProgressText').textContent=`${pct}% packed`;
+      const groups=['Rules','Fishing','Conditions','Safety','Trip'];box.innerHTML=groups.map(g=>{const rows=items.filter(i=>i.group===g);if(!rows.length)return'';return `<div class="gear-group"><div class="gear-group-title">${this.escape(g)}</div>${rows.map(i=>`<label class="gear-row ${checked[i.key]?'done':''}"><input type="checkbox" data-gear-key="${this.escape(i.key)}" ${checked[i.key]?'checked':''}/><span class="gear-checkmark">${checked[i.key]?'✓':'○'}</span><span><strong>${this.escape(i.label)}</strong><small>${this.escape(i.detail)}</small></span></label>`).join('')}</div>`;}).join('');
+      this.state.gearPlan.lastBuilt=new Date().toISOString();
+    },
+    handleGearCheck(e){const el=e.target.closest('[data-gear-key]');if(!el)return;this.state.gearPlan.checked[el.dataset.gearKey]=!!el.checked;this.save();this.renderGearPlanner();},
+    resetGearChecks(){this.state.gearPlan.checked={};this.save();this.renderGearPlanner();this.showToast('Gear checklist reset.');},
 
     scoreFactors(){
       const d=this.state.data,c=d.current,config=this.species[this.state.targetSpecies];
@@ -891,9 +1007,9 @@
 
     renderAll(){
       this.recalculateScores();
-      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderRegulations();this.renderConditions();this.renderFactors();
+      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderBaitIntelligence();this.renderRegulations();this.renderConditions();this.renderFactors();
       this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();this.renderSpotIntelligence();
-      this.evaluateAlerts({notify:true});this.renderTrips();this.renderHomeAlerts();this.renderProfile();this.renderScout();this.renderGoMode();this.renderPatternMatch();this.renderCatchIntelligence();
+      this.evaluateAlerts({notify:true});this.renderTrips();this.renderHomeAlerts();this.renderProfile();this.renderScout();this.renderGoMode();this.renderGearPlanner();this.renderPatternMatch();this.renderCatchIntelligence();
       if(this.state.view==='map') this.renderMapLayers();
     },
 
@@ -1424,6 +1540,7 @@
       if(!this.$('goModePanel'))return;const g=this.state.goMode||{},active=!!g.active,c=this.state.data?.current||{},best=this.state.data?this.findBestWindow(this.state.data.hours.filter(h=>h.dateIndex===0).slice(0,24)):{label:'—'};
       this.$('goModeBadge').textContent=active?'LIVE SESSION':'READY';this.$('goModeBadge').classList.toggle('live',active);this.$('goModeTitle').textContent=active?`Fishing ${g.species||this.state.targetSpecies}`:'Turn the forecast into a trip';
       this.$('goModeSummary').innerHTML=active?`<strong>${this.escape(g.location?.name||this.state.location.name)}</strong> • Started ${new Date(g.startedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})} • Best loaded window ${this.escape(best.label||'—')}`:'Start a live trip at your current fishing destination. CoastCast keeps your target, best window, conditions, catches, route shortcuts and checklist in one place.';
+      const bp=g.baitPlan||this.baitIntelligence(g.species||this.state.targetSpecies);if(this.$('goBaitPlan'))this.$('goBaitPlan').innerHTML=`<span>BAIT PLAN</span><strong>${this.escape(this.titleCase(bp.primary||''))}</strong><small>${this.escape(bp.rig||'')} • backup ${this.escape(this.titleCase(bp.backup||''))}</small>`;
       this.$('goModeLiveStats').innerHTML=`<div><span>SCORE</span><strong>${this.currentScore()}</strong></div><div><span>WIND</span><strong>${this.fmt(c.windSpeed,0)} mph</strong></div><div><span>SURF</span><strong>${this.fmt(c.waveHeight,1)} ft</strong></div><div><span>WATER</span><strong>${this.fmt(c.waterTemp,0)}°</strong></div>`;
       const sessionCatches=active?this.sessionCatches():[];const mins=active?Math.max(0,Math.floor((Date.now()-new Date(g.startedAt).getTime())/60000)):0;
       if(this.$('goSessionTime'))this.$('goSessionTime').textContent=active?this.formatDuration(mins):'Not started';
@@ -1433,10 +1550,10 @@
       const checks=g.checks||{};this.$('goModeChecklist').innerHTML=[['bait','Bait / lures'],['ice','Ice & drinks'],['license','License / regulations'],['gear','Rods, rigs & safety gear']].map(([k,label])=>`<label class="go-check ${checks[k]?'done':''}"><input type="checkbox" data-go-check="${k}" ${checks[k]?'checked':''}/><span>${checks[k]?'✓':'○'}</span><strong>${label}</strong></label>`).join('');
       this.$('startGoModeBtn').hidden=active;this.$('quickSessionCatchBtn').hidden=!active;this.$('endGoModeBtn').hidden=!active;this.$('goModeShopBtn').disabled=!active||!(this.state.data?.shops||[]).length;this.$('goModeSpotBtn').disabled=!active;
     },
-    startGoMode(){if(this.state.goMode.active)return;const sessionId=`session-${Date.now()}`;this.state.goMode={...this.state.goMode,active:true,startedAt:new Date().toISOString(),sessionId,location:{...this.state.location},species:this.state.targetSpecies,checks:{bait:false,ice:false,license:false,gear:false}};this.save();this.renderGoMode();this.showToast('Live fishing session started. Tight lines.');},
+    startGoMode(){if(this.state.goMode.active)return;const sessionId=`session-${Date.now()}`,bp=this.baitIntelligence();this.state.goMode={...this.state.goMode,active:true,startedAt:new Date().toISOString(),sessionId,location:{...this.state.location},species:this.state.targetSpecies,baitPlan:this.state.goMode.baitPlan||{species:bp.species,primary:bp.primary,backup:bp.backup,rig:bp.rig,presentation:bp.presentation,terminal:bp.terminal,created:new Date().toISOString()},checks:{bait:false,ice:false,license:false,gear:false}};this.save();this.renderGoMode();this.renderGearPlanner();this.showToast('Live fishing session started. Tight lines.');},
     sessionCatches(){const id=this.state.goMode?.sessionId;if(!id)return[];return this.state.catches.filter(c=>c.sessionId===id).sort((a,b)=>new Date(b.date)-new Date(a.date));},
     formatDuration(minutes){const m=Math.max(0,Number(minutes)||0);if(m<60)return`${m} min`;const h=Math.floor(m/60),r=m%60;return`${h}h ${r}m`;},
-    openSessionCatch(){if(!this.state.goMode?.active)return;this.ensureCatchDate();this.$('catchSpecies').value=this.state.goMode.species||this.state.targetSpecies;const recent=this.sessionCatches()[0]||this.state.catches.find(c=>c.species===(this.state.goMode.species||this.state.targetSpecies));if(recent?.bait)this.$('catchBait').value=recent.bait;this.$('catchSnapshot').textContent=`LIVE SESSION • ${this.snapshotConditions()}`;this.openDialog('catchDialog');},
+    openSessionCatch(){if(!this.state.goMode?.active)return;this.ensureCatchDate();this.$('catchSpecies').value=this.state.goMode.species||this.state.targetSpecies;const recent=this.sessionCatches()[0]||this.state.catches.find(c=>c.species===(this.state.goMode.species||this.state.targetSpecies));if(recent?.bait)this.$('catchBait').value=recent.bait;else if(this.state.goMode.baitPlan?.primary)this.$('catchBait').value=this.titleCase(this.state.goMode.baitPlan.primary);this.$('catchSnapshot').textContent=`LIVE SESSION • ${this.snapshotConditions()}`;this.openDialog('catchDialog');},
     handleGoChecklist(e){const input=e.target.closest('[data-go-check]');if(!input)return;this.state.goMode.checks[input.dataset.goCheck]=!!input.checked;this.save();this.renderGoMode();},
     openGoShopRoute(){const s=(this.state.data?.shops||[])[0];if(!s)return this.showToast('No bait shop is loaded for this destination.');window.open(this.mapsUrl(s.lat,s.lon,s.name),'_blank','noopener');},
     openGoSpotRoute(){const l=this.state.goMode.location||this.state.location;window.open(this.mapsUrl(l.lat,l.lon,l.name),'_blank','noopener');},
@@ -1693,7 +1810,7 @@
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
       try{localStorage.removeItem('coastcast-v12-state');localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{localStorage.removeItem('coastcast-v8-state');}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      this.state.live=false;try{['coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.regChecks={};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 
 
@@ -1741,7 +1858,7 @@
     },
 
     backupPayload(){
-      return {format:'coastcast-backup',version:'1.3.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode}};
+      return {format:'coastcast-backup',version:'1.4.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,regChecks:this.state.regChecks}};
     },
 
     exportBackup(){
@@ -1751,7 +1868,7 @@
     async importBackupFile(event){
       const file=event.target.files?.[0];if(!file)return;
       try{const text=await file.text();const parsed=JSON.parse(text);const d=parsed?.appState||parsed;if(!d||typeof d!=='object')throw new Error('Invalid');if(!confirm('Restore this CoastCast backup? Current local saved data will be replaced.'))return;
-        if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};
+        if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};if(d.gearPlan)this.state.gearPlan={...this.state.gearPlan,...d.gearPlan,checked:{...(d.gearPlan.checked||{})}};if(d.regChecks)this.state.regChecks={...d.regChecks};
         this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();if(this.$('backupStatus'))this.$('backupStatus').textContent=`Backup restored from ${this.escape(file.name)}.`;this.showToast('Backup restored. Refresh live data for the restored destination.');
       }catch(_){this.showToast('That file is not a valid CoastCast backup.');}finally{event.target.value='';}
     },
@@ -1805,11 +1922,11 @@
     },
 
     saveCloudMetaOnly(){
-      try{const raw=localStorage.getItem('coastcast-v13-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v13-state',JSON.stringify(p));}catch(_){ }
+      try{const raw=localStorage.getItem('coastcast-v14-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v14-state',JSON.stringify(p));}catch(_){ }
     },
 
     async cloudPull(){
-      if(!this.cloudSignedIn()){this.showToast('Sign in to cloud sync first.');return;}if(!confirm('Restore your cloud copy onto this device? Current local fishing data will be replaced.'))return;const c=this.state.cloud;try{if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent='Downloading cloud data…';const uid=c.session.user.id;const r=await this.cloudRequest(`${c.url}/rest/v1/coastcast_user_data?user_id=eq.${encodeURIComponent(uid)}&select=data,updated_at&limit=1`,{method:'GET'});const rows=await r.json();if(!r.ok)throw new Error(rows?.message||'Could not download cloud data.');if(!Array.isArray(rows)||!rows.length)throw new Error('No cloud backup exists yet.');const d=rows[0].data||{};if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};this.state.cloud.lastSync=rows[0].updated_at||new Date().toISOString();this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();this.showToast('Cloud data restored. Refresh live data for this destination.');}
+      if(!this.cloudSignedIn()){this.showToast('Sign in to cloud sync first.');return;}if(!confirm('Restore your cloud copy onto this device? Current local fishing data will be replaced.'))return;const c=this.state.cloud;try{if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent='Downloading cloud data…';const uid=c.session.user.id;const r=await this.cloudRequest(`${c.url}/rest/v1/coastcast_user_data?user_id=eq.${encodeURIComponent(uid)}&select=data,updated_at&limit=1`,{method:'GET'});const rows=await r.json();if(!r.ok)throw new Error(rows?.message||'Could not download cloud data.');if(!Array.isArray(rows)||!rows.length)throw new Error('No cloud backup exists yet.');const d=rows[0].data||{};if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};if(d.gearPlan)this.state.gearPlan={...this.state.gearPlan,...d.gearPlan,checked:{...(d.gearPlan.checked||{})}};if(d.regChecks)this.state.regChecks={...d.regChecks};this.state.cloud.lastSync=rows[0].updated_at||new Date().toISOString();this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();this.showToast('Cloud data restored. Refresh live data for this destination.');}
       catch(err){if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent=err.message||'Cloud restore failed.';this.showToast(err.message||'Cloud restore failed.');}
     },
 

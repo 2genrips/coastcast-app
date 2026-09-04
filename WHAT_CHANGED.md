@@ -1,24 +1,28 @@
-# CoastCast v1.3 — Catch Intelligence + Live Session
+# CoastCast v1.4.0 — What Changed
 
-## Personal Pattern Match
-- Home now compares current conditions with your own successful catches for the selected species.
-- Shows a 0–100 similarity score, confidence, top bait, best session and number of catches used.
-- Existing v1.2 catch history still contributes; new catches store a richer structured conditions snapshot.
+## Bait & Rig Intelligence
+- New Home card answers **What should I throw?** for the selected species.
+- Ranks a top bait/lure and backup option from species, tide, wind, surf, fishing style and your logged catch history.
+- Recommends a starting rig, presentation and terminal-tackle approach.
+- One tap sends the bait plan into Go Fishing Mode.
+- One tap opens the closest loaded bait/tackle option or starts a map shop search.
 
-## Catch Intelligence
-- New Logbook intelligence dashboard.
-- Learns top bait/lure, best time of day, strongest tide signal and current personal match.
-- Bait success bars become more useful as your logbook grows.
-- Species-specific model automatically follows Species Mode.
+## Regulation Guard
+- Keeps the official state regulations link from v0.9+.
+- Adds a user-controlled **Checked today** record for the current state + target species.
+- CoastCast does not claim regulations are automatically verified and does not replace official rules.
+- Smart Gear Planner shows whether today’s regulation review has been recorded.
 
-## Live Fishing Session
-- Go Fishing Mode is now a true live session.
-- Session timer, live catch count and last-catch status.
-- One-tap “Catch now” opens a prefilled catch log and reuses your recent bait when useful.
-- Catches logged during a session are linked to that exact trip.
-- Ending a trip saves duration and session catch count to trip history.
+## Smart Gear Planner
+- Builds a pack list from target species, fishing style, loaded weather/marine conditions and the bait plan.
+- Adds conditional rain, UV, wind/surf, low-light, warmth and enhanced safety items.
+- Tracks packing progress on-device.
+- Reset checks without affecting catches, trips or favorites.
 
-## Compatibility
-- Migrates v1.2 local data forward automatically.
-- Backup and optional cloud sync continue to include catches and Go Fishing state.
-- GitHub Pages / Android PWA deployment process is unchanged.
+## Go Fishing Mode
+- Carries the current bait/rig plan into the live fishing session.
+- Quick Catch pre-fills the recommended bait when there is no more recent session bait.
+
+## Data portability
+- v1.4 backups/cloud payloads include gear checklist state and regulation-check records.
+- Existing v1.3 data migrates forward automatically.

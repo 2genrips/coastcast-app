@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, Scout spot ranking, personal Catch Intelligence, live fishing sessions, trips, alerts, maps, bait shops and a private catch logbook." />
+  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, species intelligence, bait and rig intelligence, regulation guard, smart gear planning, Scout spot ranking, Catch Intelligence, live fishing sessions, trips, alerts, maps, bait shops and a private catch logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=1.3.0" />
+  <link rel="stylesheet" href="styles.css?v=1.4.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -130,6 +130,36 @@
           <div id="speciesRankList" class="species-rank-list"></div>
         </section>
 
+        <section class="panel bait-intelligence-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">BAIT & RIG INTELLIGENCE</div><h2>What should I throw?</h2></div>
+            <span id="baitConfidence" class="tiny-pill">SMART PLAN</span>
+          </div>
+          <p class="section-note">CoastCast combines your target species, fishing style, tide, surf, wind, water temperature and your own catch history into a practical starting plan.</p>
+          <div class="bait-hero-grid">
+            <article class="bait-primary-card">
+              <div class="bait-card-label">TOP PICK</div>
+              <strong id="baitPrimaryName">—</strong>
+              <p id="baitPrimaryWhy">Loading target-specific recommendation…</p>
+            </article>
+            <article class="bait-secondary-card">
+              <div class="bait-card-label">BACKUP</div>
+              <strong id="baitBackupName">—</strong>
+              <p id="baitBackupWhy">A second option for changing conditions.</p>
+            </article>
+          </div>
+          <div class="bait-detail-grid">
+            <div><span>RIG</span><strong id="baitRigName">—</strong><small id="baitRigDetail">—</small></div>
+            <div><span>PRESENTATION</span><strong id="baitPresentationName">—</strong><small id="baitPresentationDetail">—</small></div>
+            <div><span>TERMINAL</span><strong id="baitTerminalName">—</strong><small id="baitTerminalDetail">—</small></div>
+          </div>
+          <div id="personalBaitNote" class="bait-history-note">Log catches with bait/lure details and CoastCast will learn what has worked for you.</div>
+          <div class="bait-actions">
+            <button id="baitUseTripBtn" class="primary-button" type="button">Use this plan</button>
+            <button id="baitShopShortcutBtn" class="secondary-button" type="button">Find nearby bait</button>
+          </div>
+        </section>
+
         <section class="panel pattern-match-panel">
           <div class="section-heading">
             <div><div class="eyebrow">PERSONAL PATTERN MATCH</div><h2>Your history vs. right now</h2></div>
@@ -225,7 +255,11 @@
             <button id="openRegsBtn" class="primary-button" type="button">Open official regulations</button>
             <button id="openLicenseBtn" class="secondary-button" type="button">License information</button>
           </div>
-          <p class="micro-note">Always verify the official rules at the time and exact place you fish. Federal waters, marine protected areas and emergency closures can have additional rules.</p>
+          <div class="reg-guard-card">
+            <div class="reg-guard-status"><span id="regGuardBadge" class="reg-guard-badge">NEEDS CHECK</span><div><strong id="regGuardTitle">Verify before you keep fish</strong><small id="regGuardTime">Not checked today</small></div></div>
+            <button id="markRegsCheckedBtn" class="secondary-button small" type="button">Mark checked today</button>
+          </div>
+          <p class="micro-note">CoastCast never replaces official regulations. Marking this checked only records that you personally reviewed the official source for this species and state today. Federal waters, marine protected areas and emergency closures can have additional rules.</p>
         </section>
 
         <section class="panel">
@@ -543,6 +577,7 @@
             <span id="goModeBadge" class="tiny-pill">READY</span>
           </div>
           <div id="goModeSummary" class="go-mode-summary">Start a live trip at your current fishing destination. CoastCast keeps your target, best window, conditions, route shortcuts and checklist in one place.</div>
+          <div id="goBaitPlan" class="go-bait-plan">CoastCast will load your bait and rig recommendation here.</div>
           <div id="goModeLiveStats" class="go-mode-live-stats"></div>
           <div id="liveSessionStrip" class="live-session-strip">
             <div><span>SESSION TIME</span><strong id="goSessionTime">Not started</strong></div>
@@ -558,6 +593,21 @@
             <button id="goModeSpotBtn" class="secondary-button" type="button" disabled>Directions to spot</button>
             <button id="endGoModeBtn" class="danger-button" type="button" hidden>End trip</button>
           </div>
+        </section>
+
+        <section class="panel gear-planner-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">SMART GEAR PLANNER</div><h2>Pack for these conditions</h2></div>
+            <span id="gearPlanBadge" class="tiny-pill">AUTO</span>
+          </div>
+          <div id="gearPlanSummary" class="gear-plan-summary">CoastCast builds a pack list from your species, fishing style and loaded conditions.</div>
+          <div class="gear-plan-progress"><div class="gear-plan-track"><span id="gearPlanProgressBar"></span></div><strong id="gearPlanProgressText">0% packed</strong></div>
+          <div id="gearPlanList" class="gear-plan-list"></div>
+          <div class="gear-plan-actions">
+            <button id="gearUseBaitBtn" class="primary-button" type="button">Load bait plan</button>
+            <button id="gearResetBtn" class="secondary-button" type="button">Reset checks</button>
+          </div>
+          <p class="micro-note">Gear suggestions are planning guidance. Adjust terminal tackle, weights and safety equipment to local conditions and your own experience.</p>
         </section>
 
         <section class="panel">
@@ -933,6 +983,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=1.3.0"></script>
+  <script src="app.js?v=1.4.0"></script>
 </body>
 </html>

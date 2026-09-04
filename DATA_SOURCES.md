@@ -34,3 +34,7 @@ Candidate locations can come from the selected coastal point, CoastCast public-m
 
 ## v1.3 personal intelligence
 Catch Intelligence and Personal Pattern Match are calculated locally from the angler's own CoastCast logbook. No external AI service or third-party personal-data processor is required for these features. New catches store a structured local conditions snapshot in addition to the readable conditions text.
+
+
+## v1.4 intelligence note
+Bait, rig and gear suggestions are CoastCast planning heuristics built from loaded conditions, fishing style, species profiles and the user’s own catch history. They are not a substitute for local tackle-shop advice, safety judgment or official regulations. The Regulation Guard records only that the user says they reviewed the official source that day.
