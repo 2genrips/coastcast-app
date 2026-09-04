@@ -1,3 +1,12 @@
+# CoastCast 2.3 Data Sources
+
+## Coast Watch
+Coast Watch uses the same Open-Meteo Weather and Marine APIs already used by CoastCast, but queries each saved fishing destination separately. It is designed as a live in-app comparison layer, not a background monitoring service.
+
+The watch score is a planning preview and may use moving-water assumptions until the exact location is opened and CoastCast loads its NOAA tide station. Use **Analyze** for the full exact-location forecast before making a trip decision.
+
+---
+
 # CoastCast 2.2 Data Sources
 
 # CoastCast v2.2 Data Sources

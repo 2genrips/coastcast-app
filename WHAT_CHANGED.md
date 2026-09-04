@@ -1,15 +1,16 @@
-# CoastCast 2.2 — Hardened Rebrand + Daily Brief
+# CoastCast 2.3 — Coast Watch + Trip Calendar
 
-## Rebrand hardening
-- Official CoastCast emblem is now shipped at the app root so the header cannot break if GitHub drops the branding folder.
-- New app icons are generated from the approved emblem.
-- Root-level watermark asset now powers the faint background brand layer throughout the app.
-- Updated social preview and PWA icon assets.
+## Big additions
+- **Coast Watch:** scans the current fishing location plus up to seven saved favorite spots with fresh weather and marine data.
+- Ranks saved coasts for the currently selected target species.
+- Shows best day, best hour, wind, surf, water temperature, rain and forecast confidence for each saved destination.
+- **7-Day Trip Calendar:** picks the strongest saved coast for each forecast day and marks days that already have a saved trip plan.
+- One-tap **Analyze**, **Plan**, and **Watch** actions from ranked favorite coasts.
+- Existing Smart Alerts can use fresh Coast Watch results for saved locations that are not currently open in the app.
+- Coast Watch results are included in local backup and optional cloud sync.
 
-## New Daily Brief
-- One-screen summary of the next fishing hours.
-- Species-adjusted hourly scores.
-- Tide stage/next turn, water temperature, sunrise/sunset, and data confidence.
-- Direct actions into full Forecast or a complete Command Plan.
+## Important limitation
+Coast Watch is an in-app scan. It does not perform 24/7 monitoring while the app is completely closed. True background alerts still require the future CoastCast backend/push service.
 
-All v2.1 data migrates forward.
+## Preserved
+Everything from v2.2 remains: nationwide forecast engine, Destination Intelligence, Daily Brief, NOAA tides, NWS alerts, verified tackle intelligence, Scout, species intelligence, Command Center, trips, Catch Intelligence, Tackle Box, offline packs, Community and backups.

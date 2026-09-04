@@ -1,29 +1,22 @@
-# CoastCast 2.2 — Android / GitHub Pages Update
+# CoastCast 2.3 — Android / GitHub Pages Update
 
-This is the Premium Rebrand + Destination Intelligence build.
-
-## Update from your Android phone
-1. Download the ZIP and extract it in My Files.
+## Update from v2.2
+1. Download and extract the CoastCast 2.3 ZIP.
 2. Open your existing CoastCast GitHub repository.
 3. Choose **Add file → Upload files**.
-4. Upload everything inside the `coastcast_v2.2` folder.
-5. Replace matching files.
-6. Commit to `main`.
-7. Wait for GitHub Pages to redeploy.
-8. Fully close CoastCast and reopen it.
-9. If an older version appears, open the Pages URL in Chrome and refresh once.
+4. Upload everything inside the `coastcast_v2.3` folder.
+5. Replace matching files and commit to `main`.
+6. Wait for GitHub Pages to redeploy.
+7. Fully close CoastCast and reopen it.
 
-## First things to test
-- New CoastCast emblem in the header.
-- Faint watermark behind the app.
-- Home → **Destination Intelligence**.
-- Tap **Scan & rank nearby spots**.
-- Tap **Find verified tackle**.
-- Confirm existing catches, trips, settings and favorites are still present.
+Your saved v2.2 data migrates automatically.
 
-## Brand assets
-The `branding/` folder contains the new primary logo, emblem, watermark and brand guide.
+## First v2.3 test
+1. Save two or more fishing locations as Favorites.
+2. Open **Trips**.
+3. Find **Coast Watch** and tap **Scan saved coasts**.
+4. Let CoastCast finish the live multi-location scan.
+5. Review the ranked coast cards and the **7-Day Trip Calendar** directly below.
+6. Use **Analyze**, **Plan**, or **Watch** on a result.
 
-
-## 2.2 note
-The header emblem and background watermark now live at the repository root (`brand-emblem.png`, `brand-watermark.png`) for more reliable GitHub Pages deployment.
+Coast Watch requests live weather and marine forecast data for several saved locations, so a full scan can take longer than refreshing one beach.
