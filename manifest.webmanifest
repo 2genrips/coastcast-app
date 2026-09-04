@@ -1,7 +1,7 @@
 {
-  "name": "CoastCast 2.3 Fishing Command Center",
+  "name": "CoastCast 3.1 Ocean Network Fishing Command Center",
   "short_name": "CoastCast",
-  "description": "Nationwide coastal fishing command center with Coast Watch multi-location ranking, 7-day trip calendar, hardened CoastCast branding, live weather, marine conditions, NOAA tides, species intelligence, verified tackle discovery, trips and catch analytics.",
+  "description": "Nationwide coastal fishing command center with Quick Answer simplicity, premium-ready entitlement architecture, live forecasts, NOAA/NDBC observed-ocean verification, Coast Watch, Scout, trips and catch intelligence.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
@@ -11,13 +11,13 @@
   "theme_color": "#06182A",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-192-v31.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-512-v31.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -30,7 +30,7 @@
       "url": "./index.html#forecast",
       "icons": [
         {
-          "src": "icon-192.png",
+          "src": "icon-192-v31.png",
           "sizes": "192x192"
         }
       ]
@@ -41,7 +41,7 @@
       "url": "./index.html#map",
       "icons": [
         {
-          "src": "icon-192.png",
+          "src": "icon-192-v31.png",
           "sizes": "192x192"
         }
       ]
@@ -52,7 +52,7 @@
       "url": "./index.html#trips",
       "icons": [
         {
-          "src": "icon-192.png",
+          "src": "icon-192-v31.png",
           "sizes": "192x192"
         }
       ]
@@ -63,7 +63,7 @@
       "url": "./index.html#logbook",
       "icons": [
         {
-          "src": "icon-192.png",
+          "src": "icon-192-v31.png",
           "sizes": "192x192"
         }
       ]
@@ -74,7 +74,7 @@
       "url": "./index.html#community",
       "icons": [
         {
-          "src": "icon-192.png",
+          "src": "icon-192-v31.png",
           "sizes": "192x192"
         }
       ]

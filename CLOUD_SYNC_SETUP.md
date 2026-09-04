@@ -27,3 +27,6 @@ Run the new `SUPABASE_SETUP.sql` once in your existing Supabase project. It keep
 
 ## Photos
 Community Beta can store the already-compressed catch photo directly in a post for testing. This is suitable for a beta, but before a large public launch CoastCast should move community photos to Supabase Storage/CDN instead of database text rows.
+
+## CoastCast 3.1 membership note
+Premium entitlement is intentionally **not** stored in normal CoastCast backup/cloud payloads. At launch, paid, family, complimentary and lifetime access must come from the authenticated server-side entitlement record. See `PREMIUM_ARCHITECTURE.md` and `ENTITLEMENT_SETUP.sql`.

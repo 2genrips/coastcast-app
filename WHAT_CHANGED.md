@@ -1,16 +1,20 @@
-# CoastCast 2.3 — Coast Watch + Trip Calendar
+# CoastCast 3.1 — Simple Power + Premium Foundation
 
-## Big additions
-- **Coast Watch:** scans the current fishing location plus up to seven saved favorite spots with fresh weather and marine data.
-- Ranks saved coasts for the currently selected target species.
-- Shows best day, best hour, wind, surf, water temperature, rain and forecast confidence for each saved destination.
-- **7-Day Trip Calendar:** picks the strongest saved coast for each forecast day and marks days that already have a saved trip plan.
-- One-tap **Analyze**, **Plan**, and **Watch** actions from ranked favorite coasts.
-- Existing Smart Alerts can use fresh Coast Watch results for saved locations that are not currently open in the app.
-- Coast Watch results are included in local backup and optional cloud sync.
+## Biggest changes
+- New **CoastCast Quick Answer** on Home: GO / PROMISING / HOLD, best window, best target, recommended bait, and wind/surf in one glance.
+- New **Simple Home** mode hides advanced Home panels without removing them. Users can switch to Full Home at any time; Forecast, Scout, Trips and Logbook remain available.
+- New **Premium entitlement architecture preview** covering Free, Paid Premium ($4.99/month target), Family Premium, Complimentary Premium and Lifetime grants.
+- New Profile Membership card and plan/access dialog.
+- Beta access simulator lets the developer preview Free, Paid, Family, Complimentary and Lifetime UI states.
+- Selected advanced actions are marked as Premium and show the membership sheet when Free preview is active.
+- Added server-side entitlement SQL foundation and launch architecture notes.
+- **Important:** beta access preview is intentionally local for testing. Production premium access must be verified server-side / through store billing.
 
-## Important limitation
-Coast Watch is an in-app scan. It does not perform 24/7 monitoring while the app is completely closed. True background alerts still require the future CoastCast backend/push service.
+## Ocean Network carried forward
+- NOAA/NDBC observed-ocean reality check
+- Forecast-vs-observed agreement score
+- Recent station wave trend
+- Trip Ocean Reality Check
 
 ## Preserved
-Everything from v2.2 remains: nationwide forecast engine, Destination Intelligence, Daily Brief, NOAA tides, NWS alerts, verified tackle intelligence, Scout, species intelligence, Command Center, trips, Catch Intelligence, Tackle Box, offline packs, Community and backups.
+Everything from v2.3 remains: nationwide live forecast, NOAA tides, NWS alerts, verified tackle intelligence, Coast Watch, 7-day trip calendar, Destination Intelligence, Daily Brief, Command Center, Scout, Species/Bait/Catch Intelligence, Trips, Community, tackle inventory, offline packs, backups and cloud sync.

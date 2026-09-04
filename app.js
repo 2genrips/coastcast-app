@@ -32,6 +32,9 @@
       community: {tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null},
       command: {mode:'bite',lastPlan:null},
       watchCenter: {running:false,results:[],lastRun:null,species:'Red Drum'},
+      oceanNetwork: {status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null},
+      experience: {mode:'simple'},
+      membership: {tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true},
       liveUpdatedAt: null,
       data: null,
       map: null,
@@ -41,7 +44,7 @@
       mapPlacesStatus: 'idle',
       selectedIntelSpot: null,
       selectedTideStation: null,
-      sourceHealth: {weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'},
+      sourceHealth: {weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'},
       safetyAlerts: [],
     },
 
@@ -262,7 +265,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v23-state')||localStorage.getItem('coastcast-v22-state')||localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state')||localStorage.getItem('coastcast-v18-state')||localStorage.getItem('coastcast-v17-state')||localStorage.getItem('coastcast-v16-state')||localStorage.getItem('coastcast-v15-state')||localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v31-state')||localStorage.getItem('coastcast-v30-state')||localStorage.getItem('coastcast-v23-state')||localStorage.getItem('coastcast-v22-state')||localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state')||localStorage.getItem('coastcast-v18-state')||localStorage.getItem('coastcast-v17-state')||localStorage.getItem('coastcast-v16-state')||localStorage.getItem('coastcast-v15-state')||localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -290,6 +293,9 @@
         if(saved.community&&typeof saved.community==='object') this.state.community={...this.state.community,...saved.community,reactions:{...(saved.community.reactions||{})},publishedLocalIds:Array.isArray(saved.community.publishedLocalIds)?saved.community.publishedLocalIds:[],challengeClaims:{...(saved.community.challengeClaims||{})}};
         if(saved.command&&typeof saved.command==='object') this.state.command={...this.state.command,...saved.command};
         if(saved.watchCenter&&typeof saved.watchCenter==='object') this.state.watchCenter={...this.state.watchCenter,...saved.watchCenter,running:false,results:Array.isArray(saved.watchCenter.results)?saved.watchCenter.results:[]};
+        if(saved.oceanNetwork&&typeof saved.oceanNetwork==='object') this.state.oceanNetwork={...this.state.oceanNetwork,...saved.oceanNetwork,status:saved.oceanNetwork.status==='loading'?'idle':saved.oceanNetwork.status,history:Array.isArray(saved.oceanNetwork.history)?saved.oceanNetwork.history:[]};
+        if(saved.experience&&typeof saved.experience==='object') this.state.experience={...this.state.experience,...saved.experience};
+        if(saved.membership&&typeof saved.membership==='object') this.state.membership={...this.state.membership,...saved.membership,betaFullAccess:true};
         if(saved.liveUpdatedAt) this.state.liveUpdatedAt=saved.liveUpdatedAt;
         if(this.state.cloud.session&&this.state.cloud.session.expires_at&&Number(this.state.cloud.session.expires_at)*1000<Date.now()) this.state.cloud.session=null;
       }catch(_){ }
@@ -311,9 +317,9 @@
         shoppingList:this.state.shoppingList,
         offlinePacks:this.state.offlinePacks,
         community:this.state.community,
-        command:this.state.command,watchCenter:this.state.watchCenter,liveUpdatedAt:this.state.liveUpdatedAt
+        command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,membership:this.state.membership,liveUpdatedAt:this.state.liveUpdatedAt
       };
-      try{ localStorage.setItem('coastcast-v23-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v31-state',JSON.stringify(payload)); }catch(_){ }
       if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
@@ -332,10 +338,17 @@
       if(view==='trips'){this.renderTrips();this.renderCoastWatch();this.renderTripCalendar();this.renderSmartDeparture();this.renderGoMode();this.renderGearPlanner();this.renderTripSafety();this.renderTackleBox();this.renderOfflinePacks();this.renderMissionControl();}
       if(view==='logbook'){this.renderLogbook();this.renderPhotoMemories();this.renderAnglerAnalytics();}
       if(view==='community'){this.renderCommunity();this.loadCloudCommunity({quiet:true});}
-      if(view==='profile') this.renderProfile();
+      if(view==='profile'){this.renderProfile();this.renderMembership();}
     },
 
     bindControls(){
+      document.addEventListener('click',e=>{const gated=e.target.closest?.('[data-premium]');if(!gated||this.hasPremium())return;e.preventDefault();e.stopPropagation();if(typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();this.showToast(`${gated.dataset.premium||'This tool'} is part of CoastCast Premium.`);this.openMembershipDialog();},true);
+      this.$('quickBuildPlanBtn')?.addEventListener('click',()=>this.buildCommandPlan({navigateToTrips:true}));
+      this.$('quickDetailsBtn')?.addEventListener('click',()=>this.setExperienceMode('full',true));
+      this.$('quickSimpleBtn')?.addEventListener('click',()=>this.setExperienceMode(this.state.experience?.mode==='simple'?'full':'simple',true));
+      this.$('manageMembershipBtn')?.addEventListener('click',()=>this.openMembershipDialog());
+      this.$('applyMembershipPreviewBtn')?.addEventListener('click',()=>this.applyMembershipPreview());
+      this.$('experienceModeSetting')?.addEventListener('change',e=>this.setExperienceMode(e.target.value,false));
       this.$('locationTitleBtn').addEventListener('click',()=>this.openDialog('locationDialog'));
       this.$('mapSearchBtn').addEventListener('click',()=>this.openDialog('locationDialog'));
       this.$('settingsBtn').addEventListener('click',()=>this.openSettings());
@@ -368,6 +381,9 @@
       this.$('tripHubAlertBtn')?.addEventListener('click',()=>this.openAlertDialog());
       this.$('scanFavoritesBtn')?.addEventListener('click',()=>this.runCoastWatch());
       this.$('calendarRefreshBtn')?.addEventListener('click',()=>this.runCoastWatch());
+      this.$('refreshOceanNetworkBtn')?.addEventListener('click',()=>this.refreshOceanNetwork());
+      this.$('openOceanStationBtn')?.addEventListener('click',()=>this.openOceanStation());
+      this.$('tripOceanRefreshBtn')?.addEventListener('click',()=>this.refreshOceanNetwork());
       this.$('coastWatchResults')?.addEventListener('click',e=>this.handleCoastWatchClick(e));
       this.$('tripCalendarGrid')?.addEventListener('click',e=>this.handleTripCalendarClick(e));
       this.$('createAlertBtn')?.addEventListener('click',()=>this.openAlertDialog());
@@ -485,6 +501,7 @@
       if(this.$('tackleRadiusSetting'))this.$('tackleRadiusSetting').value=String(this.state.tackleRadius||20);
       if(this.$('geoapifyKeySetting'))this.$('geoapifyKeySetting').value=this.state.geoapifyKey||'';
       this.$('fishingStyleSetting').value=this.state.fishingStyle;
+      if(this.$('experienceModeSetting'))this.$('experienceModeSetting').value=this.state.experience?.mode||'simple';
       this.renderPlacesProviderStatus();
       this.openDialog('settingsDialog');
     },
@@ -620,11 +637,12 @@
       this.closeDialog('locationDialog');
       this.$('locationSearchResults').innerHTML='';
       this.state.selectedTideStation=null;
+      this.state.oceanNetwork={status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null};
       this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.scout.results=[];this.state.scout.compareIds=[];
       this.state.data=this.buildDemoData();
       this.renderAll();
       this.recenterMap();
-      if(this.state.live) this.loadLiveData(); else {this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'};this.state.safetyAlerts=[];this.renderMode();this.renderSourceHealth();this.showToast('Fishing location updated. Turn on Live Data for real forecasts.');}
+      if(this.state.live) this.loadLiveData(); else {this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.safetyAlerts=[];this.renderMode();this.renderSourceHealth();this.showToast('Fishing location updated. Turn on Live Data for real forecasts.');}
     },
 
     setLiveMode(enabled){
@@ -632,13 +650,13 @@
       this.$('liveModeToggle').checked=this.state.live;
       this.renderMode();
       if(this.state.live) this.loadLiveData();
-      else{this.state.data=this.buildDemoData();this.state.selectedTideStation=null;this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'};this.state.safetyAlerts=[];this.recalculateScores();this.renderAll();this.showToast('Demo Data is on.');}
+      else{this.state.data=this.buildDemoData();this.state.selectedTideStation=null;this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.safetyAlerts=[];this.recalculateScores();this.renderAll();this.showToast('Demo Data is on.');}
     },
 
     async loadLiveData({quiet=false}={}){
       if(this.state.loading) return;
       this.state.loading=true;
-      this.state.sourceHealth={weather:'loading',marine:'loading',tides:'loading',shops:'loading',alerts:'loading'};
+      this.state.sourceHealth={weather:'loading',marine:'loading',tides:'loading',shops:'loading',alerts:'loading',buoy:'loading'};
       this.renderMode();this.renderSourceHealth();
       this.$('syncBtn').classList.add('spinning');
       if(!quiet) this.showToast('Loading live coastal conditions…');
@@ -650,15 +668,18 @@
         this.loadMarine(lat,lon),
         this.loadTides(lat,lon),
         this.loadNearbyShops(false),
-        this.loadNWSAlerts(lat,lon)
+        this.loadNWSAlerts(lat,lon),
+        this.loadOceanNetwork(lat,lon)
       ]);
       const weather=results[0].status==='fulfilled'?results[0].value:null;
       const marine=results[1].status==='fulfilled'?results[1].value:null;
       const tideData=results[2].status==='fulfilled'?results[2].value:null;
       const shops=results[3].status==='fulfilled'&&Array.isArray(results[3].value)&&results[3].value.length?results[3].value:null;
       const alertData=results[4].status==='fulfilled'?results[4].value:null;
+      const oceanData=results[5].status==='fulfilled'?results[5].value:null;
+      if(oceanData)this.state.oceanNetwork=oceanData;else this.state.oceanNetwork={status:'fallback',station:null,observation:null,history:[],lastChecked:new Date().toISOString(),error:'NDBC observation feed unavailable'};
       this.state.safetyAlerts=alertData?.alerts||[];
-      this.state.sourceHealth={weather:weather?'live':'fallback',marine:marine?'live':'fallback',tides:tideData?'live':'fallback',shops:shops?(shops.some(x=>x.verified)?'verified':'live'):'fallback',alerts:alertData?'live':'fallback'};
+      this.state.sourceHealth={weather:weather?'live':'fallback',marine:marine?'live':'fallback',tides:tideData?'live':'fallback',shops:shops?(shops.some(x=>x.verified)?'verified':'live'):'fallback',alerts:alertData?'live':'fallback',buoy:oceanData?.observation?'live':'fallback'};
       this.state.data=this.mergeLiveData(base,weather,marine,tideData,shops);
       this.recalculateScores();
       this.renderAll();
@@ -666,10 +687,75 @@
       this.state.loading=false;
       this.renderMode();this.renderSourceHealth();
       this.$('syncBtn').classList.remove('spinning');
-      const liveCount=[weather,marine,tideData,shops,alertData].filter(Boolean).length;
+      const liveCount=[weather,marine,tideData,shops,alertData,oceanData?.observation].filter(Boolean).length;
       this.state.liveUpdatedAt=new Date().toISOString();this.save();
       this.$('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
-      if(!quiet) this.showToast(liveCount>=3?'Live coastal data updated.':`Live data partially updated (${liveCount}/5 sources). Fallbacks filled the gaps.`);
+      if(!quiet) this.showToast(liveCount>=3?'Live coastal data updated.':`Live data partially updated (${liveCount}/6 sources). Fallbacks filled the gaps.`);
+    },
+
+
+    async fetchText(url,timeout=12000){
+      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),timeout);
+      try{const r=await fetch(url,{signal:ctrl.signal,headers:{'Accept':'text/plain,text/xml,application/rss+xml,*/*'}});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.text();}finally{clearTimeout(timer);}
+    },
+
+    ndbcNumber(v){const s=String(v??'').trim();if(!s||/^(MM|N\/A|-99|999|9999|99\.0)$/i.test(s))return null;const n=Number(s);return Number.isFinite(n)?n:null;},
+
+    parseNdbcLatest(text,lat,lon){
+      const lines=String(text||'').split(/\r?\n/).filter(Boolean);let header=null;
+      for(const line of lines){if(/^#?STN\b/.test(line.trim())&&/\bLAT\b/.test(line)&&/\bLON\b/.test(line)){header=line.replace(/^#/,'').trim().split(/\s+/);break;}}
+      if(!header)return null;const idx={};header.forEach((x,i)=>idx[x.replace(/^#/,'').toUpperCase()]=i);const rows=[];
+      for(const line of lines){if(/^#/.test(line.trim()))continue;const p=line.trim().split(/\s+/);if(p.length<header.length-2)continue;const get=k=>p[idx[k]];const slat=this.ndbcNumber(get('LAT')),slon=this.ndbcNumber(get('LON'));if(slat==null||slon==null)continue;const id=get('STN');const dist=this.haversine(lat,lon,slat,slon);if(dist>300)continue;let yr=this.ndbcNumber(get('YY')??get('YYYY')),mo=this.ndbcNumber(get('MM')),dy=this.ndbcNumber(get('DD')),hh=this.ndbcNumber(get('HH')??get('hh')),mn=this.ndbcNumber(get('MN')??get('mm'));if(yr!=null&&yr<100)yr+=2000;let time=null;if([yr,mo,dy,hh].every(Number.isFinite)){time=new Date(Date.UTC(yr,mo-1,dy,hh,Number.isFinite(mn)?mn:0)).toISOString();}
+        const obs={id,lat:slat,lon:slon,distance:dist,time,windDir:this.ndbcNumber(get('WDIR')),windMps:this.ndbcNumber(get('WSPD')),gustMps:this.ndbcNumber(get('GST')),waveM:this.ndbcNumber(get('WVHT')),period:this.ndbcNumber(get('DPD')),avgPeriod:this.ndbcNumber(get('APD')),waveDir:this.ndbcNumber(get('MWD')),pressureHpa:this.ndbcNumber(get('PRES')),airC:this.ndbcNumber(get('ATMP')),waterC:this.ndbcNumber(get('WTMP')),visibility:this.ndbcNumber(get('VIS')),tide:this.ndbcNumber(get('TIDE'))};
+        const hasMarine=[obs.waveM,obs.waterC,obs.windMps].filter(x=>x!=null).length;rows.push({...obs,hasMarine});
+      }
+      rows.sort((a,b)=>{const pa=(a.hasMarine>=2?0:40)+(a.distance||999),pb=(b.hasMarine>=2?0:40)+(b.distance||999);return pa-pb;});return rows[0]||null;
+    },
+
+    parseNdbcStationHistory(text,id){
+      const lines=String(text||'').split(/\r?\n/).filter(Boolean),head=lines.find(x=>/^#YY\b|^#YYYY\b/.test(x.trim()));if(!head)return[];const header=head.replace(/^#/,'').trim().split(/\s+/),idx={};header.forEach((x,i)=>idx[x.replace(/^#/,'').toUpperCase()]=i);const out=[];
+      for(const line of lines){if(/^#/.test(line.trim()))continue;const p=line.trim().split(/\s+/);const get=k=>p[idx[k]];let yr=this.ndbcNumber(get('YY')??get('YYYY')),mo=this.ndbcNumber(get('MM')),dy=this.ndbcNumber(get('DD')),hh=this.ndbcNumber(get('HH')??get('hh')),mn=this.ndbcNumber(get('MN')??get('mm'));if(yr!=null&&yr<100)yr+=2000;if(![yr,mo,dy,hh].every(Number.isFinite))continue;const wave=this.ndbcNumber(get('WVHT')),wind=this.ndbcNumber(get('WSPD')),water=this.ndbcNumber(get('WTMP'));if(wave==null&&wind==null&&water==null)continue;out.push({id,time:new Date(Date.UTC(yr,mo-1,dy,hh,Number.isFinite(mn)?mn:0)).toISOString(),waveM:wave,windMps:wind,waterC:water,period:this.ndbcNumber(get('DPD')),pressureHpa:this.ndbcNumber(get('PRES'))});if(out.length>=36)break;
+      }return out;
+    },
+
+    async loadOceanNetwork(lat,lon){
+      const checked=new Date().toISOString();try{
+        const text=await this.fetchText('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt',12000);const obs=this.parseNdbcLatest(text,lat,lon);if(!obs)throw new Error('No nearby reporting station found');
+        let history=[];try{history=this.parseNdbcStationHistory(await this.fetchText(`https://www.ndbc.noaa.gov/data/realtime2/${encodeURIComponent(obs.id)}.txt`,9000),obs.id);}catch(_){ }
+        return{status:'live',station:{id:obs.id,name:`NDBC Station ${obs.id}`,lat:obs.lat,lon:obs.lon,distance:obs.distance,url:`https://www.ndbc.noaa.gov/station_page.php?station=${encodeURIComponent(obs.id)}`},observation:obs,history,lastChecked:checked,error:null};
+      }catch(e){return{status:'fallback',station:null,observation:null,history:[],lastChecked:checked,error:String(e?.message||'NDBC unavailable')};}
+    },
+
+    async refreshOceanNetwork(){
+      if(!this.state.live){this.showToast('Turn on Live Data first.');return;}const {lat,lon}=this.state.location;this.state.oceanNetwork={...this.state.oceanNetwork,status:'loading'};this.state.sourceHealth.buoy='loading';this.renderSourceHealth();this.renderOceanNetwork();
+      const d=await this.loadOceanNetwork(lat,lon);this.state.oceanNetwork=d;this.state.sourceHealth.buoy=d.observation?'live':'fallback';this.save();this.renderSourceHealth();this.renderOceanNetwork();this.renderTripOceanCheck();this.renderCommandCenter();this.showToast(d.observation?`Ocean Network connected to ${d.station.id}.`:'No nearby NDBC observation could be loaded from this browser.');
+    },
+
+    oceanReality(){
+      const net=this.state.oceanNetwork||{},o=net.observation,c=this.state.data?.current||{};if(!o)return{available:false,agreement:null,ageHours:null,distance:null};const waveObs=o.waveM==null?null:o.waveM*3.28084,windObs=o.windMps==null?null:o.windMps*2.23694,waterObs=o.waterC==null?null:o.waterC*9/5+32,pressureObs=o.pressureHpa;const waveFc=this.ndbcNumber(c.waveHeight),windFc=this.ndbcNumber(c.windSpeed),waterFc=this.ndbcNumber(c.waterTemp),pressureFc=this.ndbcNumber(c.pressure);const deltas={wave:waveObs!=null&&waveFc!=null?waveObs-waveFc:null,wind:windObs!=null&&windFc!=null?windObs-windFc:null,water:waterObs!=null&&waterFc!=null?waterObs-waterFc:null,pressure:pressureObs!=null&&pressureFc!=null?pressureObs-pressureFc:null};let penalty=0,count=0;if(deltas.wave!=null){penalty+=Math.min(45,Math.abs(deltas.wave)*13);count++;}if(deltas.wind!=null){penalty+=Math.min(35,Math.abs(deltas.wind)*2.5);count++;}if(deltas.water!=null){penalty+=Math.min(25,Math.abs(deltas.water)*2);count++;}if(deltas.pressure!=null){penalty+=Math.min(18,Math.abs(deltas.pressure)*1.8);count++;}const agreement=count?Math.max(20,Math.min(100,Math.round(100-penalty/count))):null;let ageHours=null;if(o.time){const t=new Date(o.time).getTime();if(Number.isFinite(t))ageHours=Math.max(0,(Date.now()-t)/3600000);}return{available:true,agreement,ageHours,distance:net.station?.distance??o.distance,waveObs,windObs,waterObs,pressureObs,waveFc,windFc,waterFc,pressureFc,deltas,station:net.station,history:net.history||[]};
+    },
+
+    oceanDeltaText(delta,unit){if(delta==null)return'Forecast comparison unavailable';const a=Math.abs(delta),dir=delta>0?'higher':'lower';return a<0.15&&unit==='ft'?'Matches forecast closely':a<0.5&&unit==='mph'?'Matches forecast closely':`${this.fmt(a,unit==='°F'?0:1)} ${unit} ${dir} than forecast`;},
+
+    openOceanStation(){const s=this.state.oceanNetwork?.station;const url=s?.url||`https://www.ndbc.noaa.gov/?lat=${encodeURIComponent(this.state.location.lat)}&lon=${encodeURIComponent(this.state.location.lon)}&zoom=6`;window.open(url,'_blank','noopener');},
+
+    renderOceanNetwork(){
+      if(!this.$('oceanNetworkPanel'))return;const r=this.oceanReality(),net=this.state.oceanNetwork||{},badge=this.$('oceanNetworkBadge');const status=net.status||'idle';badge.textContent=status==='live'?'OBSERVED LIVE':status==='loading'?'CHECKING':status==='fallback'?'FORECAST ONLY':'NOT CHECKED';badge.className=`tiny-pill ${status==='live'?'ready-pill':status==='loading'?'caution-pill':''}`;
+      if(!r.available){this.$('oceanStationName').textContent=status==='loading'?'Searching NDBC network…':'No observation station loaded';this.$('oceanStationMeta').textContent=net.error||'Live forecasts still work even when an observation station is unavailable.';['oceanAgreementScore','oceanObsWind','oceanObsWave','oceanObsWater','oceanObsPressure'].forEach(id=>this.$(id).textContent='—');this.$('oceanWindDelta').textContent='Forecast only';this.$('oceanWaveDelta').textContent='Forecast only';this.$('oceanWaterDelta').textContent='Forecast only';this.$('oceanObsAge').textContent='Observation —';this.$('oceanNetworkCall').textContent='Forecast model is not currently verified by a nearby NDBC observation in this browser.';this.renderForecastTruth();this.drawOceanObservationChart();return;}
+      this.$('oceanStationName').textContent=r.station?.name||`NDBC Station ${net.observation.id}`;this.$('oceanStationMeta').textContent=`Station ${net.observation.id} • ${this.fmt(r.distance,0)} mi from fishing spot • measured ocean conditions`;this.$('oceanAgreementScore').textContent=r.agreement??'—';this.$('oceanObsWind').textContent=r.windObs==null?'—':`${this.fmt(r.windObs,0)} mph`;this.$('oceanObsWave').textContent=r.waveObs==null?'—':`${this.fmt(r.waveObs,1)} ft`;this.$('oceanObsWater').textContent=r.waterObs==null?'—':`${this.fmt(r.waterObs,0)}°F`;this.$('oceanObsPressure').textContent=r.pressureObs==null?'—':`${this.fmt(this.hpaToInHg(r.pressureObs),2)} in`;this.$('oceanWindDelta').textContent=this.oceanDeltaText(r.deltas.wind,'mph');this.$('oceanWaveDelta').textContent=this.oceanDeltaText(r.deltas.wave,'ft');this.$('oceanWaterDelta').textContent=this.oceanDeltaText(r.deltas.water,'°F');this.$('oceanObsAge').textContent=r.ageHours==null?'Observation time unavailable':`${this.fmt(r.ageHours,1)} hr old`;
+      let call='Observed conditions broadly support the loaded marine forecast.';if(r.agreement!=null&&r.agreement<60)call='The buoy and model are diverging. Recheck surf and wind before committing to the trip.';else if(r.ageHours!=null&&r.ageHours>4)call='The station observation is getting stale. Treat the forecast as primary until a fresher report arrives.';else if(r.distance!=null&&r.distance>100)call='The nearest reporting station is distant. Use the observation as regional context, not a beach measurement.';this.$('oceanNetworkCall').textContent=call;this.renderForecastTruth();this.drawOceanObservationChart();
+    },
+
+    renderForecastTruth(){
+      if(!this.$('forecastTruthPanel'))return;const r=this.oceanReality(),badge=this.$('forecastTruthBadge');if(!r.available){badge.textContent=this.state.oceanNetwork?.status==='loading'?'CHECKING':'NO STATION';this.$('forecastTruthSummary').textContent='The marine forecast is loaded without a nearby observed-ocean comparison.';[['truthWind','truthWindNote'],['truthWave','truthWaveNote'],['truthWater','truthWaterNote'],['truthPressure','truthPressureNote']].forEach(([a,b])=>{this.$(a).textContent='—';this.$(b).textContent='Forecast only';});return;}badge.textContent=`${r.agreement??'—'}% AGREEMENT`;badge.className=`tiny-pill ${r.agreement>=75?'ready-pill':r.agreement>=55?'caution-pill':'danger-pill'}`;this.$('forecastTruthSummary').textContent=`Station ${r.station?.id||''} is ${this.fmt(r.distance,0)} miles from the selected fishing location. CoastCast is comparing its most recent observation with the current forecast model.`;const pair=(id,note,obs,fc,unit,dec=0)=>{this.$(id).textContent=obs==null?'—':`${this.fmt(obs,dec)}${unit}`;this.$(note).textContent=fc==null?'Forecast —':`Forecast ${this.fmt(fc,dec)}${unit}`;};pair('truthWind','truthWindNote',r.windObs,r.windFc,' mph',0);pair('truthWave','truthWaveNote',r.waveObs,r.waveFc,' ft',1);pair('truthWater','truthWaterNote',r.waterObs,r.waterFc,'°F',0);pair('truthPressure','truthPressureNote',r.pressureObs==null?null:this.hpaToInHg(r.pressureObs),r.pressureFc==null?null:this.hpaToInHg(r.pressureFc),' in',2);
+    },
+
+    drawOceanObservationChart(){
+      const cv=this.$('oceanObservationCanvas');if(!cv)return;const ctx=cv.getContext('2d'),dpr=Math.min(2,window.devicePixelRatio||1),w=cv.clientWidth||900,h=250;cv.width=w*dpr;cv.height=h*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);const hist=(this.state.oceanNetwork?.history||[]).filter(x=>x.waveM!=null).slice(0,18).reverse();if(hist.length<2){ctx.fillStyle='rgba(220,242,250,.55)';ctx.font='14px sans-serif';ctx.fillText('Recent NDBC wave history is unavailable in this browser.',18,34);if(this.$('oceanHistoryNote'))this.$('oceanHistoryNote').textContent='Observation trend unavailable.';return;}const vals=hist.map(x=>x.waveM*3.28084),max=Math.max(2,...vals)*1.15,min=0,pad=28;ctx.strokeStyle='rgba(117,220,235,.16)';ctx.lineWidth=1;for(let i=0;i<4;i++){const y=pad+(h-pad*2)*i/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-pad,y);ctx.stroke();}ctx.strokeStyle='#44d7e8';ctx.lineWidth=3;ctx.beginPath();vals.forEach((v,i)=>{const x=pad+(w-pad*2)*(i/(vals.length-1)),y=h-pad-(v-min)/(max-min)*(h-pad*2);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();ctx.fillStyle='rgba(79,223,181,.18)';ctx.lineTo(w-pad,h-pad);ctx.lineTo(pad,h-pad);ctx.closePath();ctx.fill();if(this.$('oceanHistoryNote'))this.$('oceanHistoryNote').textContent=`${hist.length} recent observations • newest ${this.formatDestinationDate(hist[hist.length-1].time,{hour:'numeric',minute:'2-digit'})}`;
+    },
+
+    renderTripOceanCheck(){
+      if(!this.$('tripOceanSummary'))return;const r=this.oceanReality(),badge=this.$('tripOceanBadge');if(!r.available){badge.textContent='FORECAST ONLY';this.$('tripOceanSummary').textContent='No nearby NDBC observation is loaded. Your live model forecast remains available.';this.$('tripOceanAgreement').textContent='—';this.$('tripOceanDistance').textContent='—';this.$('tripOceanAge').textContent='—';return;}badge.textContent=r.agreement>=75?'MATCHING':r.agreement>=55?'RECHECK':'DIVERGING';badge.className=`tiny-pill ${r.agreement>=75?'ready-pill':r.agreement>=55?'caution-pill':'danger-pill'}`;this.$('tripOceanAgreement').textContent=`${r.agreement}%`;this.$('tripOceanDistance').textContent=`${this.fmt(r.distance,0)} mi`;this.$('tripOceanAge').textContent=r.ageHours==null?'—':`${this.fmt(r.ageHours,1)} hr`;this.$('tripOceanSummary').textContent=r.agreement>=75?'Observed wind/waves broadly support the loaded forecast. Still check the beach itself before fishing.':r.agreement>=55?'Observed ocean conditions differ enough to justify another look before departure.':'The buoy and model are meaningfully different. Recheck the latest surf, wind and official warnings before driving.';
     },
 
     async loadWeather(lat,lon){
@@ -1241,10 +1327,87 @@
 
     renderAll(){
       this.recalculateScores();
-      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderDestinationHub();this.renderDailyBrief();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderBaitIntelligence();this.renderRegulations();this.renderConditions();this.renderFactors();this.renderOceanIntelligence();this.renderBeachReadiness();
+      this.renderExperience();this.renderMembership();this.renderQuickAnswer();
+      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderDestinationHub();this.renderDailyBrief();this.renderOceanNetwork();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderBaitIntelligence();this.renderRegulations();this.renderConditions();this.renderFactors();this.renderOceanIntelligence();this.renderBeachReadiness();
       this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderCatchTimeline();this.renderTideWeek();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();this.renderSpotIntelligence();
-      this.evaluateAlerts({notify:true});this.renderTrips();this.renderCoastWatch();this.renderTripCalendar();this.renderSmartDeparture();this.renderHomeAlerts();this.renderProfile();this.renderScout();this.renderGoMode();this.renderGearPlanner();this.renderTripSafety();this.renderPatternMatch();this.renderCatchIntelligence();this.renderTackleBox();this.renderOfflinePacks();this.renderPhotoMemories();this.renderCommandCenter();this.renderOpportunityMatrix();this.renderMissionControl();this.renderAnglerAnalytics();
+      this.evaluateAlerts({notify:true});this.renderTrips();this.renderCoastWatch();this.renderTripCalendar();this.renderSmartDeparture();this.renderHomeAlerts();this.renderProfile();this.renderScout();this.renderGoMode();this.renderGearPlanner();this.renderTripSafety();this.renderPatternMatch();this.renderCatchIntelligence();this.renderTackleBox();this.renderOfflinePacks();this.renderPhotoMemories();this.renderCommandCenter();this.renderOpportunityMatrix();this.renderMissionControl();this.renderAnglerAnalytics();this.renderForecastTruth();this.renderTripOceanCheck();
       if(this.state.view==='map') this.renderMapLayers();
+    },
+
+    membershipSnapshot(){
+      const m=this.state.membership||{},preview=m.preview||'premium';
+      const map={
+        free:{premium:false,badge:'FREE',title:'CoastCast Free',source:'Free access',expiry:'Upgrade to unlock advanced tools'},
+        premium:{premium:true,badge:'PREMIUM',title:'CoastCast Premium',source:'Paid Premium preview',expiry:'$4.99/month at launch'},
+        family:{premium:true,badge:'FAMILY PREMIUM',title:'CoastCast Premium',source:'Family Premium entitlement',expiry:'No separate subscription for this family member'},
+        complimentary:{premium:true,badge:'COMPLIMENTARY',title:'CoastCast Premium',source:'Owner-granted complimentary access',expiry:'Expiration or lifetime can be set by admin'},
+        lifetime:{premium:true,badge:'LIFETIME',title:'CoastCast Premium',source:'Owner-granted lifetime access',expiry:'No expiration'}
+      };
+      return map[preview]||map.premium;
+    },
+
+    hasPremium(){return !!this.membershipSnapshot().premium;},
+
+    openMembershipDialog(){
+      const snap=this.membershipSnapshot();
+      if(this.$('membershipPreviewSetting'))this.$('membershipPreviewSetting').value=this.state.membership?.preview||'premium';
+      if(this.$('membershipDialogTitle'))this.$('membershipDialogTitle').textContent=snap.title;
+      if(this.$('membershipDialogSource'))this.$('membershipDialogSource').textContent=snap.source;
+      this.openDialog('membershipDialog');
+    },
+
+    applyMembershipPreview(){
+      const v=this.$('membershipPreviewSetting')?.value||'premium';
+      if(!['free','premium','family','complimentary','lifetime'].includes(v))return;
+      this.state.membership={...this.state.membership,preview:v,betaFullAccess:true,status:v==='free'?'inactive':'active'};
+      this.save();this.renderMembership();this.renderExperience();this.closeDialog('membershipDialog');this.showToast(`Access preview: ${this.membershipSnapshot().badge}.`);
+    },
+
+    renderMembership(){
+      const snap=this.membershipSnapshot(),app=this.$('app');
+      app?.classList.toggle('free-preview',!snap.premium);
+      if(this.$('membershipBadge')){this.$('membershipBadge').textContent=this.state.membership?.source==='beta'&&snap.premium?`BETA ${snap.badge}`:snap.badge;this.$('membershipBadge').className=`membership-badge ${snap.premium?'':'free'}`;}
+      if(this.$('membershipTitle'))this.$('membershipTitle').textContent=this.state.membership?.source==='beta'&&snap.premium?'CoastCast Premium Beta':snap.title;
+      if(this.$('membershipSummary'))this.$('membershipSummary').textContent=snap.premium?'Full CoastCast tools are available in this access tier.':'Free mode keeps the core fishing answer useful while advanced intelligence is reserved for Premium.';
+      if(this.$('membershipSource'))this.$('membershipSource').textContent=snap.source;
+      if(this.$('membershipExpiry'))this.$('membershipExpiry').textContent=snap.expiry;
+      if(this.$('membershipDialogTitle'))this.$('membershipDialogTitle').textContent=snap.title;
+      if(this.$('membershipDialogSource'))this.$('membershipDialogSource').textContent=snap.source;
+    },
+
+    setExperienceMode(mode,announce=false){
+      if(!['simple','full'].includes(mode))return;
+      this.state.experience={...this.state.experience,mode};this.save();this.renderExperience();
+      if(announce)this.showToast(mode==='simple'?'Simple Home view on. Advanced tools are still one tap away.':'Full Home view on.');
+    },
+
+    renderExperience(){
+      const mode=this.state.experience?.mode||'simple',app=this.$('app');
+      app?.classList.toggle('simple-mode',mode==='simple');
+      if(this.$('experienceModeSetting'))this.$('experienceModeSetting').value=mode;
+      if(this.$('quickDetailsBtn'))this.$('quickDetailsBtn').textContent=mode==='simple'?'Show all tools':'Advanced tools shown';
+      if(this.$('quickSimpleBtn'))this.$('quickSimpleBtn').textContent=mode==='simple'?'Simple view ✓':'Keep it simple';
+    },
+
+    quickAnswerData(){
+      const rec=this.commandRecommendation?.()||{},best=rec.best||{},safety=this.safetyAssessment?.()||{level:0,label:'LOWER RISK'},readiness=this.planningReadiness?.()||{score:0,label:'RECHECK'},species=rec.species||this.state.targetSpecies,bait=this.baitIntelligence?.(species)||{},c=this.state.data?.current||{};
+      const window=best.window?.label||this.catchForecastWindows?.(best.index||0)?.top?.[0]?.label||this.bestWindowToday?.()?.label||'Check forecast';
+      let decision='RECHECK',cls='watch',headline='A workable trip may be developing.';
+      if(safety.level>=2){decision='HOLD',cls='hold',headline='Review official hazards before making the trip.';}
+      else if((best.score||0)>=86&&readiness.score>=72){decision='GO WINDOW',cls='go',headline=`${species} conditions line up well.`;}
+      else if((best.score||0)>=72){decision='PROMISING',cls='watch',headline=`${species} has a fishable window with tradeoffs.`;}
+      const why=`${this.currentTideLabel?.()||'Moving tide'} • ${this.fmt(c.windSpeed,0)} mph ${this.compass(c.windDir)} wind • ${this.fmt(c.waveHeight,1)} ft surf • ${this.dataConfidence?.().score||0}% data confidence.`;
+      return{decision,cls,headline,window,species,bait:bait.primary||bait.primaryName||'See bait plan',conditions:`${this.fmt(c.windSpeed,0)} mph • ${this.fmt(c.waveHeight,1)} ft`,why,bestScore:Math.round(best.score||this.currentScore?.()||0),readiness};
+    },
+
+    renderQuickAnswer(){
+      if(!this.$('quickAnswerPanel')||!this.state.data)return;const q=this.quickAnswerData();
+      this.$('quickAnswerHeadline').textContent=q.headline;this.$('quickDecisionBadge').textContent=q.decision;this.$('quickDecisionBadge').className=`quick-decision-badge ${q.cls}`;
+      this.$('quickAnswerSummary').textContent=q.cls==='go'?`CoastCast sees a strong ${q.species} opportunity. The key window is ${q.window}.`:`Best current ${q.species} opportunity: ${q.window}. Use the details if you want to see the full reasoning.`;
+      this.$('quickWhen').textContent=q.window;this.$('quickWhenNote').textContent=`${q.bestScore}/100 opportunity`;
+      this.$('quickTarget').textContent=q.species;this.$('quickTargetNote').textContent='Species Intelligence';
+      this.$('quickBait').textContent=String(q.bait).replace(/^./,m=>m.toUpperCase());this.$('quickBaitNote').textContent='Bait Intelligence';
+      this.$('quickConditions').textContent=q.conditions;this.$('quickConditionsNote').textContent='Wind • surf';this.$('quickWhy').textContent=q.why;
     },
 
     dailyBriefData(){
@@ -1274,6 +1437,7 @@
       let score=0,detail=[];for(const [key,w] of Object.entries(weights)){const status=h[key]||(!this.state.live?'demo':'fallback'),mult=values[status]??.35;score+=w*mult;detail.push({key,status,value:Math.round(mult*100)});}
       if(!this.state.live)score=Math.min(score,28);
       let ageMin=null;if(this.state.liveUpdatedAt){const t=new Date(this.state.liveUpdatedAt).getTime();if(Number.isFinite(t)){ageMin=Math.max(0,(Date.now()-t)/60000);if(ageMin>180)score*=.78;else if(ageMin>90)score*=.90;}}
+      const reality=this.oceanReality?.();if(this.state.live&&reality?.available&&reality.agreement!=null&&reality.ageHours!=null&&reality.ageHours<=4&&reality.distance<=150){score=score*.91+reality.agreement*.09;detail.push({key:'buoy',status:'live',value:reality.agreement});}
       return{score:Math.max(0,Math.min(100,Math.round(score))),detail,ageMin};
     },
 
@@ -1312,9 +1476,9 @@
 
     launchCommandTrip(){const m=this.missionReadiness();if(m.blocked){this.showToast('Safety Guard is blocking one-tap launch. Review official warnings first.');return;}if(!this.state.command?.lastPlan)this.buildCommandPlan({navigateToTrips:false,toast:false});this.startGoMode();},
 
-    commandShareText(){const r=this.commandRecommendation(),p=this.departurePlan(),bait=this.baitIntelligence(r.species),c=this.state.data?.current||{};return `CoastCast 2.0 Command Brief\n${this.state.location.name}\nCall: ${r.call}\nTarget: ${r.species} • ${r.speciesScore}/100 today\nBest day: ${r.best?.day?.day||r.best?.day?.date||'—'} • ${r.best?.score||'—'}/100\nBest window: ${r.best?.window?.label||'—'}\nData confidence: ${r.confidence.score}%\nReadiness: ${r.readiness.score}/100\nBait: ${this.titleCase(bait.primary)} • ${bait.rig}\nWind: ${this.compass(c.windDir)} ${this.fmt(c.windSpeed,0)} mph\nSurf: ${this.fmt(c.waveHeight,1)} ft @ ${this.fmt(c.wavePeriod,0)} sec${p?.leaveText?`\nLeave by: ${p.leaveText}`:''}\nSafety Guard: ${r.safety.status}\nVerify access, official warnings and current regulations before fishing.`;},
+    commandShareText(){const r=this.commandRecommendation(),p=this.departurePlan(),bait=this.baitIntelligence(r.species),c=this.state.data?.current||{};return `CoastCast 3.1 Command Brief\n${this.state.location.name}\nCall: ${r.call}\nTarget: ${r.species} • ${r.speciesScore}/100 today\nBest day: ${r.best?.day?.day||r.best?.day?.date||'—'} • ${r.best?.score||'—'}/100\nBest window: ${r.best?.window?.label||'—'}\nData confidence: ${r.confidence.score}%\nReadiness: ${r.readiness.score}/100\nBait: ${this.titleCase(bait.primary)} • ${bait.rig}\nWind: ${this.compass(c.windDir)} ${this.fmt(c.windSpeed,0)} mph\nSurf: ${this.fmt(c.waveHeight,1)} ft @ ${this.fmt(c.wavePeriod,0)} sec${p?.leaveText?`\nLeave by: ${p.leaveText}`:''}\nSafety Guard: ${r.safety.status}\nVerify access, official warnings and current regulations before fishing.`;},
 
-    async shareCommandBrief(){const text=this.commandShareText();try{if(navigator.share){await navigator.share({title:'CoastCast 2.0 Command Brief',text});}else{const b=new Blob([text],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='coastcast-command-brief.txt';a.click();setTimeout(()=>URL.revokeObjectURL(u),300);}this.showToast('Command brief ready to share.');}catch(e){if(e?.name!=='AbortError')this.showToast('Could not share the Command Brief.');}},
+    async shareCommandBrief(){const text=this.commandShareText();try{if(navigator.share){await navigator.share({title:'CoastCast 3.1 Command Brief',text});}else{const b=new Blob([text],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='coastcast-command-brief.txt';a.click();setTimeout(()=>URL.revokeObjectURL(u),300);}this.showToast('Command brief ready to share.');}catch(e){if(e?.name!=='AbortError')this.showToast('Could not share the Command Brief.');}},
 
     personalAnalytics(){
       const catches=this.state.catches||[],complete=catches.filter(c=>c.bait||c.conditionData||c.conditions),speciesCounts={},baitCounts={},waterCounts={},tideCounts={},timeCounts={};let wind=[],wave=[],water=[];for(const c of catches){speciesCounts[c.species]=(speciesCounts[c.species]||0)+1;if(c.bait)baitCounts[c.bait]=(baitCounts[c.bait]||0)+1;const w=this.generalizeWater(c.location||c.water||'');if(w)waterCounts[w]=(waterCounts[w]||0)+1;const tide=this.catchTide(c)||'Unknown tide';tideCounts[tide]=(tideCounts[tide]||0)+1;const tb=this.catchTimeBucket(c.date);timeCounts[tb]=(timeCounts[tb]||0)+1;const d=c.conditionData||{};if(Number.isFinite(Number(d.wind)))wind.push(Number(d.wind));if(Number.isFinite(Number(d.wave)))wave.push(Number(d.wave));if(Number.isFinite(Number(d.water)))water.push(Number(d.water));}const top=obj=>Object.entries(obj).sort((a,b)=>b[1]-a[1])[0]||['—',0],topSpecies=top(speciesCounts),topBait=top(baitCounts),topWater=top(waterCounts),topTide=top(tideCounts),topTime=top(timeCounts),depth=Math.min(100,Math.round(catches.length*6+complete.length*4));return{count:catches.length,depth,topSpecies,topBait,topWater,topTide,topTime,avgWind:wind.length?this.average(wind):null,avgWave:wave.length?this.average(wave):null,avgWater:water.length?this.average(water):null};
@@ -1444,7 +1608,7 @@
     renderSourceHealth(){
       const box=this.$('sourceHealth'); if(!box) return;
       const h=this.state.sourceHealth||{};
-      const items=[['Weather',h.weather],['Marine',h.marine],['NOAA tides',h.tides],['NWS alerts',h.alerts],['Tackle shops',h.shops]];
+      const items=[['Weather',h.weather],['Marine',h.marine],['NOAA tides',h.tides],['NWS alerts',h.alerts],['Ocean obs',h.buoy],['Tackle shops',h.shops]];
       const label=s=>s==='live'?'LIVE':s==='verified'?'VERIFIED':s==='loading'?'CHECKING':s==='fallback'||s==='partial'?'FALLBACK':'DEMO';
       box.innerHTML=items.map(([name,status])=>`<span class="source-chip ${status||'demo'}"><span class="source-chip-name">${this.escape(name)}</span><strong>${label(status)}</strong></span>`).join('');
     },
@@ -2688,7 +2852,7 @@
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
       try{localStorage.removeItem('coastcast-v12-state');localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{['coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.watchCenter={running:false,results:[],lastRun:null,species:'Red Drum'};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      this.state.live=false;try{['coastcast-v31-state','coastcast-v30-state','coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.watchCenter={running:false,results:[],lastRun:null,species:'Red Drum'};this.state.oceanNetwork={status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null};this.state.experience={mode:'simple'};this.state.membership={tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 
 
@@ -2736,7 +2900,7 @@
     },
 
     backupPayload(){
-      return {format:'coastcast-backup',version:'2.3.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,watchCenter:this.state.watchCenter,liveUpdatedAt:this.state.liveUpdatedAt}};
+      return {format:'coastcast-backup',version:'3.1.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,liveUpdatedAt:this.state.liveUpdatedAt}};
     },
 
     exportBackup(){
@@ -2746,7 +2910,7 @@
     async importBackupFile(event){
       const file=event.target.files?.[0];if(!file)return;
       try{const text=await file.text();const parsed=JSON.parse(text);const d=parsed?.appState||parsed;if(!d||typeof d!=='object')throw new Error('Invalid');if(!confirm('Restore this CoastCast backup? Current local saved data will be replaced.'))return;
-        if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.tackleRadius)this.state.tackleRadius=Number(d.tackleRadius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};if(d.gearPlan)this.state.gearPlan={...this.state.gearPlan,...d.gearPlan,checked:{...(d.gearPlan.checked||{})}};if(d.departure)this.state.departure={...this.state.departure,...d.departure};if(d.regChecks)this.state.regChecks={...d.regChecks};if(Array.isArray(d.tackleBox))this.state.tackleBox=d.tackleBox;if(Array.isArray(d.shoppingList))this.state.shoppingList=d.shoppingList;if(Array.isArray(d.offlinePacks))this.state.offlinePacks=d.offlinePacks;if(d.community&&typeof d.community==='object')this.state.community={...this.state.community,...d.community,reactions:{...(d.community.reactions||{})},publishedLocalIds:Array.isArray(d.community.publishedLocalIds)?d.community.publishedLocalIds:[]};if(d.command&&typeof d.command==='object')this.state.command={...this.state.command,...d.command};if(d.watchCenter&&typeof d.watchCenter==='object')this.state.watchCenter={...this.state.watchCenter,...d.watchCenter,running:false,results:Array.isArray(d.watchCenter.results)?d.watchCenter.results:[]};if(d.liveUpdatedAt)this.state.liveUpdatedAt=d.liveUpdatedAt;
+        if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.tackleRadius)this.state.tackleRadius=Number(d.tackleRadius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};if(d.gearPlan)this.state.gearPlan={...this.state.gearPlan,...d.gearPlan,checked:{...(d.gearPlan.checked||{})}};if(d.departure)this.state.departure={...this.state.departure,...d.departure};if(d.regChecks)this.state.regChecks={...d.regChecks};if(Array.isArray(d.tackleBox))this.state.tackleBox=d.tackleBox;if(Array.isArray(d.shoppingList))this.state.shoppingList=d.shoppingList;if(Array.isArray(d.offlinePacks))this.state.offlinePacks=d.offlinePacks;if(d.community&&typeof d.community==='object')this.state.community={...this.state.community,...d.community,reactions:{...(d.community.reactions||{})},publishedLocalIds:Array.isArray(d.community.publishedLocalIds)?d.community.publishedLocalIds:[]};if(d.command&&typeof d.command==='object')this.state.command={...this.state.command,...d.command};if(d.watchCenter&&typeof d.watchCenter==='object')this.state.watchCenter={...this.state.watchCenter,...d.watchCenter,running:false,results:Array.isArray(d.watchCenter.results)?d.watchCenter.results:[]};if(d.oceanNetwork&&typeof d.oceanNetwork==='object')this.state.oceanNetwork={...this.state.oceanNetwork,...d.oceanNetwork,status:'idle'};if(d.experience&&typeof d.experience==='object')this.state.experience={...this.state.experience,...d.experience};if(d.liveUpdatedAt)this.state.liveUpdatedAt=d.liveUpdatedAt;
         this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();if(this.$('backupStatus'))this.$('backupStatus').textContent=`Backup restored from ${this.escape(file.name)}.`;this.showToast('Backup restored. Refresh live data for the restored destination.');
       }catch(_){this.showToast('That file is not a valid CoastCast backup.');}finally{event.target.value='';}
     },
@@ -2800,11 +2964,11 @@
     },
 
     saveCloudMetaOnly(){
-      try{const raw=localStorage.getItem('coastcast-v23-state')||localStorage.getItem('coastcast-v22-state')||localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v23-state',JSON.stringify(p));}catch(_){ }
+      try{const raw=localStorage.getItem('coastcast-v31-state')||localStorage.getItem('coastcast-v30-state')||localStorage.getItem('coastcast-v23-state')||localStorage.getItem('coastcast-v22-state')||localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v31-state',JSON.stringify(p));}catch(_){ }
     },
 
     async cloudPull(){
-      if(!this.cloudSignedIn()){this.showToast('Sign in to cloud sync first.');return;}if(!confirm('Restore your cloud copy onto this device? Current local fishing data will be replaced.'))return;const c=this.state.cloud;try{if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent='Downloading cloud data…';const uid=c.session.user.id;const r=await this.cloudRequest(`${c.url}/rest/v1/coastcast_user_data?user_id=eq.${encodeURIComponent(uid)}&select=data,updated_at&limit=1`,{method:'GET'});const rows=await r.json();if(!r.ok)throw new Error(rows?.message||'Could not download cloud data.');if(!Array.isArray(rows)||!rows.length)throw new Error('No cloud backup exists yet.');const d=rows[0].data||{};if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.tackleRadius)this.state.tackleRadius=Number(d.tackleRadius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};if(d.gearPlan)this.state.gearPlan={...this.state.gearPlan,...d.gearPlan,checked:{...(d.gearPlan.checked||{})}};if(d.departure)this.state.departure={...this.state.departure,...d.departure};if(d.regChecks)this.state.regChecks={...d.regChecks};if(Array.isArray(d.tackleBox))this.state.tackleBox=d.tackleBox;if(Array.isArray(d.shoppingList))this.state.shoppingList=d.shoppingList;if(Array.isArray(d.offlinePacks))this.state.offlinePacks=d.offlinePacks;if(d.community&&typeof d.community==='object')this.state.community={...this.state.community,...d.community,reactions:{...(d.community.reactions||{})},publishedLocalIds:Array.isArray(d.community.publishedLocalIds)?d.community.publishedLocalIds:[]};if(d.command&&typeof d.command==='object')this.state.command={...this.state.command,...d.command};if(d.watchCenter&&typeof d.watchCenter==='object')this.state.watchCenter={...this.state.watchCenter,...d.watchCenter,running:false,results:Array.isArray(d.watchCenter.results)?d.watchCenter.results:[]};if(d.liveUpdatedAt)this.state.liveUpdatedAt=d.liveUpdatedAt;this.state.cloud.lastSync=rows[0].updated_at||new Date().toISOString();this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();this.showToast('Cloud data restored. Refresh live data for this destination.');}
+      if(!this.cloudSignedIn()){this.showToast('Sign in to cloud sync first.');return;}if(!confirm('Restore your cloud copy onto this device? Current local fishing data will be replaced.'))return;const c=this.state.cloud;try{if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent='Downloading cloud data…';const uid=c.session.user.id;const r=await this.cloudRequest(`${c.url}/rest/v1/coastcast_user_data?user_id=eq.${encodeURIComponent(uid)}&select=data,updated_at&limit=1`,{method:'GET'});const rows=await r.json();if(!r.ok)throw new Error(rows?.message||'Could not download cloud data.');if(!Array.isArray(rows)||!rows.length)throw new Error('No cloud backup exists yet.');const d=rows[0].data||{};if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.tackleRadius)this.state.tackleRadius=Number(d.tackleRadius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};if(d.gearPlan)this.state.gearPlan={...this.state.gearPlan,...d.gearPlan,checked:{...(d.gearPlan.checked||{})}};if(d.departure)this.state.departure={...this.state.departure,...d.departure};if(d.regChecks)this.state.regChecks={...d.regChecks};if(Array.isArray(d.tackleBox))this.state.tackleBox=d.tackleBox;if(Array.isArray(d.shoppingList))this.state.shoppingList=d.shoppingList;if(Array.isArray(d.offlinePacks))this.state.offlinePacks=d.offlinePacks;if(d.community&&typeof d.community==='object')this.state.community={...this.state.community,...d.community,reactions:{...(d.community.reactions||{})},publishedLocalIds:Array.isArray(d.community.publishedLocalIds)?d.community.publishedLocalIds:[]};if(d.command&&typeof d.command==='object')this.state.command={...this.state.command,...d.command};if(d.watchCenter&&typeof d.watchCenter==='object')this.state.watchCenter={...this.state.watchCenter,...d.watchCenter,running:false,results:Array.isArray(d.watchCenter.results)?d.watchCenter.results:[]};if(d.oceanNetwork&&typeof d.oceanNetwork==='object')this.state.oceanNetwork={...this.state.oceanNetwork,...d.oceanNetwork,status:'idle'};if(d.experience&&typeof d.experience==='object')this.state.experience={...this.state.experience,...d.experience};if(d.liveUpdatedAt)this.state.liveUpdatedAt=d.liveUpdatedAt;this.state.cloud.lastSync=rows[0].updated_at||new Date().toISOString();this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();this.showToast('Cloud data restored. Refresh live data for this destination.');}
       catch(err){if(this.$('cloudSyncStatus'))this.$('cloudSyncStatus').textContent=err.message||'Cloud restore failed.';this.showToast(err.message||'Cloud restore failed.');}
     },
 

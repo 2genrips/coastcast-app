@@ -1,36 +1,37 @@
-# CoastCast 2.3 Data Sources
+# CoastCast 3.1 Data Sources
 
-## Coast Watch
-Coast Watch uses the same Open-Meteo Weather and Marine APIs already used by CoastCast, but queries each saved fishing destination separately. It is designed as a live in-app comparison layer, not a background monitoring service.
-
-The watch score is a planning preview and may use moving-water assumptions until the exact location is opened and CoastCast loads its NOAA tide station. Use **Analyze** for the full exact-location forecast before making a trip decision.
-
----
-
-# CoastCast 2.2 Data Sources
-
-# CoastCast v2.2 Data Sources
-
-## Forecast and marine
+## Forecast & marine
 - Open-Meteo weather forecast
 - Open-Meteo marine forecast
 - NOAA CO-OPS tide predictions
 - National Weather Service point alerts
 
+## Ocean Network reality check
+- NOAA/NDBC latest observations: `https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt`
+- NDBC station realtime files: `https://www.ndbc.noaa.gov/data/realtime2/{station}.txt`
+- NDBC station pages: `https://www.ndbc.noaa.gov/station_page.php?station={station}`
+
+NDBC station data can be offshore or exposed differently than the beach. CoastCast treats it as a regional reality check for the forecast, not a measurement at the angler's feet.
+
+## Coast Watch
+Coast Watch uses the weather and marine forecast services to query saved fishing destinations separately. Its comparison score is a planning preview. Open a destination with **Analyze** to load its exact-location NOAA tide and full forecast context before making a trip decision.
+
 ## Fishing access / map discovery
 - Official/state public coastal-access datasets where integrated
 - OpenStreetMap / Overpass
-- Nominatim / Photon as secondary location discovery
+- Nominatim / Photon secondary location discovery
 - CoastCast verified regional access catalogs where available
 
 ## Bait & tackle intelligence
-CoastCast v2.2 uses a multi-source merge:
-1. **Geoapify Places** (optional key) — dedicated `commercial.outdoor_and_sport.fishing` category.
-2. **OpenStreetMap / Overpass** — fishing-store tags plus fishing-specific names/descriptions/products.
-3. **Nominatim / Photon** — strict text discovery, never accepted solely because a geocoder returned a nearby business.
-4. **CoastCast verified regional catalogs** — high-confidence local fallbacks built from current official/business sources.
+CoastCast merges multiple sources:
+1. Geoapify Places (optional key) using its fishing/outdoor retail category
+2. OpenStreetMap / Overpass fishing-store tags and fishing-specific metadata
+3. Nominatim / Photon strict text discovery
+4. CoastCast verified regional business catalogs
 
-Every tackle result must pass a fishing-business validation rule or be explicitly marked as a verified fishing-supply business. CoastCast prefers showing no pin over knowingly showing an unrelated business.
+Results must pass fishing-business validation or be explicitly verified. CoastCast prefers no bait pin over knowingly labeling an unrelated business as tackle.
 
-## Important limitation
-Business openings, closures, inventory and category data can change. CoastCast cannot guarantee that every existing shop is indexed or that every indexed shop is still open. A dedicated commercial Places provider improves nationwide completeness, but final navigation/business details should still be verified before driving.
+## Premium / entitlement architecture
+CoastCast 3.1 includes the membership UI/state preview and server-side database schema, but Google Play Billing and secure entitlement validation are **not yet connected**. The beta access selector exists only for UI testing and must not be treated as payment security.
+
+See `PREMIUM_ARCHITECTURE.md` and `ENTITLEMENT_SETUP.sql`.

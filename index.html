@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast 2.3 is a nationwide coastal fishing command center with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CoastCast 3.1 is a nationwide coastal fishing command center with Ocean Network verification with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -15,8 +15,8 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=2.3.0" />
-  <title>CoastCast 2.3</title>
+  <link rel="stylesheet" href="styles.css?v=3.1.0" />
+  <title>CoastCast 3.1</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -25,7 +25,7 @@
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>COAST</span><b>CAST</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">2.3</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">3.1</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -65,7 +65,27 @@
           <div id="dataQualityMessage" class="data-quality-message">Demo values are shown until live feeds confirm.</div>
         </section>
 
-        <section class="panel destination-hub-panel" id="destinationHubPanel">
+        <section class="panel quick-answer-panel" id="quickAnswerPanel">
+          <div class="quick-answer-head">
+            <div><div class="eyebrow">COASTCAST QUICK ANSWER</div><h2 id="quickAnswerHeadline">Here’s the fishing move.</h2></div>
+            <span id="quickDecisionBadge" class="quick-decision-badge">ANALYZING</span>
+          </div>
+          <p id="quickAnswerSummary" class="quick-answer-summary">CoastCast is reducing the forecast into the few things you need before deciding whether to go.</p>
+          <div class="quick-answer-grid">
+            <article><span>WHEN</span><strong id="quickWhen">—</strong><small id="quickWhenNote">Best window</small></article>
+            <article><span>TARGET</span><strong id="quickTarget">—</strong><small id="quickTargetNote">Best species</small></article>
+            <article><span>THROW</span><strong id="quickBait">—</strong><small id="quickBaitNote">Bait / lure</small></article>
+            <article><span>CONDITIONS</span><strong id="quickConditions">—</strong><small id="quickConditionsNote">Wind • surf</small></article>
+          </div>
+          <div id="quickWhy" class="quick-why">Live data will explain why CoastCast made this recommendation.</div>
+          <div class="quick-answer-actions">
+            <button id="quickBuildPlanBtn" class="primary-button" type="button" data-premium="Smart Trip Builder">Build my plan</button>
+            <button id="quickDetailsBtn" class="secondary-button" type="button">Show all tools</button>
+            <button id="quickSimpleBtn" class="ghost-button" type="button">Simple view</button>
+          </div>
+        </section>
+
+        <section class="panel destination-hub-panel advanced-home" id="destinationHubPanel">
           <div class="destination-hub-head">
             <div>
               <div class="eyebrow">DESTINATION INTELLIGENCE</div>
@@ -89,7 +109,7 @@
             <article><span>WATER</span><strong id="destinationWaterTemp">—</strong><small id="destinationWaterNote">Sea temperature</small></article>
           </div>
           <div class="destination-actions">
-            <button id="destinationScanBtn" class="primary-button" type="button">Scan & rank nearby spots</button>
+            <button id="destinationScanBtn" data-premium="Scout & Spot Intelligence" class="primary-button" type="button">Scan & rank nearby spots</button>
             <button id="destinationTackleBtn" class="secondary-button" type="button">Find verified tackle</button>
           </div>
           <div id="destinationSourceLine" class="destination-source-line">Live data quality and place coverage will appear here.</div>
@@ -113,18 +133,46 @@
           </div>
           <div class="daily-brief-actions">
             <button id="dailyBriefForecastBtn" class="secondary-button" type="button">Open full forecast</button>
-            <button id="dailyBriefTripBtn" class="primary-button" type="button">Build this trip</button>
+            <button id="dailyBriefTripBtn" data-premium="Smart Trip Builder" class="primary-button" type="button">Build this trip</button>
+          </div>
+        </section>
+
+
+        <section class="panel ocean-network-panel advanced-home premium-surface" id="oceanNetworkPanel">
+          <div class="section-heading">
+            <div><div class="eyebrow">OCEAN NETWORK • NOAA/NDBC</div><h2>Forecast vs. what the ocean is doing</h2></div>
+            <span id="oceanNetworkBadge" class="tiny-pill">NOT CHECKED</span>
+          </div>
+          <p class="section-note">CoastCast looks for a nearby National Data Buoy Center observation and compares measured wind, waves and water temperature with the forecast model. Offshore observations may differ from the beach itself.</p>
+          <div class="ocean-station-hero">
+            <div class="ocean-station-copy">
+              <span>NEAREST REPORTING STATION</span>
+              <strong id="oceanStationName">No station loaded</strong>
+              <small id="oceanStationMeta">Refresh Live Data to check the NOAA/NDBC network.</small>
+            </div>
+            <div class="ocean-agreement-dial"><strong id="oceanAgreementScore">—</strong><span>%</span><small>MODEL<br/>AGREEMENT</small></div>
+          </div>
+          <div class="ocean-observed-grid">
+            <article><span>OBS. WIND</span><strong id="oceanObsWind">—</strong><small id="oceanWindDelta">Forecast —</small></article>
+            <article><span>OBS. WAVES</span><strong id="oceanObsWave">—</strong><small id="oceanWaveDelta">Forecast —</small></article>
+            <article><span>OBS. WATER</span><strong id="oceanObsWater">—</strong><small id="oceanWaterDelta">Forecast —</small></article>
+            <article><span>OBS. PRESSURE</span><strong id="oceanObsPressure">—</strong><small id="oceanObsAge">Observation —</small></article>
+          </div>
+          <div id="oceanNetworkCall" class="ocean-network-call">Observed ocean data has not been checked yet.</div>
+          <div class="ocean-network-actions">
+            <button id="refreshOceanNetworkBtn" data-premium="Ocean Network" class="primary-button" type="button">Refresh ocean network</button>
+            <button id="openOceanStationBtn" class="secondary-button" type="button">Open official station</button>
           </div>
         </section>
 
         <section class="home-actions" aria-label="Quick actions">
           <button id="homePlanBtn" class="home-action" type="button"><span class="home-action-icon">↗</span><span><strong>Plan</strong><small>Best trip</small></span></button>
           <button id="homeSaveBtn" class="home-action" type="button"><span class="home-action-icon">☆</span><span><strong>Save</strong><small>Favorite</small></span></button>
-          <button id="homeAlertBtn" class="home-action" type="button"><span class="home-action-icon">◉</span><span><strong>Alert</strong><small>Watch score</small></span></button>
+          <button id="homeAlertBtn" data-premium="Smart Alerts" class="home-action" type="button"><span class="home-action-icon">◉</span><span><strong>Alert</strong><small>Watch score</small></span></button>
           <button id="homeMapBtn" class="home-action scout-home-action" type="button"><span class="home-action-icon">◎</span><span><strong>Scout</strong><small>Rank spots</small></span></button>
         </section>
 
-        <section class="panel command-center-panel" id="commandCenterPanel">
+        <section class="panel command-center-panel advanced-home premium-surface" id="commandCenterPanel">
           <div class="command-center-top">
             <div>
               <div class="eyebrow">COASTCAST COMMAND CENTER</div>
@@ -158,8 +206,8 @@
           <div id="commandFactors" class="command-factor-row"></div>
           <div id="commandPlanStatus" class="command-plan-status">No Command Plan saved yet.</div>
           <div class="command-actions">
-            <button id="commandBuildBtn" class="primary-button" type="button">Build my complete plan</button>
-            <button id="commandScoutBtn" class="secondary-button" type="button">Scout a better spot</button>
+            <button id="commandBuildBtn" data-premium="Command Center" class="primary-button" type="button">Build my complete plan</button>
+            <button id="commandScoutBtn" data-premium="Scout & Spot Intelligence" class="secondary-button" type="button">Scout a better spot</button>
           </div>
           <p class="micro-note">Command Center is a planning recommendation, not a safety guarantee. Recheck live conditions, local beach flags, access and regulations before fishing.</p>
         </section>
@@ -202,7 +250,7 @@
         </section>
 
 
-        <section class="panel species-intelligence-panel">
+        <section class="panel species-intelligence-panel advanced-home premium-surface">
           <div class="section-heading">
             <div>
               <div class="eyebrow">SPECIES INTELLIGENCE</div>
@@ -214,7 +262,7 @@
           <div id="speciesRankList" class="species-rank-list"></div>
         </section>
 
-        <section class="panel bait-intelligence-panel">
+        <section class="panel bait-intelligence-panel advanced-home premium-surface">
           <div class="section-heading">
             <div><div class="eyebrow">BAIT & RIG INTELLIGENCE</div><h2>What should I throw?</h2></div>
             <span id="baitConfidence" class="tiny-pill">SMART PLAN</span>
@@ -239,12 +287,12 @@
           </div>
           <div id="personalBaitNote" class="bait-history-note">Log catches with bait/lure details and CoastCast will learn what has worked for you.</div>
           <div class="bait-actions">
-            <button id="baitUseTripBtn" class="primary-button" type="button">Use this plan</button>
+            <button id="baitUseTripBtn" data-premium="Bait & Rig Intelligence" class="primary-button" type="button">Use this plan</button>
             <button id="baitShopShortcutBtn" class="secondary-button" type="button">Find nearby bait</button>
           </div>
         </section>
 
-        <section class="panel pattern-match-panel">
+        <section class="panel pattern-match-panel advanced-home premium-surface">
           <div class="section-heading">
             <div><div class="eyebrow">PERSONAL PATTERN MATCH</div><h2>Your history vs. right now</h2></div>
             <span id="patternConfidence" class="tiny-pill">Learning</span>
@@ -319,7 +367,7 @@
           </div>
         </section>
 
-        <section class="panel intel-panel">
+        <section class="panel intel-panel advanced-home">
           <div class="section-heading">
             <div>
               <div class="eyebrow">FISHING INTELLIGENCE</div>
@@ -435,7 +483,7 @@
         <section class="panel home-alert-panel">
           <div class="section-heading">
             <div><div class="eyebrow">SMART WATCH</div><h2>Fishing alerts</h2></div>
-            <button id="homeCreateAlertBtn" class="link-button" type="button">Create alert</button>
+            <button id="homeCreateAlertBtn" data-premium="Smart Alerts" class="link-button" type="button">Create alert</button>
           </div>
           <div id="homeAlertSummary" class="home-alert-summary"><div class="empty-state compact-empty">No alert rules yet. Watch a favorite coast for a strong fishing window.</div></div>
         </section>
@@ -479,6 +527,26 @@
             <div><span>Rain</span><strong id="summaryRain">10%</strong></div>
             <div><span>Surf</span><strong id="summarySurf">2.0 ft</strong></div>
           </div>
+        </section>
+
+
+        <section class="panel forecast-truth-panel" id="forecastTruthPanel">
+          <div class="section-heading">
+            <div><div class="eyebrow">OCEAN TRUTH LAYER</div><h2>Observed vs forecast</h2></div>
+            <span id="forecastTruthBadge" class="tiny-pill">NO STATION</span>
+          </div>
+          <div id="forecastTruthSummary" class="forecast-truth-summary">CoastCast will compare the current marine model with the nearest available NOAA/NDBC observation.</div>
+          <div class="truth-compare-grid">
+            <article><span>WIND</span><strong id="truthWind">—</strong><small id="truthWindNote">—</small></article>
+            <article><span>WAVES</span><strong id="truthWave">—</strong><small id="truthWaveNote">—</small></article>
+            <article><span>WATER TEMP</span><strong id="truthWater">—</strong><small id="truthWaterNote">—</small></article>
+            <article><span>PRESSURE</span><strong id="truthPressure">—</strong><small id="truthPressureNote">—</small></article>
+          </div>
+          <div class="ocean-history-shell">
+            <div class="ocean-history-head"><strong>Recent station wave trend</strong><small id="oceanHistoryNote">No recent station history loaded.</small></div>
+            <canvas id="oceanObservationCanvas" width="900" height="250" aria-label="Recent observed wave height trend"></canvas>
+          </div>
+          <p class="micro-note">NDBC observations are measured at the station location and may be offshore. CoastCast uses them as a reality check for the forecast—not as an exact measurement at your feet.</p>
         </section>
 
         <section class="panel">
@@ -611,7 +679,7 @@
             <label class="field-group compact-field"><span>Search radius</span><select id="scoutRadius" class="select-control"><option value="10">10 miles</option><option value="25" selected>25 miles</option><option value="50">50 miles</option></select></label>
             <label class="field-group compact-field"><span>When</span><select id="scoutPeriod" class="select-control"><option value="today">Today</option><option value="tomorrow">Tomorrow</option><option value="weekend">This weekend</option></select></label>
           </div>
-          <button id="runScoutBtn" class="primary-button full scout-run-button" type="button"><span>◎</span> Run CoastCast Scout</button>
+          <button id="runScoutBtn" data-premium="Scout & Spot Intelligence" class="primary-button full scout-run-button" type="button"><span>◎</span> Run CoastCast Scout</button>
           <div id="scoutStatus" class="scout-status">Scout is ready. Run it from any U.S. coastal destination.</div>
           <div class="scout-metrics">
             <div><span>CANDIDATES</span><strong id="scoutCandidateCount">0</strong></div>
@@ -621,7 +689,7 @@
           <div id="scoutResults" class="scout-results"><div class="empty-state">Run Scout to rank nearby fishing options with live conditions.</div></div>
           <div id="compareTray" class="compare-tray">
             <div><span class="eyebrow">COMPARE TRAY</span><strong id="compareTrayText">Choose up to 3 Scout results</strong></div>
-            <div class="compare-tray-actions"><button id="clearCompareBtn" class="secondary-button tiny" type="button" disabled>Clear</button><button id="compareSpotsBtn" class="primary-button tiny" type="button" disabled>Compare spots</button></div>
+            <div class="compare-tray-actions"><button id="clearCompareBtn" class="secondary-button tiny" type="button" disabled>Clear</button><button id="compareSpotsBtn" data-premium="Spot Compare" class="primary-button tiny" type="button" disabled>Compare spots</button></div>
           </div>
         </section>
 
@@ -730,7 +798,22 @@
         <section class="panel launch-panel">
           <div class="launch-panel-top"><div><div class="eyebrow">TRIP COMMAND CENTER</div><h2 id="tripHubHeadline">Ready when the coast lines up</h2></div><span id="tripHubBadge" class="tiny-pill">BETA</span></div>
           <div id="tripHubRecommendation" class="trip-hub-recommendation">CoastCast will combine your live forecast, target species, favorites and alert rules here.</div>
-          <div class="trip-hub-actions"><button id="tripHubPlanBtn" class="primary-button" type="button">Build best trip</button><button id="tripHubAlertBtn" class="secondary-button" type="button">Create smart alert</button></div>
+          <div class="trip-hub-actions"><button id="tripHubPlanBtn" class="primary-button" type="button">Build best trip</button><button id="tripHubAlertBtn" data-premium="Smart Alerts" class="secondary-button" type="button">Create smart alert</button></div>
+        </section>
+
+
+        <section class="panel ocean-trip-check-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">OCEAN REALITY CHECK</div><h2>Before you leave</h2></div>
+            <span id="tripOceanBadge" class="tiny-pill">CHECK</span>
+          </div>
+          <div id="tripOceanSummary" class="ocean-trip-summary">Refresh Live Data before departure to compare forecast conditions with the nearest reporting ocean station.</div>
+          <div class="trip-ocean-metrics">
+            <div><span>MODEL AGREEMENT</span><strong id="tripOceanAgreement">—</strong></div>
+            <div><span>STATION DISTANCE</span><strong id="tripOceanDistance">—</strong></div>
+            <div><span>OBS AGE</span><strong id="tripOceanAge">—</strong></div>
+          </div>
+          <button id="tripOceanRefreshBtn" data-premium="Ocean Network" class="secondary-button full" type="button">Refresh observed ocean conditions</button>
         </section>
 
         <section class="panel coast-watch-panel" id="coastWatchPanel">
@@ -741,7 +824,7 @@
           <p class="section-note">Scan your saved fishing spots with fresh weather + marine data and rank them for your current target species. This is an in-app scan, not a 24/7 background monitor.</p>
           <div class="coast-watch-toolbar">
             <div class="coast-watch-target"><span>TARGET</span><strong id="coastWatchSpecies">Red Drum</strong></div>
-            <button id="scanFavoritesBtn" class="primary-button" type="button">Scan saved coasts</button>
+            <button id="scanFavoritesBtn" data-premium="Coast Watch" class="primary-button" type="button">Scan saved coasts</button>
           </div>
           <div id="coastWatchSummary" class="coast-watch-summary">Save at least one fishing spot, then scan to compare live conditions across your favorites.</div>
           <div id="coastWatchResults" class="coast-watch-results"></div>
@@ -750,7 +833,7 @@
         <section class="panel trip-calendar-panel" id="tripCalendarPanel">
           <div class="section-heading">
             <div><div class="eyebrow">7-DAY TRIP CALENDAR</div><h2>Your best coast each day</h2></div>
-            <button id="calendarRefreshBtn" class="link-button" type="button">Refresh</button>
+            <button id="calendarRefreshBtn" data-premium="Coast Watch Calendar" class="link-button" type="button">Refresh</button>
           </div>
           <p class="section-note">After Coast Watch runs, each day shows the strongest saved destination for your selected species. Saved trip plans are marked on the same calendar.</p>
           <div id="tripCalendarGrid" class="trip-calendar-grid"></div>
@@ -768,8 +851,8 @@
           </div>
           <div id="missionChecklist" class="mission-checklist"></div>
           <div class="mission-actions">
-            <button id="missionBuildBtn" class="primary-button" type="button">Auto-build full trip</button>
-            <button id="missionLaunchBtn" class="primary-button launch-button" type="button">Start Go Fishing Mode</button>
+            <button id="missionBuildBtn" data-premium="Mission Control" class="primary-button" type="button">Auto-build full trip</button>
+            <button id="missionLaunchBtn" data-premium="Mission Control" class="primary-button launch-button" type="button">Start Go Fishing Mode</button>
             <button id="missionShareBtn" class="secondary-button" type="button">Share command brief</button>
           </div>
           <p class="micro-note">Starting Go Fishing Mode does not mean conditions are safe. CoastCast blocks its one-tap launch when a high-level Safety Guard condition is loaded.</p>
@@ -852,7 +935,7 @@
             <span id="offlinePackBadge" class="tiny-pill">0 saved</span>
           </div>
           <p class="section-note">Save a compact snapshot of your destination, species, tide, weather, surf, bait plan, Safety Guard and departure plan before cell service gets weak.</p>
-          <button id="saveOfflinePackBtn" class="primary-button full" type="button">Save current trip for offline use</button>
+          <button id="saveOfflinePackBtn" data-premium="Offline Trip Packs" class="primary-button full" type="button">Save current trip for offline use</button>
           <div id="offlinePackList" class="offline-pack-list"><div class="empty-state">No offline trip packs yet.</div></div>
           <p class="micro-note">Offline packs are saved on this device. They are snapshots, not live forecasts; recheck official conditions whenever you have service.</p>
         </section>
@@ -865,7 +948,7 @@
           <div class="tackle-stat-strip">
             <div><span>TRACKED</span><strong id="tackleCount">0</strong></div>
             <div><span>LOW / OUT</span><strong id="tackleLowCount">0</strong></div>
-            <button id="generateShoppingBtn" class="secondary-button small" type="button">Build shopping list</button>
+            <button id="generateShoppingBtn" data-premium="Smart Tackle Planner" class="secondary-button small" type="button">Build shopping list</button>
           </div>
           <div id="tackleInventory" class="tackle-inventory"><div class="empty-state">Add your hooks, rigs, lures, bait, weights and other fishing supplies.</div></div>
           <div class="section-heading shopping-heading">
@@ -885,7 +968,7 @@
         </section>
 
         <section class="panel alert-center-panel">
-          <div class="section-heading"><div><div class="eyebrow">SMART ALERTS</div><h2>Forecast watches</h2></div><button id="createAlertBtn" class="primary-button tiny" type="button">+ Alert</button></div>
+          <div class="section-heading"><div><div class="eyebrow">SMART ALERTS</div><h2>Forecast watches</h2></div><button id="createAlertBtn" data-premium="Smart Alerts" class="primary-button tiny" type="button">+ Alert</button></div>
           <div id="alertCenterStatus" class="alert-center-status">Alerts are checked whenever CoastCast opens or refreshes live data.</div>
           <div id="alertRuleList" class="alert-rule-list"><div class="empty-state">No forecast watches yet.</div></div>
         </section>
@@ -1003,6 +1086,19 @@
             <div><strong id="profileTripCount">0</strong><span>Trips</span></div>
             <div><strong id="profileAlertCount">0</strong><span>Alerts</span></div>
           </div>
+        </section>
+
+        <section class="panel membership-panel" id="membershipPanel">
+          <div class="section-heading"><div><div class="eyebrow">COASTCAST ACCESS</div><h2>Membership</h2></div><span id="membershipBadge" class="membership-badge">BETA FULL ACCESS</span></div>
+          <div class="membership-hero">
+            <div><strong id="membershipTitle">CoastCast Premium Beta</strong><p id="membershipSummary">All premium tools are unlocked while CoastCast is in development.</p></div>
+            <div class="membership-price"><strong>$4.99</strong><span>/month at launch</span></div>
+          </div>
+          <div class="membership-benefits">
+            <span>✓ Premium fishing intelligence</span><span>✓ Family sharing architecture</span><span>✓ Complimentary owner grants</span><span>✓ Lifetime/expiring access supported</span>
+          </div>
+          <div class="membership-access-row"><span>ACCESS SOURCE</span><strong id="membershipSource">Beta full access</strong><small id="membershipExpiry">No expiration during beta</small></div>
+          <button id="manageMembershipBtn" class="secondary-button full" type="button">View plans & access model</button>
         </section>
 
         <section class="panel">
@@ -1328,6 +1424,28 @@
     </form>
   </dialog>
 
+
+  <!-- MEMBERSHIP / ENTITLEMENT PREVIEW -->
+  <dialog id="membershipDialog" class="sheet-dialog">
+    <form class="sheet-card membership-sheet" method="dialog">
+      <div class="sheet-head"><div><div class="eyebrow">COASTCAST ACCESS</div><h2>Premium built the right way</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="membership-current-card"><span>CURRENT ACCESS</span><strong id="membershipDialogTitle">Premium Beta</strong><small id="membershipDialogSource">Development full access</small></div>
+      <div class="plan-stack">
+        <article class="plan-card"><div><span>FREE</span><strong>CoastCast Free</strong></div><p>Quick Answer, basic current conditions, limited forecast, basic map access and a starter logbook.</p></article>
+        <article class="plan-card featured"><div><span>PREMIUM</span><strong>$4.99 / month</strong></div><p>Full forecast intelligence, Ocean Network, Species & Bait Intelligence, Scout, Coast Watch, Smart Alerts, trip command tools, offline packs, analytics and premium community tools.</p></article>
+        <article class="plan-card"><div><span>FAMILY</span><strong>Premium through family</strong></div><p>An invited family member receives the same Premium entitlement without buying another subscription.</p></article>
+        <article class="plan-card"><div><span>COMPLIMENTARY</span><strong>Owner-granted Premium</strong></div><p>You can grant selected testers, partners, creators, friends or family Premium with an expiration date or lifetime access—without requiring payment.</p></article>
+      </div>
+      <div class="beta-entitlement-preview">
+        <strong>Beta entitlement preview</strong>
+        <p>Use this only to test how Free/Premium access will look. Public launch access will be verified by the CoastCast backend and store billing—not trusted from this device.</p>
+        <label class="field-group"><span>Preview access</span><select id="membershipPreviewSetting" class="select-control"><option value="premium">Paid Premium</option><option value="family">Family Premium</option><option value="complimentary">Complimentary Premium</option><option value="lifetime">Lifetime Premium</option><option value="free">Free user</option></select></label>
+        <button id="applyMembershipPreviewBtn" class="secondary-button full" type="button">Apply preview</button>
+      </div>
+      <div class="membership-security-note"><strong>Launch security:</strong> payment, family membership and complimentary grants must resolve to one server-side Premium entitlement. LocalStorage never decides paid access in production.</div>
+    </form>
+  </dialog>
+
   <!-- SETTINGS DIALOG -->
   <dialog id="settingsDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
@@ -1336,6 +1454,8 @@
         <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
       </div>
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
+      <label class="field-group"><span>Home experience</span><select id="experienceModeSetting" class="select-control"><option value="simple">Simple — quick answers first</option><option value="full">Full — show every Home tool</option></select></label>
+      <div class="settings-note"><strong>SIMPLE ON THE SURFACE, POWERFUL UNDERNEATH</strong><br/>Simple mode keeps the key answer up front. Forecast, Scout, Trips, Logbook and advanced intelligence stay available whenever you want them.</div>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
       <label class="field-group"><span>Fishing-area scan radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
       <div class="settings-note"><strong>BAIT & TACKLE ACCURACY</strong><br/>CoastCast now merges multiple shop sources and keeps public fishing-access pins separate from tackle-store pins.</div>
@@ -1344,7 +1464,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. CoastCast is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CoastCast backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">CoastCast v2.3 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">CoastCast v3.1 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -1371,6 +1491,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=2.3.0"></script>
+  <script src="app.js?v=3.1.0"></script>
 </body>
 </html>
