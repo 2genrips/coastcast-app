@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast 2.1 is a nationwide coastal fishing command center with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CoastCast 2.2 is a nationwide coastal fishing command center with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -15,17 +15,17 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=2.1.0" />
-  <title>CoastCast 2.1</title>
+  <link rel="stylesheet" href="styles.css?v=2.2.0" />
+  <title>CoastCast 2.2</title>
 </head>
 <body>
   <div id="app" class="app-shell">
     <header class="topbar">
-      <div class="brand-lockup brand-lockup-v21" aria-label="CoastCast Fishing Forecast">
-        <img class="brand-emblem-img" src="branding/coastcast-emblem.png" alt="" aria-hidden="true" />
+      <div class="brand-lockup brand-lockup-v22" aria-label="CoastCast Fishing Forecast">
+        <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>COAST</span><b>CAST</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">2.1</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">2.2</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -93,6 +93,28 @@
             <button id="destinationTackleBtn" class="secondary-button" type="button">Find verified tackle</button>
           </div>
           <div id="destinationSourceLine" class="destination-source-line">Live data quality and place coverage will appear here.</div>
+        </section>
+
+        <section class="panel daily-brief-panel" id="dailyBriefPanel">
+          <div class="daily-brief-head">
+            <div>
+              <div class="eyebrow">COASTCAST DAILY BRIEF</div>
+              <h2 id="dailyBriefHeadline">Building today's fishing story…</h2>
+            </div>
+            <span id="dailyBriefBadge" class="daily-brief-badge">ANALYZING</span>
+          </div>
+          <p id="dailyBriefSummary" class="daily-brief-summary">Live tide, wind, surf, weather and species conditions will be condensed into one quick read.</p>
+          <div id="dailyBriefTimeline" class="daily-brief-timeline" aria-label="Upcoming fishing hours"></div>
+          <div class="daily-brief-metrics">
+            <article><span>NEXT TIDE</span><strong id="dailyBriefTide">—</strong><small id="dailyBriefTideNote">—</small></article>
+            <article><span>WATER</span><strong id="dailyBriefWater">—</strong><small>Sea temperature</small></article>
+            <article><span>SUNRISE</span><strong id="dailyBriefSunrise">—</strong><small id="dailyBriefSunset">Sunset —</small></article>
+            <article><span>CONFIDENCE</span><strong id="dailyBriefConfidence">—</strong><small>Loaded data quality</small></article>
+          </div>
+          <div class="daily-brief-actions">
+            <button id="dailyBriefForecastBtn" class="secondary-button" type="button">Open full forecast</button>
+            <button id="dailyBriefTripBtn" class="primary-button" type="button">Build this trip</button>
+          </div>
         </section>
 
         <section class="home-actions" aria-label="Quick actions">
@@ -1298,7 +1320,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. CoastCast is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CoastCast backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">CoastCast v2.0.2 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">CoastCast v2.2 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -1325,6 +1347,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=2.1.0"></script>
+  <script src="app.js?v=2.2.0"></script>
 </body>
 </html>

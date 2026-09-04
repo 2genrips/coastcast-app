@@ -1,7 +1,7 @@
 {
-  "name": "CoastCast 2.1 Fishing Command Center",
+  "name": "CoastCast 2.2 Fishing Command Center",
   "short_name": "CoastCast",
-  "description": "Nationwide coastal fishing command center with live weather, marine conditions, NOAA tides, Destination Intelligence, species intelligence, Scout, verified tackle discovery, trips and private catch analytics.",
+  "description": "Nationwide coastal fishing command center with hardened CoastCast branding, Daily Brief, live weather, marine conditions, NOAA tides, species intelligence, verified tackle discovery, trips and catch analytics.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",

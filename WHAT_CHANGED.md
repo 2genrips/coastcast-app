@@ -1,34 +1,15 @@
-# CoastCast 2.1 — Premium Rebrand + Destination Intelligence
+# CoastCast 2.2 — Hardened Rebrand + Daily Brief
 
-## Rebrand integration
-- New CoastCast compass/fish/wave emblem is now the primary in-app mark.
-- Rebuilt Android/PWA icons from the new emblem.
-- Added the new semi-transparent CoastCast watermark behind the app.
-- Refined the navy/aqua visual system, header, panels, navigation, buttons and score presentation.
-- Added new social/open-graph artwork.
-- Added a v2.1 brand guide and reusable brand assets.
+## Rebrand hardening
+- Official CoastCast emblem is now shipped at the app root so the header cannot break if GitHub drops the branding folder.
+- New app icons are generated from the approved emblem.
+- Root-level watermark asset now powers the faint background brand layer throughout the app.
+- Updated social preview and PWA icon assets.
 
-## New Destination Intelligence
-Home now includes a Destination Intelligence panel that combines:
-- coastal region
-- best current target species
-- species score
-- public fishing/access place count
-- public-access source status
-- verified/live tackle-shop count
-- water temperature
-- live-data confidence
+## New Daily Brief
+- One-screen summary of the next fishing hours.
+- Species-adjusted hourly scores.
+- Tide stage/next turn, water temperature, sunrise/sunset, and data confidence.
+- Direct actions into full Forecast or a complete Command Plan.
 
-The panel has direct actions to:
-- scan and rank nearby fishing spots
-- search verified tackle shops around the fishing destination
-
-## Data integrity
-- v2.0.2 tackle verification remains intact.
-- Unrelated businesses are still rejected from Bait/Tackle pins.
-- Dedicated tackle radius and optional Geoapify integration remain available.
-- Existing v2.0.x data migrates into v2.1.
-
-## Storage
-New local state key: `coastcast-v21-state`.
-Previous CoastCast state remains readable for migration.
+All v2.1 data migrates forward.

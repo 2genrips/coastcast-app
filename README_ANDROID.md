@@ -1,4 +1,4 @@
-# CoastCast 2.1 — Android / GitHub Pages Update
+# CoastCast 2.2 — Android / GitHub Pages Update
 
 This is the Premium Rebrand + Destination Intelligence build.
 
@@ -6,7 +6,7 @@ This is the Premium Rebrand + Destination Intelligence build.
 1. Download the ZIP and extract it in My Files.
 2. Open your existing CoastCast GitHub repository.
 3. Choose **Add file → Upload files**.
-4. Upload everything inside the `coastcast_v2.1` folder.
+4. Upload everything inside the `coastcast_v2.2` folder.
 5. Replace matching files.
 6. Commit to `main`.
 7. Wait for GitHub Pages to redeploy.
@@ -23,3 +23,7 @@ This is the Premium Rebrand + Destination Intelligence build.
 
 ## Brand assets
 The `branding/` folder contains the new primary logo, emblem, watermark and brand guide.
+
+
+## 2.2 note
+The header emblem and background watermark now live at the repository root (`brand-emblem.png`, `brand-watermark.png`) for more reliable GitHub Pages deployment.

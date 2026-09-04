@@ -1,6 +1,6 @@
-# CoastCast 2.1 Data Sources
+# CoastCast 2.2 Data Sources
 
-# CoastCast v2.0.2 Data Sources
+# CoastCast v2.2 Data Sources
 
 ## Forecast and marine
 - Open-Meteo weather forecast
@@ -15,7 +15,7 @@
 - CoastCast verified regional access catalogs where available
 
 ## Bait & tackle intelligence
-CoastCast v2.0.2 uses a multi-source merge:
+CoastCast v2.2 uses a multi-source merge:
 1. **Geoapify Places** (optional key) — dedicated `commercial.outdoor_and_sport.fishing` category.
 2. **OpenStreetMap / Overpass** — fishing-store tags plus fishing-specific names/descriptions/products.
 3. **Nominatim / Photon** — strict text discovery, never accepted solely because a geocoder returned a nearby business.
