@@ -460,16 +460,9 @@
         normalized.push({name,lat:slat,lon:slon,distance:this.haversine(lat,lon,slat,slon),rating:null,tags,source,demo:false});
       };
       try{
-        const endpoints=['https://overpass-api.de/api/interpreter?data=','https://overpass.kumi.systems/api/interpreter?data=','https://overpass.nchc.org.tw/api/interpreter?data='];
+        const endpoints=['https://overpass.private.coffee/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass-api.de/api/interpreter'];
         for(const endpoint of endpoints){
-          try{const data=await this.fetchJSON(endpoint+encodeURIComponent(query),18000);(data?.elements||[]).forEach(el=>{const t=el.tags||{};const slat=el.lat??el.center?.lat,slon=el.lon??el.center?.lon;add(t.name||'',slat,slon,[t.shop==='fishing'?'Fishing shop':'Bait / tackle',t.opening_hours||'Hours not listed'].filter(Boolean),'OpenStreetMap');});if(normalized.length)break;}catch(_){ }
-        }
-        if(!normalized.length){
-          const latDelta=this.state.radius/69,lonDelta=this.state.radius/(69*Math.max(.2,Math.cos(lat*Math.PI/180)));
-          const viewbox=[lon-lonDelta,lat+latDelta,lon+lonDelta,lat-latDelta].join(',');
-          for(const q of ['bait tackle','fishing tackle','fishing shop']){
-            try{const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&countrycodes=us&bounded=1&viewbox='+encodeURIComponent(viewbox)+'&q='+encodeURIComponent(q);const rows=await this.fetchJSON(url,12000);(rows||[]).forEach(r=>add((r.display_name||'').split(',')[0],r.lat,r.lon,['Map search','Hours not listed'],'OpenStreetMap search'));if(normalized.length)break;}catch(_){ }
-          }
+          try{const data=await this.fetchOverpass(endpoint,query,18000);(data?.elements||[]).forEach(el=>{const t=el.tags||{};const slat=el.lat??el.center?.lat,slon=el.lon??el.center?.lon;add(t.name||'',slat,slon,[t.shop==='fishing'?'Fishing shop':'Bait / tackle',t.opening_hours||'Hours not listed'].filter(Boolean),'OpenStreetMap');});if(normalized.length)break;}catch(_){ }
         }
         normalized.sort((a,b)=>a.distance-b.distance);
         const shops=normalized.slice(0,10);if(shops.length)this.writePlaceCache(cacheKey,shops);
@@ -923,7 +916,7 @@
       const radiusMeters=Math.min(32000,Math.max(5000,Math.round(this.state.radius*1609.344)));
       const query=`[out:json][timeout:22];(nwr(around:${radiusMeters},${lat},${lon})["leisure"="fishing"];nwr(around:${radiusMeters},${lat},${lon})["sport"="fishing"];nwr(around:${radiusMeters},${lat},${lon})["man_made"="pier"]["name"];nwr(around:${radiusMeters},${lat},${lon})["leisure"="marina"]["name"];nwr(around:${radiusMeters},${lat},${lon})["leisure"="slipway"]["name"];nwr(around:${radiusMeters},${lat},${lon})["natural"="beach"]["name"];nwr(around:${radiusMeters},${lat},${lon})["waterway"="dock"]["name"];);out center tags;`;
       try{
-        let data=null;for(const endpoint of ['https://overpass-api.de/api/interpreter?data=','https://overpass.kumi.systems/api/interpreter?data=','https://overpass.nchc.org.tw/api/interpreter?data=']){try{data=await this.fetchJSON(endpoint+encodeURIComponent(query),20000);if(data)break;}catch(_){ }}
+        let data=null;for(const endpoint of ['https://overpass.private.coffee/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass-api.de/api/interpreter']){try{data=await this.fetchOverpass(endpoint,query,20000);if(data)break;}catch(_){ }}
         if(!data)throw new Error('No map-place response');
         const seen=new Set(),items=[];
         (data.elements||[]).forEach(el=>{const tags=el.tags||{};const plat=Number(el.lat??el.center?.lat),plon=Number(el.lon??el.center?.lon);if(!Number.isFinite(plat)||!Number.isFinite(plon))return;const type=this.classifyMapPlace(tags);const name=(tags.name||'').trim();if(!name&&type!=='Fishing access')return;const display=name||'Fishing access';const key=display.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,28)+':'+plat.toFixed(3)+':'+plon.toFixed(3);if(seen.has(key))return;seen.add(key);items.push({id:`osm-${el.type||'x'}-${el.id}`,name:display,type,lat:plat,lon:plon,distance:this.haversine(lat,lon,plat,plon),tags:{access:tags.access||'',surface:tags.surface||'',operator:tags.operator||''}});});
@@ -1044,6 +1037,15 @@
     mapsRouteUrl(fromLat,fromLon,toLat,toLon){return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(`${fromLat},${fromLon}`)}&destination=${encodeURIComponent(`${toLat},${toLon}`)}&travelmode=driving`;},
     escape(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));},
 
+    async fetchOverpass(endpoint,query,timeout=18000){
+      const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),timeout);
+      try{
+        const body=new URLSearchParams({data:query});
+        const r=await fetch(endpoint,{method:'POST',signal:ctrl.signal,cache:'no-store',headers:{'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body});
+        if(!r.ok)throw new Error(`Overpass HTTP ${r.status}`);
+        return await r.json();
+      }finally{clearTimeout(timer);}
+    },
     async fetchJSON(url,timeout=12000){const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),timeout);try{const r=await fetch(url,{signal:ctrl.signal,headers:{'Accept':'application/json'}});if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json();}finally{clearTimeout(timer);}},
 
     showToast(msg){const t=this.$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(this._toastTimer);this._toastTimer=setTimeout(()=>t.classList.remove('show'),3000);},
