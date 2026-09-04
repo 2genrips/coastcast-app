@@ -1,9 +1,16 @@
-# CoastCast 3.1.1 Android update
+# CoastCast 4.0 — Android update
 
-Upload every file in this folder to the root of the existing CoastCast GitHub repository and replace matching files. Commit to `main`, wait for GitHub Pages, then fully close and reopen CoastCast.
+1. Extract this ZIP.
+2. Upload **everything inside `coastcast_v4.0`** to the root of the same GitHub repository.
+3. Replace matching files and commit to `main`.
+4. Wait for GitHub Pages to redeploy, fully close CoastCast, then reopen it.
 
-## Test
-1. Turn on Live Data.
-2. Open **Ocean Network**.
-3. Tap **Refresh ocean network**.
-4. If NDBC cannot be fetched directly by Android Chrome, CoastCast should now try NOAA CO-OPS automatically instead of stopping at `Failed to fetch`.
+Your v3.1 saved data migrates into the new `coastcast-v40-state` key.
+
+### First tests
+- Home → Show all tools → Seasonal Intelligence.
+- Forecast → 12-Month Species Calendar.
+- Trips → 90-Day Season Planner.
+- Profile → Family Crew and Premium Value.
+
+The Family Crew screen is a local preview until CoastCast has a production backend and authenticated entitlement service.

@@ -1,4 +1,4 @@
--- CoastCast 3.1 entitlement foundation (Supabase/Postgres)
+-- CoastCast 4.0 entitlement foundation (Supabase/Postgres)
 -- Run only when you are ready to add account entitlements.
 -- IMPORTANT: no client-side INSERT/UPDATE policies are created for entitlements.
 -- Paid/family/complimentary grants should be written by a trusted backend/service role.

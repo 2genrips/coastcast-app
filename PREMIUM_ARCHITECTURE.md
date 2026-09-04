@@ -39,4 +39,16 @@ Private admin dashboard should support:
 - audit trail / granted_by
 
 ## Beta build
-CoastCast 3.1 includes a local entitlement **preview** solely to test the UI. Remove/disable this simulator in a release build.
+CoastCast 4.0 includes a local entitlement **preview** solely to test the UI. Remove/disable this simulator in a release build.
+
+
+## CoastCast 4.0 family UX
+The app now includes a local Family Crew preview. This does **not** grant real Premium. Production flow should be:
+1. Paid owner has an active server-verified Premium entitlement.
+2. Owner sends an invite from Family Crew.
+3. Invitee signs in / creates a CoastCast account.
+4. Backend writes `source=family` entitlement tied to the owner.
+5. If owner's eligible entitlement expires/revokes, family entitlements are recalculated by the backend.
+6. Complimentary/lifetime grants remain independent of family membership and are written only by trusted admin/backend tooling.
+
+Private catches and exact private waypoints must not be shared automatically with family.

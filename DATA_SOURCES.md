@@ -1,4 +1,4 @@
-# CoastCast 3.1 Data Sources
+# CoastCast 4.0 Data Sources
 
 ## Forecast & marine
 - Open-Meteo weather forecast
@@ -32,6 +32,9 @@ CoastCast merges multiple sources:
 Results must pass fishing-business validation or be explicitly verified. CoastCast prefers no bait pin over knowingly labeling an unrelated business as tackle.
 
 ## Premium / entitlement architecture
-CoastCast 3.1 includes the membership UI/state preview and server-side database schema, but Google Play Billing and secure entitlement validation are **not yet connected**. The beta access selector exists only for UI testing and must not be treated as payment security.
+CoastCast 4.0 includes the membership UI/state preview and server-side database schema, but Google Play Billing and secure entitlement validation are **not yet connected**. The beta access selector exists only for UI testing and must not be treated as payment security.
 
 See `PREMIUM_ARCHITECTURE.md` and `ENTITLEMENT_SETUP.sql`.
+
+## Seasonal Intelligence
+CoastCast 4.0 seasonal scores are **broad regional planning heuristics** layered on top of the live species-condition score. They are not regulatory seasons, closures, bag limits, or guarantees of fish presence. The app should continue linking anglers to official state regulations and encourage recent local reports for final trip decisions.

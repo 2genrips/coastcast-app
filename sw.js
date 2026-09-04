@@ -1,5 +1,5 @@
-const CACHE='coastcast-v3.1.1';
-const CORE=['./','./index.html','./styles.css?v=3.1.1','./app.js?v=3.1.1','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-192-v31.png','./icon-512-v31.png','./apple-touch-icon.png','./favicon-32.png','./og-image.png','./brand-emblem.png','./brand-watermark.png','./brand-primary.png'];
+const CACHE='coastcast-v4.0.0';
+const CORE=['./','./index.html','./styles.css?v=4.0.0','./app.js?v=4.0.0','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-192-v40.png','./icon-512-v40.png','./apple-touch-icon.png','./favicon-32.png','./og-image.png','./brand-emblem.png','./brand-watermark.png','./brand-primary.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
 });
@@ -20,7 +20,7 @@ self.addEventListener('fetch',event=>{
 self.addEventListener('push',event=>{
   let payload={title:'CoastCast fishing alert',body:'A saved fishing watch has an update.',url:'./index.html#trips'};
   try{const incoming=event.data?.json();if(incoming)payload={...payload,...incoming};}catch(_){try{payload.body=event.data?.text()||payload.body;}catch(__){}}
-  event.waitUntil(self.registration.showNotification(payload.title,{body:payload.body,icon:'./icon-192.png',badge:'./favicon-32.png',data:{url:payload.url||'./index.html#trips'},tag:payload.tag||'coastcast-alert'}));
+  event.waitUntil(self.registration.showNotification(payload.title,{body:payload.body,icon:'./icon-192-v40.png',badge:'./favicon-32.png',data:{url:payload.url||'./index.html#trips'},tag:payload.tag||'coastcast-alert'}));
 });
 self.addEventListener('notificationclick',event=>{
   event.notification.close();const target=event.notification?.data?.url||'./index.html#trips';

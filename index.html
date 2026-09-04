@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast 3.1.1 is a nationwide coastal fishing command center with Ocean Network verification with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CoastCast 4.0 is a nationwide coastal fishing command center with Ocean Network verification with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -15,8 +15,8 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=3.1.1" />
-  <title>CoastCast 3.1.1</title>
+  <link rel="stylesheet" href="styles.css?v=4.0.0" />
+  <title>CoastCast 4.0</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -25,7 +25,7 @@
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>COAST</span><b>CAST</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">3.1.1</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">4.0</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -137,6 +137,18 @@
           </div>
         </section>
 
+
+
+        <section class="panel season-pulse-panel advanced-home premium-surface" id="seasonPulsePanel">
+          <div class="section-heading">
+            <div><div class="eyebrow">SEASONAL INTELLIGENCE</div><h2>What is running right now?</h2></div>
+            <span id="seasonPulseMonth" class="tiny-pill">THIS MONTH</span>
+          </div>
+          <p class="section-note">CoastCast blends broad regional seasonality with the live conditions already loaded for this coast. It is a planning signal—not a regulation season or guarantee that fish are present.</p>
+          <div id="seasonPulseList" class="season-pulse-list"></div>
+          <div id="seasonPulseCall" class="season-pulse-call">CoastCast is building the seasonal picture.</div>
+          <button id="seasonCalendarShortcutBtn" data-premium="Seasonal Intelligence" class="secondary-button full" type="button">Open 12-month species calendar</button>
+        </section>
 
         <section class="panel ocean-network-panel advanced-home premium-surface" id="oceanNetworkPanel">
           <div class="section-heading">
@@ -567,6 +579,19 @@
           <div id="matrixBestCall" class="matrix-best-call">CoastCast is ranking the week.</div>
         </section>
 
+
+        <section class="panel season-calendar-panel premium-surface" id="seasonCalendarPanel">
+          <div class="section-heading">
+            <div><div class="eyebrow">12-MONTH SPECIES CALENDAR</div><h2>Plan farther than the forecast</h2></div>
+            <span id="seasonCalendarRegion" class="tiny-pill">REGIONAL</span>
+          </div>
+          <p class="section-note">Seasonal scores are broad CoastCast planning heuristics for the region. They do not represent legal seasons, bag limits, closures or a promise of fish. Always verify local regulations and recent reports.</p>
+          <div class="season-calendar-scroll">
+            <div id="seasonCalendarGrid" class="season-calendar-grid"></div>
+          </div>
+          <div id="seasonCalendarCall" class="season-calendar-call">Tap a species row to make it your active target.</div>
+        </section>
+
         <section class="panel bite-trend-panel">
           <div class="section-heading">
             <div><div class="eyebrow">BITE TREND</div><h2>Best hours at a glance</h2></div>
@@ -840,6 +865,17 @@
           <div id="tripCalendarNote" class="trip-calendar-note">Run Coast Watch to build a multi-location calendar.</div>
         </section>
 
+
+        <section class="panel season-trip-panel premium-surface" id="seasonTripPanel">
+          <div class="section-heading">
+            <div><div class="eyebrow">90-DAY SEASON PLANNER</div><h2>What should I plan for next?</h2></div>
+            <span id="seasonTripBadge" class="tiny-pill">3 MONTHS</span>
+          </div>
+          <p class="section-note">A long-range species planner built from regional seasonal potential. Weather and tides are only treated as live inside the normal forecast horizon.</p>
+          <div id="seasonTripMonths" class="season-trip-months"></div>
+          <button id="seasonTripUseBtn" data-premium="Season Planner" class="primary-button full" type="button">Use strongest upcoming target</button>
+        </section>
+
         <section class="panel mission-control-panel">
           <div class="section-heading">
             <div><div class="eyebrow">TRIP MISSION CONTROL</div><h2>One-tap launch readiness</h2></div>
@@ -1099,6 +1135,28 @@
           </div>
           <div class="membership-access-row"><span>ACCESS SOURCE</span><strong id="membershipSource">Beta full access</strong><small id="membershipExpiry">No expiration during beta</small></div>
           <button id="manageMembershipBtn" class="secondary-button full" type="button">View plans & access model</button>
+        </section>
+
+
+        <section class="panel family-crew-panel premium-surface" id="familyCrewPanel">
+          <div class="section-heading">
+            <div><div class="eyebrow">FAMILY PREMIUM</div><h2>Family Crew</h2></div>
+            <span id="familyCrewBadge" class="tiny-pill">PREVIEW</span>
+          </div>
+          <p class="section-note">One Premium household can share Premium access without making each family member buy another subscription. This build previews the family experience locally; public launch invitations will be verified by the CoastCast backend.</p>
+          <div id="familyCrewSummary" class="family-crew-summary">No family members added to the preview yet.</div>
+          <div id="familyCrewList" class="family-crew-list"></div>
+          <div class="family-share-grid">
+            <label class="switch-row"><span><strong>Share trip plans</strong><small>Let family see planned fishing trips</small></span><input id="familyShareTrips" type="checkbox" checked /></label>
+            <label class="switch-row"><span><strong>Share favorite waters</strong><small>Share named favorites, not private exact coordinates</small></span><input id="familyShareFavorites" type="checkbox" /></label>
+          </div>
+          <button id="manageFamilyCrewBtn" data-premium="Family Premium" class="secondary-button full" type="button">Manage Family Crew preview</button>
+        </section>
+
+        <section class="panel premium-value-panel" id="premiumValuePanel">
+          <div class="section-heading"><div><div class="eyebrow">PREMIUM VALUE</div><h2>Everything that earns the $4.99</h2></div><span class="membership-badge">$4.99/MO</span></div>
+          <div id="premiumValueGrid" class="premium-value-grid"></div>
+          <p class="micro-note">Free mode stays useful. Premium is for anglers who want the full decision engine, advanced planning, personalization, alerts, offline tools and deeper intelligence.</p>
         </section>
 
         <section class="panel">
@@ -1425,6 +1483,20 @@
   </dialog>
 
 
+
+  <!-- FAMILY CREW PREVIEW -->
+  <dialog id="familyCrewDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head"><div><div class="eyebrow">FAMILY PREMIUM</div><h2>Manage Family Crew</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="cloud-warning"><strong>Preview only in this build.</strong><span>Adding someone here does not send an invitation or grant real Premium yet. Launch access will require a signed-in account and server-side entitlement.</span></div>
+      <label class="field-group"><span>Family member name</span><input id="familyMemberName" class="text-control" maxlength="40" placeholder="Example: Dad" /></label>
+      <label class="field-group"><span>Email <small>(optional preview label)</small></span><input id="familyMemberEmail" class="text-control" type="email" maxlength="100" placeholder="family@example.com" /></label>
+      <button id="addFamilyMemberBtn" class="primary-button full" type="button">Add family member preview</button>
+      <div id="familyDialogList" class="family-dialog-list"></div>
+      <div class="membership-security-note"><strong>Privacy default:</strong> exact private waypoints and private catches are never automatically shared with Family Crew.</div>
+    </form>
+  </dialog>
+
   <!-- MEMBERSHIP / ENTITLEMENT PREVIEW -->
   <dialog id="membershipDialog" class="sheet-dialog">
     <form class="sheet-card membership-sheet" method="dialog">
@@ -1464,7 +1536,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. CoastCast is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CoastCast backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">CoastCast v3.1.1 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">CoastCast v4.0 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -1491,6 +1563,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=3.1.1"></script>
+  <script src="app.js?v=4.0.0"></script>
 </body>
 </html>
