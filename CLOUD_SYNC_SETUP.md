@@ -1,32 +1,24 @@
-# CoastCast v2.0 — Cloud Sync + Community Beta
+# CoastCast v5.0 — Account + Cloud Sync
 
-Cloud Sync is optional. CoastCast still works locally without Supabase.
+CoastCast still works locally without Supabase. v5.0 upgrades Supabase from optional backup/community storage into the foundation for real signed-in accounts and server-verified access.
 
-## Existing users upgrading from v1.7
-Run the new `SUPABASE_SETUP.sql` once in your existing Supabase project. It keeps the private `coastcast_user_data` table and adds:
-
-- `community_catches` — public catch posts created only when an angler taps **Publish to Community**
-- `community_reactions` — Community Beta likes
-
-## Setup from Android
+## Android setup order
 1. Open your Supabase project in Chrome.
-2. Open **SQL Editor**.
-3. Paste the complete contents of `SUPABASE_SETUP.sql` and run it.
-4. In CoastCast open **Profile → Cloud Sync**.
-5. Enter your project URL and anon/publishable key, then sign in.
-6. Open **Community → Refresh**.
+2. Run `SUPABASE_SETUP.sql` in SQL Editor.
+3. Run `COASTCAST_LAUNCH_BACKEND.sql` in SQL Editor.
+4. In CoastCast open **Profile → CoastCast Account** and sign up/sign in.
+5. For easier public deployment, put your public project URL and publishable key in `coastcast-config.js` so normal users never have to enter them.
+6. Follow `ADMIN_SETUP.md` once to mark your own account as CoastCast owner.
+7. Tap **Refresh server access**.
 
-## Privacy model
-- Private catches remain private in your CoastCast logbook.
-- Publishing to Community is a separate explicit action.
-- **General water area** is the default share precision.
-- General posts round map coordinates before upload and display only the generalized location label.
-- **Hidden** uploads no public latitude/longitude.
-- **Exact spot** is accepted only when the saved catch itself is marked Public.
-- A CoastCast catch-card image never prints raw coordinates.
+## What syncs
+Private app data can still sync through `coastcast_user_data`: catches, favorites, trips, preferences, alert rules and other CoastCast state.
 
-## Photos
-Community Beta can store the already-compressed catch photo directly in a post for testing. This is suitable for a beta, but before a large public launch CoastCast should move community photos to Supabase Storage/CDN instead of database text rows.
+## What does NOT sync through the normal backup record
+Premium entitlements are deliberately excluded from user-editable CoastCast backup data. Paid, family, complimentary, lifetime and promo access come from server tables/functions.
 
-## CoastCast 4.0 membership note
-Premium entitlement is intentionally **not** stored in normal CoastCast backup/cloud payloads. At launch, paid, family, complimentary and lifetime access must come from the authenticated server-side entitlement record. See `PREMIUM_ARCHITECTURE.md` and `ENTITLEMENT_SETUP.sql`.
+## Public browser configuration
+The Supabase **publishable** key can be used in the browser with Row Level Security enabled. Never publish a secret/service-role key.
+
+## Community privacy
+Community publishing remains opt-in. Private catches and exact private locations are not automatically shared.

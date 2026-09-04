@@ -1,18 +1,13 @@
-# CoastCast Family Premium — Production Plan
+# CoastCast Family Premium — v5.0
 
-CoastCast 4.0 contains the **Family Crew UI preview**. It is not a real invitation system yet.
+Family Premium is now backed by real database functions when `COASTCAST_LAUNCH_BACKEND.sql` is installed.
 
-## Production rules
-- A normal subscriber pays **$4.99/month** for CoastCast Premium.
-- Invited family members receive a **Family Premium entitlement** and do not purchase another subscription.
-- Family access is resolved on the server. The public app never decides Premium by changing local storage.
-- If the owner loses eligible Premium access, the backend should recalculate linked Family Premium entitlements.
-- Complimentary and lifetime grants are independent entitlement sources and can continue even if a family relationship changes.
+- A direct Premium owner can invite a family email.
+- If that email already has a CoastCast account, the membership can activate immediately.
+- If not, the invitation remains pending. After the invitee creates/signs into CoastCast, **Accept pending family invite** links the account.
+- Effective access is resolved server-side by `coastcast_my_access()`.
+- Family members do not need their own paid subscription.
+- A Family Premium member cannot create a nested family group.
+- Private catches and exact private waypoints remain excluded from automatic family sharing.
 
-## Privacy defaults
-- Shared trip plans: optional.
-- Shared named favorite waters: optional.
-- Exact private waypoints: **off by default and never automatically shared**.
-- Private catches: **never automatically shared**.
-
-Use `ENTITLEMENT_SETUP.sql` as the entitlement foundation. Trusted backend/service-role code should own all writes to entitlement records.
+Before public launch, choose and enforce the maximum number of family seats and add email delivery for invitations. v5.0 deliberately does not invent an invitation email service.

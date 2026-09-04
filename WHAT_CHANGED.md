@@ -1,25 +1,38 @@
-# CoastCast 4.0 — Huge Wave
+# CoastCast 5.0 — Launch Infrastructure
 
-## Seasonal Intelligence
-- New **What is running right now?** panel blending broad regional seasonality with live CoastCast species conditions.
-- New **12-Month Species Calendar** for long-range target planning across Atlantic, Gulf, Pacific, Alaska and Hawaiʻi regions.
-- New **90-Day Season Planner** in Trips.
-- Seasonal scores are planning heuristics only; they are not legal seasons, bag limits, closures, or guarantees of fish.
+## Real account/access foundation
+- CoastCast Account card on Profile.
+- Server access refresh and status.
+- Effective Premium check from `coastcast_my_access()` when backend is installed.
+- Free / Paid / Family / Complimentary / Lifetime / Promo access resolve through one entitlement model.
+- Local Premium preview remains only as a development fallback when server access is not active.
 
-## Family Premium foundation
-- New Family Crew preview in Profile.
-- Paid Premium remains targeted at **$4.99/month**.
-- Family members are designed to receive Premium without separate subscriptions.
-- Complimentary and lifetime Premium remain part of the entitlement architecture.
-- Exact private waypoints/catches are never automatically shared with Family Crew.
-- The current Family Crew editor is a local UI preview; public launch membership and invitations require server-side account verification.
+## Family Premium
+- Real server Family Crew invite/link RPCs.
+- Family members can accept a pending invite after sign-in.
+- Effective Family Premium is derived server-side from the owner's active direct Premium entitlement.
+- Private catches and exact private waypoints remain excluded from automatic sharing.
 
-## Premium value / simplicity
-- Premium Value panel makes the advanced toolset easier to understand.
-- Simple Home remains the default; seasonal and deeper tools live under Full Home/Forecast/Trips.
-- Existing v3.1 data migrates forward.
+## Owner Console
+- Hidden unless the signed-in account is a CoastCast admin.
+- Grant Complimentary, Lifetime, Promo or Beta Premium to an existing CoastCast account.
+- Optional expiration for grants.
+- Revoke direct Premium.
+- View recent account access rows.
+- Entitlement audit trail in the database.
 
-## Android / PWA
-- Storage key bumped to `coastcast-v40-state`.
-- Versioned v4.0 icon filenames added to help Android notice icon changes.
-- Service-worker cache bumped for a clean update.
+## Google Play foundation
+- Backend-only Play purchase ledger.
+- Included `verify-play-subscription` Supabase Edge Function scaffold.
+- Verifies subscription tokens against Google Play Developer API before writing `source=play` Premium.
+- No Google secrets are placed in the PWA.
+
+## Background-alert foundation
+- Push subscription database table.
+- Existing service worker remains push-ready.
+- Production still needs VAPID secrets and scheduled alert evaluation/deployment.
+
+## Android/PWA
+- New v5 cache namespace.
+- Versioned v5 icon assets.
+- Local state migrates from v4.0.

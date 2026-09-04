@@ -34,7 +34,8 @@
       watchCenter: {running:false,results:[],lastRun:null,species:'Red Drum'},
       oceanNetwork: {status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null},
       experience: {mode:'simple'},
-      membership: {tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true},
+      membership: {tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true,server:null},
+      backend: {installed:false,lastAccessCheck:null,isAdmin:false,familyMembers:[]},
       seasonal: {selectedSpecies:null,lastViewedMonth:null},
       familyCrew: {members:[],shareTrips:true,shareFavorites:false},
       liveUpdatedAt: null,
@@ -245,6 +246,7 @@
 
     init(){
       this.restore();
+      this.applyPublicConfig();
       this.populateSpeciesControls();
       this.populateProfileControls();
       this.populateScoutControls();
@@ -259,15 +261,22 @@
       this.registerServiceWorker();
       this._sessionTimer=setInterval(()=>{if(this.state.goMode?.active&&this.state.view==='trips')this.renderGoMode();},30000);
       if(this.state.live) this.loadLiveData({quiet:true});
+      if(this.cloudSignedIn()) setTimeout(()=>this.refreshServerAccess({quiet:true}),250);
     },
 
     buildDemoData(){
       return JSON.parse(JSON.stringify(this.mock));
     },
 
+    applyPublicConfig(){
+      const cfg=window.COASTCAST_CONFIG||{};
+      if(!this.state.cloud.url&&cfg.supabaseUrl)this.state.cloud.url=String(cfg.supabaseUrl).replace(/\/+$/,'');
+      if(!this.state.cloud.anonKey&&cfg.supabasePublishableKey)this.state.cloud.anonKey=String(cfg.supabasePublishableKey);
+    },
+
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v40-state')||localStorage.getItem('coastcast-v31-state')||localStorage.getItem('coastcast-v30-state')||localStorage.getItem('coastcast-v23-state')||localStorage.getItem('coastcast-v22-state')||localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state')||localStorage.getItem('coastcast-v18-state')||localStorage.getItem('coastcast-v17-state')||localStorage.getItem('coastcast-v16-state')||localStorage.getItem('coastcast-v15-state')||localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v50-state')||localStorage.getItem('coastcast-v40-state')||localStorage.getItem('coastcast-v31-state')||localStorage.getItem('coastcast-v30-state')||localStorage.getItem('coastcast-v23-state')||localStorage.getItem('coastcast-v22-state')||localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state')||localStorage.getItem('coastcast-v18-state')||localStorage.getItem('coastcast-v17-state')||localStorage.getItem('coastcast-v16-state')||localStorage.getItem('coastcast-v15-state')||localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -298,10 +307,11 @@
         if(saved.oceanNetwork&&typeof saved.oceanNetwork==='object') this.state.oceanNetwork={...this.state.oceanNetwork,...saved.oceanNetwork,status:saved.oceanNetwork.status==='loading'?'idle':saved.oceanNetwork.status,history:Array.isArray(saved.oceanNetwork.history)?saved.oceanNetwork.history:[]};
         if(saved.experience&&typeof saved.experience==='object') this.state.experience={...this.state.experience,...saved.experience};
         if(saved.membership&&typeof saved.membership==='object') this.state.membership={...this.state.membership,...saved.membership,betaFullAccess:true};
+        if(saved.backend&&typeof saved.backend==='object') this.state.backend={...this.state.backend,...saved.backend,familyMembers:Array.isArray(saved.backend.familyMembers)?saved.backend.familyMembers:[]};
         if(saved.seasonal&&typeof saved.seasonal==='object') this.state.seasonal={...this.state.seasonal,...saved.seasonal};
         if(saved.familyCrew&&typeof saved.familyCrew==='object') this.state.familyCrew={...this.state.familyCrew,...saved.familyCrew,members:Array.isArray(saved.familyCrew.members)?saved.familyCrew.members:[]};
         if(saved.liveUpdatedAt) this.state.liveUpdatedAt=saved.liveUpdatedAt;
-        if(this.state.cloud.session&&this.state.cloud.session.expires_at&&Number(this.state.cloud.session.expires_at)*1000<Date.now()) this.state.cloud.session=null;
+        if(this.state.cloud.session&&this.state.cloud.session.expires_at&&Number(this.state.cloud.session.expires_at)*1000<Date.now()&&!this.state.cloud.session.refresh_token) this.state.cloud.session=null;
       }catch(_){ }
     },
 
@@ -321,9 +331,9 @@
         shoppingList:this.state.shoppingList,
         offlinePacks:this.state.offlinePacks,
         community:this.state.community,
-        command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,membership:this.state.membership,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt
+        command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,membership:this.state.membership,backend:this.state.backend,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt
       };
-      try{ localStorage.setItem('coastcast-v40-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v50-state',JSON.stringify(payload)); }catch(_){ }
       if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
@@ -355,8 +365,7 @@
       this.$('seasonCalendarShortcutBtn')?.addEventListener('click',()=>{this.navigate('forecast');setTimeout(()=>this.$('seasonCalendarPanel')?.scrollIntoView({behavior:'smooth',block:'start'}),120);});
       this.$('seasonCalendarGrid')?.addEventListener('click',e=>this.handleSeasonCalendarClick(e));
       this.$('seasonTripUseBtn')?.addEventListener('click',()=>this.useStrongestSeasonTarget());
-      this.$('manageFamilyCrewBtn')?.addEventListener('click',()=>this.openFamilyCrewDialog());
-      this.$('addFamilyMemberBtn')?.addEventListener('click',()=>this.addFamilyMemberPreview());
+            this.$('addFamilyMemberBtn')?.addEventListener('click',()=>this.addFamilyMemberPreview());
       this.$('familyDialogList')?.addEventListener('click',e=>this.handleFamilyCrewClick(e));
       this.$('familyShareTrips')?.addEventListener('change',e=>{this.state.familyCrew.shareTrips=!!e.target.checked;this.save();this.renderFamilyCrew();});
       this.$('familyShareFavorites')?.addEventListener('change',e=>{this.state.familyCrew.shareFavorites=!!e.target.checked;this.save();this.renderFamilyCrew();});
@@ -487,12 +496,22 @@
       this.$('importBackupBtn')?.addEventListener('click',()=>this.$('importBackupInput')?.click());
       this.$('importBackupInput')?.addEventListener('change',e=>this.importBackupFile(e));
       this.$('cloudSetupBtn')?.addEventListener('click',()=>this.openCloudSetup());
+      this.$('cloudSetupSecondaryBtn')?.addEventListener('click',()=>this.openCloudSetup());
       this.$('cloudSignInBtn')?.addEventListener('click',()=>this.cloudSignIn());
       this.$('cloudSignUpBtn')?.addEventListener('click',()=>this.cloudSignUp());
       this.$('cloudSignOutBtn')?.addEventListener('click',()=>this.cloudSignOut());
       this.$('cloudSyncNowBtn')?.addEventListener('click',()=>this.cloudPush({manual:true}));
       this.$('cloudPullBtn')?.addEventListener('click',()=>this.cloudPull());
       this.$('cloudAutoSyncToggle')?.addEventListener('change',e=>{this.state.cloud.autoSync=!!e.target.checked;this.save();this.renderProfile();});
+      this.$('refreshServerAccessBtn')?.addEventListener('click',()=>this.refreshServerAccess({quiet:false}));
+      this.$('acceptFamilyInviteBtn')?.addEventListener('click',()=>this.acceptFamilyInvite());
+      this.$('manageFamilyCrewBtn')?.addEventListener('click',()=>this.openFamilyCrewServer());
+      this.$('familyServerInviteBtn')?.addEventListener('click',()=>this.serverFamilyInvite());
+      this.$('familyServerList')?.addEventListener('click',e=>{const b=e.target.closest('[data-remove-family]');if(b)this.serverFamilyRemove(Number(b.dataset.removeFamily));});
+      this.$('openAdminConsoleBtn')?.addEventListener('click',()=>this.openAdminConsole());
+      this.$('adminGrantBtn')?.addEventListener('click',()=>this.adminGrantAccess());
+      this.$('adminRevokeBtn')?.addEventListener('click',()=>this.adminRevokeAccess());
+      this.$('adminRefreshBtn')?.addEventListener('click',()=>this.adminLoadAccessList());
       this.$$('.command-mode').forEach(btn=>btn.addEventListener('click',()=>this.setCommandMode(btn.dataset.commandMode)));
       this.$('commandBuildBtn')?.addEventListener('click',()=>this.buildCommandPlan({navigateToTrips:true}));
       this.$('commandScoutBtn')?.addEventListener('click',()=>{this.navigate('map');setTimeout(()=>{if(!(this.state.scout?.results||[]).length)this.runScout();},120);});
@@ -1399,13 +1418,22 @@
     },
 
     membershipSnapshot(){
+      const server=this.state.membership?.server;
+      if(server&&this.state.backend?.installed){
+        const source=server.source||'free',premium=!!server.premium;
+        const labels={play:'Paid Premium',family:'Family Premium',complimentary:'Complimentary Premium',lifetime:'Lifetime Premium',promo:'Promotional Premium',beta:'Beta Premium',free:'Free access'};
+        let expiry='';
+        if(server.expires_at){try{expiry=`Access through ${new Date(server.expires_at).toLocaleDateString()}`;}catch(_){expiry='Expiring access';}}
+        else expiry=premium?(source==='family'?'No separate subscription required':'Active server-verified access'):'Upgrade to unlock advanced tools';
+        return {premium,badge:source==='family'?'FAMILY PREMIUM':source==='complimentary'?'COMPLIMENTARY':source==='lifetime'?'LIFETIME':source==='promo'?'PROMO':premium?'PREMIUM':'FREE',title:premium?'CoastCast Premium':'CoastCast Free',source:labels[source]||source,expiry,server:true};
+      }
       const m=this.state.membership||{},preview=m.preview||'premium';
       const map={
-        free:{premium:false,badge:'FREE',title:'CoastCast Free',source:'Free access',expiry:'Upgrade to unlock advanced tools'},
+        free:{premium:false,badge:'FREE',title:'CoastCast Free',source:'Free access preview',expiry:'Upgrade to unlock advanced tools'},
         premium:{premium:true,badge:'PREMIUM',title:'CoastCast Premium',source:'Paid Premium preview',expiry:'$4.99/month at launch'},
-        family:{premium:true,badge:'FAMILY PREMIUM',title:'CoastCast Premium',source:'Family Premium entitlement',expiry:'No separate subscription for this family member'},
-        complimentary:{premium:true,badge:'COMPLIMENTARY',title:'CoastCast Premium',source:'Owner-granted complimentary access',expiry:'Expiration or lifetime can be set by admin'},
-        lifetime:{premium:true,badge:'LIFETIME',title:'CoastCast Premium',source:'Owner-granted lifetime access',expiry:'No expiration'}
+        family:{premium:true,badge:'FAMILY PREMIUM',title:'CoastCast Premium',source:'Family Premium preview',expiry:'No separate subscription for this family member'},
+        complimentary:{premium:true,badge:'COMPLIMENTARY',title:'CoastCast Premium',source:'Owner-granted complimentary preview',expiry:'Expiration or lifetime can be set by admin'},
+        lifetime:{premium:true,badge:'LIFETIME',title:'CoastCast Premium',source:'Owner-granted lifetime preview',expiry:'No expiration'}
       };
       return map[preview]||map.premium;
     },
@@ -1417,10 +1445,12 @@
       if(this.$('membershipPreviewSetting'))this.$('membershipPreviewSetting').value=this.state.membership?.preview||'premium';
       if(this.$('membershipDialogTitle'))this.$('membershipDialogTitle').textContent=snap.title;
       if(this.$('membershipDialogSource'))this.$('membershipDialogSource').textContent=snap.source;
+      const preview=this.$('membershipPreviewBlock');if(preview)preview.hidden=!!(this.state.backend?.installed&&this.cloudSignedIn());
       this.openDialog('membershipDialog');
     },
 
     applyMembershipPreview(){
+      if(this.state.backend?.installed&&this.cloudSignedIn()){this.showToast('Server access is active; local Premium preview is disabled.');return;}
       const v=this.$('membershipPreviewSetting')?.value||'premium';
       if(!['free','premium','family','complimentary','lifetime'].includes(v))return;
       this.state.membership={...this.state.membership,preview:v,betaFullAccess:true,status:v==='free'?'inactive':'active'};
@@ -1430,13 +1460,75 @@
     renderMembership(){
       const snap=this.membershipSnapshot(),app=this.$('app');
       app?.classList.toggle('free-preview',!snap.premium);
-      if(this.$('membershipBadge')){this.$('membershipBadge').textContent=this.state.membership?.source==='beta'&&snap.premium?`BETA ${snap.badge}`:snap.badge;this.$('membershipBadge').className=`membership-badge ${snap.premium?'':'free'}`;}
-      if(this.$('membershipTitle'))this.$('membershipTitle').textContent=this.state.membership?.source==='beta'&&snap.premium?'CoastCast Premium Beta':snap.title;
-      if(this.$('membershipSummary'))this.$('membershipSummary').textContent=snap.premium?'Full CoastCast tools are available in this access tier.':'Free mode keeps the core fishing answer useful while advanced intelligence is reserved for Premium.';
+      if(this.$('membershipBadge')){this.$('membershipBadge').textContent=snap.server?snap.badge:(this.state.membership?.source==='beta'&&snap.premium?`BETA ${snap.badge}`:snap.badge);this.$('membershipBadge').className=`membership-badge ${snap.premium?'':'free'}`;}
+      if(this.$('membershipTitle'))this.$('membershipTitle').textContent=snap.server?snap.title:(this.state.membership?.source==='beta'&&snap.premium?'CoastCast Premium Beta':snap.title);
+      if(this.$('membershipSummary'))this.$('membershipSummary').textContent=snap.server?(snap.premium?'Premium is verified by the CoastCast server for this signed-in account.':'This signed-in account currently has Free access.'):(snap.premium?'Full CoastCast tools are available in this access tier.':'Free mode keeps the core fishing answer useful while advanced intelligence is reserved for Premium.');
       if(this.$('membershipSource'))this.$('membershipSource').textContent=snap.source;
       if(this.$('membershipExpiry'))this.$('membershipExpiry').textContent=snap.expiry;
       if(this.$('membershipDialogTitle'))this.$('membershipDialogTitle').textContent=snap.title;
       if(this.$('membershipDialogSource'))this.$('membershipDialogSource').textContent=snap.source;
+      if(this.$('serverAccessBadge'))this.$('serverAccessBadge').textContent=this.state.backend?.installed?'SERVER VERIFIED':(this.cloudSignedIn()?'BACKEND NOT INSTALLED':'SIGN IN REQUIRED');
+      if(this.$('serverAccessSummary')){
+        const email=this.state.cloud?.email||this.state.cloud?.session?.user?.email||'';
+        this.$('serverAccessSummary').innerHTML=this.cloudSignedIn()?`<strong>${this.escape(email||'Signed in')}</strong><span>${this.state.backend?.installed?`${this.escape(snap.source)} • ${snap.premium?'Premium active':'Free access'}`:'Account connected. Install the v5 launch backend to turn on server-verified access.'}</span>`:`<strong>No CoastCast account connected</strong><span>Sign in to activate server-verified Premium, family and complimentary access.</span>`;
+      }
+      if(this.$('openAdminConsoleBtn'))this.$('openAdminConsoleBtn').hidden=!this.state.backend?.isAdmin;
+    },
+
+    async refreshSessionIfNeeded(){
+      const c=this.state.cloud;if(!c?.session?.refresh_token)return this.cloudSignedIn();
+      const exp=Number(c.session.expires_at||0)*1000;if(exp&&exp>Date.now()+120000)return true;
+      try{const r=await fetch(`${c.url}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{'apikey':c.anonKey,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:c.session.refresh_token})});const b=await r.json();if(!r.ok)throw new Error(b?.message||'Session refresh failed');this.state.cloud.session=b;this.saveCloudMetaOnly();return true;}catch(_){this.state.cloud.session=null;this.save();return false;}
+    },
+
+    async rpc(name,payload={}){
+      if(!await this.refreshSessionIfNeeded())throw new Error('Sign in to your CoastCast account first.');
+      const c=this.state.cloud;const r=await fetch(`${c.url}/rest/v1/rpc/${name}`,{method:'POST',headers:this.cloudHeaders(c.session.access_token),body:JSON.stringify(payload)});let b=null;try{b=await r.json();}catch(_){b=null;}if(!r.ok)throw new Error(b?.message||b?.hint||`Backend request failed (${r.status})`);return b;
+    },
+
+    async refreshServerAccess({quiet=false}={}){
+      if(!this.cloudSignedIn()){if(!quiet)this.showToast('Sign in to CoastCast Account first.');return;}
+      try{const access=await this.rpc('coastcast_my_access',{});this.state.backend={...this.state.backend,installed:true,lastAccessCheck:new Date().toISOString(),isAdmin:!!access?.is_admin};this.state.membership={...this.state.membership,server:access,source:'server',status:access?.status||'active'};this.save();this.renderMembership();this.renderProfile();await this.refreshFamilyServer({quiet:true});if(!quiet)this.showToast(`${this.membershipSnapshot().badge} access verified by server.`);}catch(err){const notInstalled=/function|schema cache|could not find/i.test(String(err.message||''));this.state.backend={...this.state.backend,installed:!notInstalled,lastAccessCheck:new Date().toISOString()};if(notInstalled)this.state.membership.server=null;this.save();this.renderMembership();if(!quiet)this.showToast(notInstalled?'Install COASTCAST_LAUNCH_BACKEND.sql to activate real entitlements.':(err.message||'Could not verify server access.'));}
+    },
+
+    async refreshFamilyServer({quiet=false}={}){
+      if(!this.cloudSignedIn()||!this.state.backend?.installed)return;
+      try{const rows=await this.rpc('coastcast_family_list',{});this.state.backend.familyMembers=Array.isArray(rows)?rows:[];this.save();this.renderFamilyCrew();this.renderServerFamilyList();}catch(err){if(!quiet)this.showToast(err.message||'Could not load Family Crew.');}
+    },
+
+    openFamilyCrewServer(){
+      if(this.cloudSignedIn()&&this.state.backend?.installed){this.renderServerFamilyList();this.openDialog('familyServerDialog');return;}
+      this.openDialog('familyCrewDialog');
+    },
+
+    renderServerFamilyList(){
+      const el=this.$('familyServerList');if(!el)return;const rows=this.state.backend?.familyMembers||[];
+      el.innerHTML=rows.length?rows.map(r=>`<div class="server-family-row"><div><strong>${this.escape(r.email||'Family member')}</strong><small>${this.escape(String(r.status||'invited').toUpperCase())}</small></div><button type="button" class="danger-button small" data-remove-family="${Number(r.id)}">Remove</button></div>`).join(''):'<div class="empty-state">No server Family Crew members yet.</div>';
+    },
+
+    async serverFamilyInvite(){
+      const email=(this.$('familyServerEmail')?.value||'').trim();if(!email)return this.showToast('Enter a family member email.');
+      try{const r=await this.rpc('coastcast_family_invite',{p_email:email});this.$('familyServerEmail').value='';await this.refreshFamilyServer({quiet:true});this.showToast(r?.status==='active'?'Family Premium linked.':'Family invite saved. They can accept after signing in.');}catch(err){this.showToast(err.message||'Could not add family member.');}
+    },
+
+    async acceptFamilyInvite(){
+      try{const r=await this.rpc('coastcast_family_accept',{});await this.refreshServerAccess({quiet:true});this.showToast(Number(r?.accepted||0)>0?'Family Premium invitation accepted.':'No pending family invitation matched this account.');}catch(err){this.showToast(err.message||'Could not accept family invitation.');}
+    },
+
+    async serverFamilyRemove(id){
+      if(!id||!confirm('Remove this Family Crew member?'))return;try{await this.rpc('coastcast_family_remove',{p_id:id});await this.refreshFamilyServer({quiet:true});this.showToast('Family member removed.');}catch(err){this.showToast(err.message||'Could not remove family member.');}
+    },
+
+    openAdminConsole(){if(!this.state.backend?.isAdmin){this.showToast('Owner/Admin access required.');return;}this.openDialog('adminConsoleDialog');this.adminLoadAccessList();},
+    async adminGrantAccess(){
+      const email=(this.$('adminEmail')?.value||'').trim(),source=this.$('adminSource')?.value||'complimentary',days=Number(this.$('adminDays')?.value||0),note=(this.$('adminNote')?.value||'').trim();
+      if(!email)return this.showToast('Enter an existing CoastCast account email.');let expires=null;if(source!=='lifetime'&&days>0)expires=new Date(Date.now()+days*86400000).toISOString();
+      try{await this.rpc('coastcast_admin_grant_access',{p_email:email,p_source:source,p_expires_at:expires,p_note:note||null});this.showToast(`${source} Premium granted.`);await this.adminLoadAccessList();}catch(err){this.showToast(err.message||'Could not grant access.');}
+    },
+    async adminRevokeAccess(){const email=(this.$('adminEmail')?.value||'').trim(),note=(this.$('adminNote')?.value||'').trim();if(!email)return this.showToast('Enter an account email.');if(!confirm(`Revoke direct Premium for ${email}?`))return;try{await this.rpc('coastcast_admin_revoke_access',{p_email:email,p_note:note||null});this.showToast('Direct Premium revoked.');await this.adminLoadAccessList();}catch(err){this.showToast(err.message||'Could not revoke access.');}},
+    async adminLoadAccessList(){
+      const el=this.$('adminAccessList');if(!el)return;el.innerHTML='<div class="empty-state">Loading accounts…</div>';
+      try{const rows=await this.rpc('coastcast_admin_list_access',{p_limit:50});el.innerHTML=(rows||[]).map(r=>`<div class="admin-access-row"><div><strong>${this.escape(r.email||'Account')}</strong><small>${this.escape((r.source||'free').toUpperCase())} • ${this.escape((r.status||'active').toUpperCase())}${r.expires_at?` • until ${new Date(r.expires_at).toLocaleDateString()}`:''}</small></div><span class="tiny-pill">${this.escape((r.access_level||'free').toUpperCase())}</span></div>`).join('')||'<div class="empty-state">No accounts yet.</div>';}catch(err){el.innerHTML=`<div class="empty-state">${this.escape(err.message||'Could not load accounts.')}</div>`;}
     },
 
     setExperienceMode(mode,announce=false){
@@ -2916,7 +3008,7 @@
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
       try{localStorage.removeItem('coastcast-v12-state');localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{['coastcast-v40-state','coastcast-v31-state','coastcast-v30-state','coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.watchCenter={running:false,results:[],lastRun:null,species:'Red Drum'};this.state.oceanNetwork={status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null};this.state.experience={mode:'simple'};this.state.membership={tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true};this.state.seasonal={selectedSpecies:null,lastViewedMonth:null};this.state.familyCrew={members:[],shareTrips:true,shareFavorites:false};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      this.state.live=false;try{['coastcast-v50-state','coastcast-v40-state','coastcast-v31-state','coastcast-v30-state','coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.watchCenter={running:false,results:[],lastRun:null,species:'Red Drum'};this.state.oceanNetwork={status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null};this.state.experience={mode:'simple'};this.state.membership={tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true,server:null};this.state.backend={installed:false,lastAccessCheck:null,isAdmin:false,familyMembers:[]};this.state.seasonal={selectedSpecies:null,lastViewedMonth:null};this.state.familyCrew={members:[],shareTrips:true,shareFavorites:false};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 
 
@@ -2964,7 +3056,7 @@
     },
 
     backupPayload(){
-      return {format:'coastcast-backup',version:'4.0.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt}};
+      return {format:'coastcast-backup',version:'5.0.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt}};
     },
 
     exportBackup(){
@@ -2993,18 +3085,18 @@
     cloudHeaders(token){const c=this.state.cloud;return{'apikey':c.anonKey,'Authorization':`Bearer ${token||c.anonKey}`,'Content-Type':'application/json'};},
 
     async cloudSignIn(){
-      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Signing in…';const r=await fetch(`${cfg.url}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign in failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent='Signed in successfully.';this.renderProfile();this.showToast('Cloud account connected.');}
+      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Signing in…';const r=await fetch(`${cfg.url}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign in failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent='Signed in successfully.';this.renderProfile();this.showToast('CoastCast account connected.');setTimeout(()=>this.refreshServerAccess({quiet:true}),120);}
       catch(err){this.$('cloudDialogStatus').textContent=err.message||'Could not sign in.';this.showToast(err.message||'Could not sign in.');}
     },
 
     async cloudSignUp(){
-      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Creating account…';const r=await fetch(`${cfg.url}/auth/v1/signup`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign up failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body?.access_token?body:null};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent=body?.access_token?'Account created and signed in.':'Account created. Check your email if confirmation is enabled, then sign in.';this.renderProfile();this.showToast('Cloud account created.');}
+      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Creating account…';const r=await fetch(`${cfg.url}/auth/v1/signup`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign up failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body?.access_token?body:null};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent=body?.access_token?'Account created and signed in.':'Account created. Check your email if confirmation is enabled, then sign in.';this.renderProfile();this.showToast('CoastCast account created.');if(body?.access_token)setTimeout(()=>this.refreshServerAccess({quiet:true}),120);}
       catch(err){this.$('cloudDialogStatus').textContent=err.message||'Could not create account.';this.showToast(err.message||'Could not create account.');}
     },
 
     async cloudSignOut(){
       const c=this.state.cloud;try{if(c?.session?.access_token)await fetch(`${c.url}/auth/v1/logout`,{method:'POST',headers:this.cloudHeaders(c.session.access_token)});}catch(_){ }
-      this.state.cloud.session=null;this.state.cloud.autoSync=false;this.save();this.renderProfile();if(this.$('cloudDialogStatus'))this.$('cloudDialogStatus').textContent='Signed out. Project settings remain on this device.';this.showToast('Cloud session disconnected.');
+      this.state.cloud.session=null;this.state.cloud.autoSync=false;this.state.membership.server=null;this.state.backend={...this.state.backend,installed:false,isAdmin:false,familyMembers:[]};this.save();this.renderProfile();this.renderMembership();if(this.$('cloudDialogStatus'))this.$('cloudDialogStatus').textContent='Signed out. Project settings remain on this device.';this.showToast('Cloud session disconnected.');
     },
 
     async refreshCloudSession(){
@@ -3028,7 +3120,7 @@
     },
 
     saveCloudMetaOnly(){
-      try{const raw=localStorage.getItem('coastcast-v40-state')||localStorage.getItem('coastcast-v31-state')||localStorage.getItem('coastcast-v30-state')||localStorage.getItem('coastcast-v23-state')||localStorage.getItem('coastcast-v22-state')||localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v40-state',JSON.stringify(p));}catch(_){ }
+      try{const raw=localStorage.getItem('coastcast-v50-state')||localStorage.getItem('coastcast-v40-state')||localStorage.getItem('coastcast-v31-state')||localStorage.getItem('coastcast-v30-state')||localStorage.getItem('coastcast-v23-state')||localStorage.getItem('coastcast-v22-state')||localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state');if(!raw)return;const p=JSON.parse(raw);p.cloud={url:this.state.cloud.url,anonKey:this.state.cloud.anonKey,email:this.state.cloud.email,autoSync:this.state.cloud.autoSync,session:this.state.cloud.session,lastSync:this.state.cloud.lastSync};localStorage.setItem('coastcast-v50-state',JSON.stringify(p));}catch(_){ }
     },
 
     async cloudPull(){
@@ -3093,8 +3185,16 @@
     useStrongestSeasonTarget(){const b=this.state.seasonal?.upcomingBest;if(!b?.species||!this.species[b.species])return this.showToast('Season Planner needs regional species data first.');this.setSpecies(b.species);const label=new Date(2026,b.month,1).toLocaleDateString([],{month:'long'});this.showToast(`${b.species} selected for the strongest ${label} seasonal signal.`);this.navigate('forecast');setTimeout(()=>this.$('seasonCalendarPanel')?.scrollIntoView({behavior:'smooth',block:'start'}),120);},
 
     renderFamilyCrew(){
-      if(!this.$('familyCrewList'))return;const f=this.state.familyCrew||{members:[]},members=Array.isArray(f.members)?f.members:[];this.$('familyCrewBadge').textContent=members.length?`${members.length} MEMBER${members.length===1?'':'S'}`:'PREVIEW';this.$('familyCrewSummary').innerHTML=members.length?`<strong>${members.length} family member${members.length===1?'':'s'} in this device preview.</strong> At launch, each accepted family member will receive a server-verified Family Premium entitlement without purchasing another subscription.`:'No family members added to the preview yet. Your future paid Premium account will be able to invite family without making each person buy another subscription.';
-      const html=members.map(m=>`<div class="family-member-row"><div><strong>${this.escape(m.name)}</strong><small>${this.escape(m.email||'Email not set')}</small></div><span class="family-access">FAMILY PREMIUM</span></div>`).join('');this.$('familyCrewList').innerHTML=html||'';if(this.$('familyShareTrips'))this.$('familyShareTrips').checked=f.shareTrips!==false;if(this.$('familyShareFavorites'))this.$('familyShareFavorites').checked=!!f.shareFavorites;this.renderFamilyDialogList();
+      if(!this.$('familyCrewList'))return;const f=this.state.familyCrew||{members:[]};
+      if(this.cloudSignedIn()&&this.state.backend?.installed){
+        const members=this.state.backend?.familyMembers||[];this.$('familyCrewBadge').textContent=members.length?`${members.length} SERVER MEMBER${members.length===1?'':'S'}`:'SERVER READY';
+        this.$('familyCrewSummary').innerHTML=members.length?`<strong>${members.length} Family Crew member${members.length===1?'':'s'} linked on the CoastCast server.</strong> Active members receive Family Premium without purchasing another subscription.`:'No Family Crew members linked yet. Invite a family email from your Premium owner account.';
+        this.$('familyCrewList').innerHTML=members.map(m=>`<div class="family-member-row"><div><strong>${this.escape(m.email||'Family member')}</strong><small>${this.escape(String(m.status||'invited').toUpperCase())} • server verified</small></div><span class="family-access">${m.status==='active'?'FAMILY PREMIUM':'INVITED'}</span></div>`).join('');
+      }else{
+        const members=Array.isArray(f.members)?f.members:[];this.$('familyCrewBadge').textContent=members.length?`${members.length} PREVIEW`:'PREVIEW';this.$('familyCrewSummary').innerHTML=members.length?`<strong>${members.length} family member${members.length===1?'':'s'} in this device preview.</strong> Connect the v5 backend to turn these into real server memberships.`:'No family members added to the preview yet. Sign in and install the v5 launch backend for real Family Premium.';
+        this.$('familyCrewList').innerHTML=members.map(m=>`<div class="family-member-row"><div><strong>${this.escape(m.name)}</strong><small>${this.escape(m.email||'Email not set')}</small></div><span class="family-access">PREVIEW</span></div>`).join('');
+      }
+      if(this.$('familyShareTrips'))this.$('familyShareTrips').checked=f.shareTrips!==false;if(this.$('familyShareFavorites'))this.$('familyShareFavorites').checked=!!f.shareFavorites;this.renderFamilyDialogList();this.renderServerFamilyList();
     },
 
     openFamilyCrewDialog(){this.renderFamilyDialogList();this.openDialog('familyCrewDialog');},

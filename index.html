@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast 4.0 is a nationwide coastal fishing command center with Ocean Network verification with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CoastCast 5.0 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -15,8 +15,8 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=4.0.0" />
-  <title>CoastCast 4.0</title>
+  <link rel="stylesheet" href="styles.css?v=5.0.0" />
+  <title>CoastCast 5.0</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -25,7 +25,7 @@
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>COAST</span><b>CAST</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">4.0</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.0</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -1124,6 +1124,18 @@
           </div>
         </section>
 
+        <section class="panel account-access-panel" id="accountAccessPanel">
+          <div class="section-heading"><div><div class="eyebrow">COASTCAST ACCOUNT</div><h2>Account & secure access</h2></div><span id="serverAccessBadge" class="tiny-pill">SIGN IN REQUIRED</span></div>
+          <div id="serverAccessSummary" class="cloud-account-summary"><strong>No CoastCast account connected</strong><span>Sign in to activate server-verified Premium, family and complimentary access.</span></div>
+          <div class="account-action-grid">
+            <button id="cloudSetupBtn" class="primary-button" type="button">Sign in / create account</button>
+            <button id="refreshServerAccessBtn" class="secondary-button" type="button">Refresh server access</button>
+            <button id="acceptFamilyInviteBtn" class="secondary-button" type="button">Accept family invite</button>
+            <button id="openAdminConsoleBtn" class="secondary-button" type="button" hidden>Owner Console</button>
+          </div>
+          <p class="micro-note">When the v5 launch backend is installed, Premium access is decided by your signed-in account on the server—not by editable browser storage.</p>
+        </section>
+
         <section class="panel membership-panel" id="membershipPanel">
           <div class="section-heading"><div><div class="eyebrow">COASTCAST ACCESS</div><h2>Membership</h2></div><span id="membershipBadge" class="membership-badge">BETA FULL ACCESS</span></div>
           <div class="membership-hero">
@@ -1141,16 +1153,16 @@
         <section class="panel family-crew-panel premium-surface" id="familyCrewPanel">
           <div class="section-heading">
             <div><div class="eyebrow">FAMILY PREMIUM</div><h2>Family Crew</h2></div>
-            <span id="familyCrewBadge" class="tiny-pill">PREVIEW</span>
+            <span id="familyCrewBadge" class="tiny-pill">FAMILY READY</span>
           </div>
-          <p class="section-note">One Premium household can share Premium access without making each family member buy another subscription. This build previews the family experience locally; public launch invitations will be verified by the CoastCast backend.</p>
+          <p class="section-note">One Premium household can share Premium access without making each family member buy another subscription. When your v5 backend is connected, invitations and effective access are verified server-side.</p>
           <div id="familyCrewSummary" class="family-crew-summary">No family members added to the preview yet.</div>
           <div id="familyCrewList" class="family-crew-list"></div>
           <div class="family-share-grid">
             <label class="switch-row"><span><strong>Share trip plans</strong><small>Let family see planned fishing trips</small></span><input id="familyShareTrips" type="checkbox" checked /></label>
             <label class="switch-row"><span><strong>Share favorite waters</strong><small>Share named favorites, not private exact coordinates</small></span><input id="familyShareFavorites" type="checkbox" /></label>
           </div>
-          <button id="manageFamilyCrewBtn" data-premium="Family Premium" class="secondary-button full" type="button">Manage Family Crew preview</button>
+          <button id="manageFamilyCrewBtn" data-premium="Family Premium" class="secondary-button full" type="button">Manage Family Crew</button>
         </section>
 
         <section class="panel premium-value-panel" id="premiumValuePanel">
@@ -1181,11 +1193,11 @@
         </section>
 
         <section class="panel cloud-sync-panel">
-          <div class="section-heading"><div><div class="eyebrow">CLOUD SYNC BETA</div><h2>Sync across devices</h2></div><span id="cloudConnectionBadge" class="tiny-pill">NOT CONNECTED</span></div>
-          <p class="section-note">Optional Supabase sync can keep one encrypted-by-transport CoastCast data record tied to your account. Your password is never saved by CoastCast.</p>
+          <div class="section-heading"><div><div class="eyebrow">COASTCAST ACCOUNT + CLOUD</div><h2>Account & sync across devices</h2></div><span id="cloudConnectionBadge" class="tiny-pill">NOT CONNECTED</span></div>
+          <p class="section-note">Your CoastCast account uses Supabase Auth and can also sync your private app data across devices. Your password is never saved by CoastCast.</p>
           <div id="cloudAccountSummary" class="cloud-account-summary"><strong>Local-only mode</strong><span>Add your own Supabase project when you want cross-device sync.</span></div>
           <div class="cloud-actions">
-            <button id="cloudSetupBtn" class="secondary-button" type="button">Cloud setup</button>
+            <button id="cloudSetupSecondaryBtn" class="secondary-button" type="button">Account setup</button>
             <button id="cloudSyncNowBtn" class="primary-button" type="button" disabled>Sync now</button>
             <button id="cloudPullBtn" class="secondary-button" type="button" disabled>Restore from cloud</button>
           </div>
@@ -1469,7 +1481,7 @@
   <!-- CLOUD SYNC SETUP -->
   <dialog id="cloudDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">CLOUD SYNC BETA</div><h2>Connect Supabase</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="sheet-head"><div><div class="eyebrow">COASTCAST ACCOUNT + CLOUD</div><h2>Connect Supabase</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
       <div class="cloud-warning"><strong>Use your own CoastCast Supabase project.</strong><span>The project URL and anon key are public client configuration. Do not paste a service-role key here.</span></div>
       <label class="field-group"><span>Supabase project URL</span><input id="cloudUrlInput" class="text-control" type="url" placeholder="https://your-project.supabase.co" autocapitalize="off" /></label>
       <label class="field-group"><span>Supabase anon / publishable key</span><textarea id="cloudKeyInput" class="text-control textarea compact-textarea" placeholder="Paste anon key"></textarea></label>
@@ -1478,7 +1490,7 @@
       <label class="switch-row"><span><strong>Remember project connection</strong><small>Saves URL, anon key and email on this device; never saves your password</small></span><input id="rememberCloudToggle" type="checkbox" checked /></label>
       <div class="cloud-auth-actions"><button id="cloudSignInBtn" class="primary-button" type="button">Sign in</button><button id="cloudSignUpBtn" class="secondary-button" type="button">Create account</button></div>
       <button id="cloudSignOutBtn" class="danger-button full" type="button">Sign out / disconnect session</button>
-      <div id="cloudDialogStatus" class="vault-status">Run SUPABASE_SETUP.sql in your project before first sync.</div>
+      <div id="cloudDialogStatus" class="vault-status">Run SUPABASE_SETUP.sql and COASTCAST_LAUNCH_BACKEND.sql in your project to enable launch accounts and entitlements.</div>
     </form>
   </dialog>
 
@@ -1508,13 +1520,42 @@
         <article class="plan-card"><div><span>FAMILY</span><strong>Premium through family</strong></div><p>An invited family member receives the same Premium entitlement without buying another subscription.</p></article>
         <article class="plan-card"><div><span>COMPLIMENTARY</span><strong>Owner-granted Premium</strong></div><p>You can grant selected testers, partners, creators, friends or family Premium with an expiration date or lifetime access—without requiring payment.</p></article>
       </div>
-      <div class="beta-entitlement-preview">
+      <div class="beta-entitlement-preview" id="membershipPreviewBlock">
         <strong>Beta entitlement preview</strong>
         <p>Use this only to test how Free/Premium access will look. Public launch access will be verified by the CoastCast backend and store billing—not trusted from this device.</p>
         <label class="field-group"><span>Preview access</span><select id="membershipPreviewSetting" class="select-control"><option value="premium">Paid Premium</option><option value="family">Family Premium</option><option value="complimentary">Complimentary Premium</option><option value="lifetime">Lifetime Premium</option><option value="free">Free user</option></select></label>
         <button id="applyMembershipPreviewBtn" class="secondary-button full" type="button">Apply preview</button>
       </div>
       <div class="membership-security-note"><strong>Launch security:</strong> payment, family membership and complimentary grants must resolve to one server-side Premium entitlement. LocalStorage never decides paid access in production.</div>
+    </form>
+  </dialog>
+
+  <!-- FAMILY CREW SERVER -->
+  <dialog id="familyServerDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head"><div><div class="eyebrow">FAMILY PREMIUM</div><h2>Family Crew</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="membership-current-card"><span>SERVER VERIFIED</span><strong>Share Premium with family</strong><small>Family members use Premium without buying another CoastCast subscription.</small></div>
+      <label class="field-group"><span>Family member email</span><input id="familyServerEmail" class="text-control" type="email" autocomplete="email" placeholder="family@example.com" /></label>
+      <button id="familyServerInviteBtn" class="primary-button full" type="button">Invite / link family member</button>
+      <div id="familyServerList" class="family-dialog-list"><div class="empty-state">No server Family Crew members yet.</div></div>
+      <div class="membership-security-note"><strong>Privacy:</strong> Premium access can be shared without automatically sharing private catches or exact private waypoints.</div>
+    </form>
+  </dialog>
+
+  <!-- OWNER / ADMIN CONSOLE -->
+  <dialog id="adminConsoleDialog" class="sheet-dialog">
+    <form class="sheet-card admin-sheet" method="dialog">
+      <div class="sheet-head"><div><div class="eyebrow">COASTCAST OWNER</div><h2>Premium Access Console</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="membership-current-card"><span>PRIVATE ADMIN TOOL</span><strong>Grant selected people Premium for free</strong><small>Paid customers, family access and owner-granted access all resolve through the same server entitlement check.</small></div>
+      <label class="field-group"><span>Existing CoastCast account email</span><input id="adminEmail" class="text-control" type="email" autocomplete="off" placeholder="person@example.com" /></label>
+      <div class="two-col">
+        <label class="field-group"><span>Grant type</span><select id="adminSource" class="select-control"><option value="complimentary">Complimentary Premium</option><option value="lifetime">Lifetime Premium</option><option value="promo">Promotional Premium</option><option value="beta">Beta / Tester Premium</option></select></label>
+        <label class="field-group"><span>Days <small>(0 = no date)</small></span><input id="adminDays" class="text-control" type="number" min="0" max="3650" value="0" /></label>
+      </div>
+      <label class="field-group"><span>Private admin note</span><input id="adminNote" class="text-control" maxlength="160" placeholder="Tester, partner, family friend…" /></label>
+      <div class="admin-action-row"><button id="adminGrantBtn" class="primary-button" type="button">Grant Premium</button><button id="adminRevokeBtn" class="danger-button" type="button">Revoke direct Premium</button><button id="adminRefreshBtn" class="secondary-button" type="button">Refresh list</button></div>
+      <div id="adminAccessList" class="admin-access-list"><div class="empty-state">Refresh to load CoastCast accounts.</div></div>
+      <p class="micro-note">Admin writes go through database RPCs that verify your signed-in account is listed in <code>coastcast_admins</code>. Secret/service-role keys never belong in this browser app.</p>
     </form>
   </dialog>
 
@@ -1536,7 +1577,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. CoastCast is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CoastCast backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">CoastCast v4.0 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">CoastCast v5.0 is a launch-infrastructure development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -1563,6 +1604,7 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=4.0.0"></script>
+  <script src="coastcast-config.js?v=5.0.0"></script>
+  <script src="app.js?v=5.0.0"></script>
 </body>
 </html>

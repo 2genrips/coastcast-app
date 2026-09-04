@@ -1,54 +1,33 @@
-# CoastCast Premium architecture
+# CoastCast Premium — v5.0 production architecture
 
-## Target product
-- Free tier: useful core fishing answer and basic planning.
-- CoastCast Premium: **$4.99/month** target price.
-- Family Premium: invited family members receive Premium without a separate subscription.
-- Complimentary Premium: CoastCast owner/admin can grant Premium without payment, optionally expiring or lifetime.
-- Lifetime Premium: optional owner-granted entitlement for selected people.
+Target price: **$4.99/month** for CoastCast Premium.
 
-## One entitlement check
-The client should never ask “did this person pay?” It should ask: **does this account currently have Premium entitlement?**
+## Effective access types
+- `free` — core CoastCast.
+- `play` — paid Google Play Premium.
+- `family` — Premium inherited from an active Premium family owner; no second subscription.
+- `complimentary` — owner/admin granted Premium, expiring or non-expiring.
+- `lifetime` — owner/admin granted permanent Premium.
+- `promo` — time-limited promotional Premium.
+- `beta` — tester/development grant.
 
-Valid sources can include:
-- `play` — paid Google Play subscription
-- `family` — inherited from a paying family owner
-- `complimentary` — manually granted by CoastCast admin
-- `lifetime` — non-expiring admin grant
-- `promo` — time-limited promotion
-- `beta` — development/testing only
+The client asks one question: **does this signed-in account have effective Premium access?** It does not infer payment from local browser state.
 
-## Production security
-The app must not trust localStorage, hidden buttons, client JavaScript, or a user-editable database row for paid access. Production flow should be:
-1. Google Play Billing / approved store completes purchase.
-2. A CoastCast backend validates the purchase token.
-3. Backend writes/updates the user's entitlement.
-4. CoastCast reads the authenticated user's entitlement.
-5. Family/complimentary access is written only by trusted backend/admin actions.
+## Security boundary
+- Browser uses only a Supabase publishable key + authenticated user token.
+- Direct entitlement tables have no normal client write policies.
+- Admin/family mutations use security-definer RPC functions that validate the signed-in account.
+- Google Play purchase verification happens in a trusted Edge Function/backend.
+- Google/Supabase secret keys never ship in the browser.
 
-## Family model
-A Premium owner has a family group. Invited members resolve to `source=family` while the owner entitlement remains active. If owner billing expires, family entitlements should end after any configured grace period. Seat count can be decided before launch.
+## Owner-controlled free Premium
+The Owner Console can grant selected existing accounts:
+- Complimentary Premium
+- Lifetime Premium
+- Promotional Premium
+- Beta/tester Premium
 
-## Complimentary model
-Private admin dashboard should support:
-- user/email lookup
-- reason/note
-- starts_at
-- expires_at or lifetime
-- revoke immediately
-- audit trail / granted_by
+Each grant can carry a private note and optional expiration, and can be revoked.
 
-## Beta build
-CoastCast 4.0 includes a local entitlement **preview** solely to test the UI. Remove/disable this simulator in a release build.
-
-
-## CoastCast 4.0 family UX
-The app now includes a local Family Crew preview. This does **not** grant real Premium. Production flow should be:
-1. Paid owner has an active server-verified Premium entitlement.
-2. Owner sends an invite from Family Crew.
-3. Invitee signs in / creates a CoastCast account.
-4. Backend writes `source=family` entitlement tied to the owner.
-5. If owner's eligible entitlement expires/revokes, family entitlements are recalculated by the backend.
-6. Complimentary/lifetime grants remain independent of family membership and are written only by trusted admin/backend tooling.
-
-Private catches and exact private waypoints must not be shared automatically with family.
+## Family Premium
+Family access is derived from the owner's active direct Premium entitlement. Family members do not buy another subscription. Before launch, choose the final family-seat limit and add invitation email delivery.
