@@ -1,10 +1,10 @@
-# CoastCast Family Premium — v5.0
+# AnglerSignal Family Premium — v5.0
 
 Family Premium is now backed by real database functions when `COASTCAST_LAUNCH_BACKEND.sql` is installed.
 
 - A direct Premium owner can invite a family email.
-- If that email already has a CoastCast account, the membership can activate immediately.
-- If not, the invitation remains pending. After the invitee creates/signs into CoastCast, **Accept pending family invite** links the account.
+- If that email already has a AnglerSignal account, the membership can activate immediately.
+- If not, the invitation remains pending. After the invitee creates/signs into AnglerSignal, **Accept pending family invite** links the account.
 - Effective access is resolved server-side by `coastcast_my_access()`.
 - Family members do not need their own paid subscription.
 - A Family Premium member cannot create a nested family group.

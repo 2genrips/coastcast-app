@@ -1,7 +1,7 @@
-# CoastCast 5.0 — Launch Infrastructure
+# AnglerSignal 5.0 — Launch Infrastructure
 
 ## Real account/access foundation
-- CoastCast Account card on Profile.
+- AnglerSignal Account card on Profile.
 - Server access refresh and status.
 - Effective Premium check from `coastcast_my_access()` when backend is installed.
 - Free / Paid / Family / Complimentary / Lifetime / Promo access resolve through one entitlement model.
@@ -14,8 +14,8 @@
 - Private catches and exact private waypoints remain excluded from automatic sharing.
 
 ## Owner Console
-- Hidden unless the signed-in account is a CoastCast admin.
-- Grant Complimentary, Lifetime, Promo or Beta Premium to an existing CoastCast account.
+- Hidden unless the signed-in account is a AnglerSignal admin.
+- Grant Complimentary, Lifetime, Promo or Beta Premium to an existing AnglerSignal account.
 - Optional expiration for grants.
 - Revoke direct Premium.
 - View recent account access rows.

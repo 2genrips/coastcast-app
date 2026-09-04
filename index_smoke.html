@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="AnglerSignal 5.2 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="AnglerSignal 4.0 is a nationwide coastal fishing command center with Ocean Network verification with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -14,9 +14,9 @@
   <meta property="og:title" content="AnglerSignal Fishing Forecast" />
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="brand-emblem.png" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=5.2.0" />
-  <title>AnglerSignal 5.2</title>
+  
+  <link rel="stylesheet" href="styles.css?v=4.0.0" />
+  <title>AnglerSignal 4.0</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -25,7 +25,7 @@
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>ANGLER</span><b>SIGNAL</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.2</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">4.0</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -147,7 +147,7 @@
           <p class="section-note">AnglerSignal blends broad regional seasonality with the live conditions already loaded for this coast. It is a planning signal—not a regulation season or guarantee that fish are present.</p>
           <div id="seasonPulseList" class="season-pulse-list"></div>
           <div id="seasonPulseCall" class="season-pulse-call">AnglerSignal is building the seasonal picture.</div>
-          <button id="seasonCalendarShortcutBtn" data-premium="Seasonal Intelligence" class="secondary-button full" type="button">Open 12-month species calendar</button>
+          <button id="seasonCalendarShortcutBtn" class="secondary-button full" type="button">Open 12-month species calendar</button>
         </section>
 
         <section class="panel ocean-network-panel advanced-home premium-surface" id="oceanNetworkPanel">
@@ -1124,19 +1124,6 @@
           </div>
         </section>
 
-        <section class="panel account-access-panel" id="accountAccessPanel">
-          <div class="section-heading"><div><div class="eyebrow">ANGLERSIGNAL ACCOUNT</div><h2>Account & secure access</h2></div><span id="serverAccessBadge" class="tiny-pill">SIGN IN REQUIRED</span></div>
-          <div id="serverAccessSummary" class="cloud-account-summary"><strong>No AnglerSignal account connected</strong><span>Sign in to activate server-verified Premium, family and complimentary access.</span></div>
-          <div class="account-action-grid">
-            <button id="cloudSetupBtn" class="primary-button" type="button">Sign in / create account</button>
-            <button id="refreshServerAccessBtn" class="secondary-button" type="button">Refresh server access</button>
-            <button id="acceptFamilyInviteBtn" class="secondary-button" type="button">Accept family invite</button>
-            <button id="openAdminConsoleBtn" class="secondary-button" type="button" hidden>Owner Console</button>
-            <button id="deleteAccountBtn" class="danger-button" type="button">Delete account & cloud data</button>
-          </div>
-          <p class="micro-note">When the v5 launch backend is installed, Premium access is decided by your signed-in account on the server—not by editable browser storage.</p>
-        </section>
-
         <section class="panel membership-panel" id="membershipPanel">
           <div class="section-heading"><div><div class="eyebrow">ANGLERSIGNAL ACCESS</div><h2>Membership</h2></div><span id="membershipBadge" class="membership-badge">BETA FULL ACCESS</span></div>
           <div class="membership-hero">
@@ -1154,16 +1141,16 @@
         <section class="panel family-crew-panel premium-surface" id="familyCrewPanel">
           <div class="section-heading">
             <div><div class="eyebrow">FAMILY PREMIUM</div><h2>Family Crew</h2></div>
-            <span id="familyCrewBadge" class="tiny-pill">FAMILY READY</span>
+            <span id="familyCrewBadge" class="tiny-pill">PREVIEW</span>
           </div>
-          <p class="section-note">One Premium household can share Premium access without making each family member buy another subscription. When your v5 backend is connected, invitations and effective access are verified server-side.</p>
+          <p class="section-note">One Premium household can share Premium access without making each family member buy another subscription. This build previews the family experience locally; public launch invitations will be verified by the AnglerSignal backend.</p>
           <div id="familyCrewSummary" class="family-crew-summary">No family members added to the preview yet.</div>
           <div id="familyCrewList" class="family-crew-list"></div>
           <div class="family-share-grid">
             <label class="switch-row"><span><strong>Share trip plans</strong><small>Let family see planned fishing trips</small></span><input id="familyShareTrips" type="checkbox" checked /></label>
             <label class="switch-row"><span><strong>Share favorite waters</strong><small>Share named favorites, not private exact coordinates</small></span><input id="familyShareFavorites" type="checkbox" /></label>
           </div>
-          <button id="manageFamilyCrewBtn" data-premium="Family Premium" class="secondary-button full" type="button">Manage Family Crew</button>
+          <button id="manageFamilyCrewBtn" class="secondary-button full" type="button">Manage Family Crew preview</button>
         </section>
 
         <section class="panel premium-value-panel" id="premiumValuePanel">
@@ -1194,11 +1181,11 @@
         </section>
 
         <section class="panel cloud-sync-panel">
-          <div class="section-heading"><div><div class="eyebrow">ANGLERSIGNAL ACCOUNT + CLOUD</div><h2>Account & sync across devices</h2></div><span id="cloudConnectionBadge" class="tiny-pill">NOT CONNECTED</span></div>
-          <p class="section-note">Your AnglerSignal account uses Supabase Auth and can also sync your private app data across devices. Your password is never saved by AnglerSignal.</p>
+          <div class="section-heading"><div><div class="eyebrow">CLOUD SYNC BETA</div><h2>Sync across devices</h2></div><span id="cloudConnectionBadge" class="tiny-pill">NOT CONNECTED</span></div>
+          <p class="section-note">Optional Supabase sync can keep one encrypted-by-transport AnglerSignal data record tied to your account. Your password is never saved by AnglerSignal.</p>
           <div id="cloudAccountSummary" class="cloud-account-summary"><strong>Local-only mode</strong><span>Add your own Supabase project when you want cross-device sync.</span></div>
           <div class="cloud-actions">
-            <button id="cloudSetupSecondaryBtn" class="secondary-button" type="button">Account setup</button>
+            <button id="cloudSetupBtn" class="secondary-button" type="button">Cloud setup</button>
             <button id="cloudSyncNowBtn" class="primary-button" type="button" disabled>Sync now</button>
             <button id="cloudPullBtn" class="secondary-button" type="button" disabled>Restore from cloud</button>
           </div>
@@ -1217,14 +1204,8 @@
         </section>
 
         <section class="panel profile-privacy-panel">
-          <div><div class="eyebrow">PRIVACY & SUPPORT</div><h2>Your fishing data stays yours</h2><p>Private catch coordinates and private waypoints are not included in public community posts unless you explicitly choose to share them. Signed-in cloud data is stored in AnglerSignal's account backend.</p></div>
-          <div class="legal-action-row">
-            <a class="secondary-button legal-link-button" href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
-            <a class="secondary-button legal-link-button" href="terms.html" target="_blank" rel="noopener">Terms</a>
-            <a class="secondary-button legal-link-button" href="support.html" target="_blank" rel="noopener">Support</a>
-            <a class="secondary-button legal-link-button" href="delete-account.html" target="_blank" rel="noopener">Account deletion</a>
-            <button id="profileSettingsBtn" class="secondary-button" type="button">App settings</button>
-          </div>
+          <div><div class="eyebrow">PRIVACY</div><h2>Your fishing data stays yours</h2><p>Private catch coordinates and private waypoints are never included in the public community feed. Cloud sync uses only the project you choose to connect.</p></div>
+          <button id="profileSettingsBtn" class="secondary-button" type="button">App settings</button>
         </section>
       </section>
 
@@ -1282,7 +1263,7 @@
           </section>
         </section>
       </section>
-      <footer class="app-trust-footer"><nav class="footer-legal-links" aria-label="Legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a><a href="terms.html" target="_blank" rel="noopener">Terms</a><a href="support.html" target="_blank" rel="noopener">Support</a></nav><svg class="footer-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9 3 4 8.5 4 15.5 4 24.5 16 29 16 29s12-4.5 12-13.5C28 8.5 23 3 16 3Z" fill="none" stroke="#69C9E8" stroke-width="1.8"/><path d="M8.5 15c3-4 7-5 11-2l4-2-1 4 1 4-4-2c-4 3-8 2-11-2Z" fill="#DFF6FF"/><path d="M9 22c4-2 6-2 9 0 3 2 5 2 8 0" fill="none" stroke="#4FDFB5" stroke-width="1.6" stroke-linecap="round"/></svg><div><strong>ANGLERSIGNAL</strong><span>Plan Smarter. Fish Better.</span></div><small>Forecast guidance only. Always check local safety conditions.</small></footer>
+      <footer class="app-trust-footer"><svg class="footer-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9 3 4 8.5 4 15.5 4 24.5 16 29 16 29s12-4.5 12-13.5C28 8.5 23 3 16 3Z" fill="none" stroke="#69C9E8" stroke-width="1.8"/><path d="M8.5 15c3-4 7-5 11-2l4-2-1 4 1 4-4-2c-4 3-8 2-11-2Z" fill="#DFF6FF"/><path d="M9 22c4-2 6-2 9 0 3 2 5 2 8 0" fill="none" stroke="#4FDFB5" stroke-width="1.6" stroke-linecap="round"/></svg><div><strong>ANGLERSIGNAL</strong><span>Plan Smarter. Fish Better.</span></div><small>Forecast guidance only. Always check local safety conditions.</small></footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Primary navigation">
@@ -1488,18 +1469,16 @@
   <!-- CLOUD SYNC SETUP -->
   <dialog id="cloudDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">ANGLERSIGNAL ACCOUNT + CLOUD</div><h2>Connect Supabase</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
-      <div class="cloud-warning"><strong>Secure AnglerSignal account</strong><span>Your account verifies Premium, Family Crew and complimentary access on the AnglerSignal server. Your password is sent only to the authentication provider and is not saved by AnglerSignal.</span></div>
-      <div id="cloudTechnicalConfig">
-        <label class="field-group"><span>Supabase project URL</span><input id="cloudUrlInput" class="text-control" type="url" placeholder="https://your-project.supabase.co" autocapitalize="off" /></label>
-        <label class="field-group"><span>Supabase anon / publishable key</span><textarea id="cloudKeyInput" class="text-control textarea compact-textarea" placeholder="Paste publishable key"></textarea></label>
-      </div>
+      <div class="sheet-head"><div><div class="eyebrow">CLOUD SYNC BETA</div><h2>Connect Supabase</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="cloud-warning"><strong>Use your own AnglerSignal Supabase project.</strong><span>The project URL and anon key are public client configuration. Do not paste a service-role key here.</span></div>
+      <label class="field-group"><span>Supabase project URL</span><input id="cloudUrlInput" class="text-control" type="url" placeholder="https://your-project.supabase.co" autocapitalize="off" /></label>
+      <label class="field-group"><span>Supabase anon / publishable key</span><textarea id="cloudKeyInput" class="text-control textarea compact-textarea" placeholder="Paste anon key"></textarea></label>
       <label class="field-group"><span>Email</span><input id="cloudEmailInput" class="text-control" type="email" autocomplete="email" placeholder="you@example.com" /></label>
       <label class="field-group"><span>Password</span><input id="cloudPasswordInput" class="text-control" type="password" autocomplete="current-password" placeholder="Password" /></label>
       <label class="switch-row"><span><strong>Remember project connection</strong><small>Saves URL, anon key and email on this device; never saves your password</small></span><input id="rememberCloudToggle" type="checkbox" checked /></label>
       <div class="cloud-auth-actions"><button id="cloudSignInBtn" class="primary-button" type="button">Sign in</button><button id="cloudSignUpBtn" class="secondary-button" type="button">Create account</button></div>
       <button id="cloudSignOutBtn" class="danger-button full" type="button">Sign out / disconnect session</button>
-      <div id="cloudDialogStatus" class="vault-status">Run SUPABASE_SETUP.sql and ANGLERSIGNAL_LAUNCH_BACKEND.sql in your project to enable launch accounts and entitlements.</div>
+      <div id="cloudDialogStatus" class="vault-status">Run SUPABASE_SETUP.sql in your project before first sync.</div>
     </form>
   </dialog>
 
@@ -1529,54 +1508,13 @@
         <article class="plan-card"><div><span>FAMILY</span><strong>Premium through family</strong></div><p>An invited family member receives the same Premium entitlement without buying another subscription.</p></article>
         <article class="plan-card"><div><span>COMPLIMENTARY</span><strong>Owner-granted Premium</strong></div><p>You can grant selected testers, partners, creators, friends or family Premium with an expiration date or lifetime access—without requiring payment.</p></article>
       </div>
-      <div class="beta-entitlement-preview" id="membershipPreviewBlock">
+      <div class="beta-entitlement-preview">
         <strong>Beta entitlement preview</strong>
         <p>Use this only to test how Free/Premium access will look. Public launch access will be verified by the AnglerSignal backend and store billing—not trusted from this device.</p>
         <label class="field-group"><span>Preview access</span><select id="membershipPreviewSetting" class="select-control"><option value="premium">Paid Premium</option><option value="family">Family Premium</option><option value="complimentary">Complimentary Premium</option><option value="lifetime">Lifetime Premium</option><option value="free">Free user</option></select></label>
         <button id="applyMembershipPreviewBtn" class="secondary-button full" type="button">Apply preview</button>
       </div>
       <div class="membership-security-note"><strong>Launch security:</strong> payment, family membership and complimentary grants must resolve to one server-side Premium entitlement. LocalStorage never decides paid access in production.</div>
-    </form>
-  </dialog>
-
-  <!-- FAMILY CREW SERVER -->
-  <dialog id="familyServerDialog" class="sheet-dialog">
-    <form class="sheet-card" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">FAMILY PREMIUM</div><h2>Family Crew</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
-      <div class="membership-current-card"><span>SERVER VERIFIED</span><strong>Share Premium with family</strong><small>Family members use Premium without buying another AnglerSignal subscription.</small></div>
-      <label class="field-group"><span>Family member email</span><input id="familyServerEmail" class="text-control" type="email" autocomplete="email" placeholder="family@example.com" /></label>
-      <button id="familyServerInviteBtn" class="primary-button full" type="button">Invite / link family member</button>
-      <div id="familyServerList" class="family-dialog-list"><div class="empty-state">No server Family Crew members yet.</div></div>
-      <div class="membership-security-note"><strong>Privacy:</strong> Premium access can be shared without automatically sharing private catches or exact private waypoints.</div>
-    </form>
-  </dialog>
-
-  <!-- OWNER / ADMIN CONSOLE -->
-  <dialog id="adminConsoleDialog" class="sheet-dialog">
-    <form class="sheet-card admin-sheet" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">ANGLERSIGNAL OWNER</div><h2>Premium Access Console</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
-      <div class="membership-current-card"><span>PRIVATE ADMIN TOOL</span><strong>Grant selected people Premium for free</strong><small>Paid customers, family access and owner-granted access all resolve through the same server entitlement check.</small></div>
-      <label class="field-group"><span>Existing AnglerSignal account email</span><input id="adminEmail" class="text-control" type="email" autocomplete="off" placeholder="person@example.com" /></label>
-      <div class="two-col">
-        <label class="field-group"><span>Grant type</span><select id="adminSource" class="select-control"><option value="complimentary">Complimentary Premium</option><option value="lifetime">Lifetime Premium</option><option value="promo">Promotional Premium</option><option value="beta">Beta / Tester Premium</option></select></label>
-        <label class="field-group"><span>Days <small>(0 = no date)</small></span><input id="adminDays" class="text-control" type="number" min="0" max="3650" value="0" /></label>
-      </div>
-      <label class="field-group"><span>Private admin note</span><input id="adminNote" class="text-control" maxlength="160" placeholder="Tester, partner, family friend…" /></label>
-      <div class="admin-action-row"><button id="adminGrantBtn" class="primary-button" type="button">Grant Premium</button><button id="adminRevokeBtn" class="danger-button" type="button">Revoke direct Premium</button><button id="adminRefreshBtn" class="secondary-button" type="button">Refresh list</button></div>
-      <div id="adminAccessList" class="admin-access-list"><div class="empty-state">Refresh to load AnglerSignal accounts.</div></div>
-      <p class="micro-note">Admin writes go through database RPCs that verify your signed-in account is listed in <code>coastcast_admins</code>. Secret/service-role keys never belong in this browser app.</p>
-    </form>
-  </dialog>
-
-  <!-- DELETE ACCOUNT -->
-  <dialog id="accountDeleteDialog" class="sheet-dialog">
-    <form class="sheet-card" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">ACCOUNT & DATA</div><h2>Delete AnglerSignal account</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
-      <div class="danger-confirm-card"><strong>This permanently deletes your signed-in AnglerSignal account and server data.</strong><span>Cloud sync data, community posts, family links, entitlements and push subscriptions tied to this account are removed. Local device data is also cleared after the server confirms deletion. When paid store subscriptions go live, deleting a AnglerSignal account will not by itself cancel Apple/Google billing; users must cancel the store subscription separately.</span></div>
-      <label class="field-group"><span>Type DELETE to confirm</span><input id="deleteAccountConfirmInput" class="text-control" autocomplete="off" placeholder="DELETE" /></label>
-      <button id="confirmDeleteAccountBtn" class="danger-button full" type="button">Permanently delete account</button>
-      <div id="deleteAccountStatus" class="vault-status">This action cannot be undone.</div>
-      <p class="micro-note">If you cannot sign in, use the public <a href="delete-account.html" target="_blank" rel="noopener">account deletion request page</a>.</p>
     </form>
   </dialog>
 
@@ -1598,7 +1536,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. AnglerSignal is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or AnglerSignal backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">AnglerSignal v5.2 is a launch-readiness build. No business database can guarantee 100% completeness, so AnglerSignal shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">AnglerSignal v4.0 is an active development build. No business database can guarantee 100% completeness, so AnglerSignal shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved AnglerSignal data</button>
     </form>
   </dialog>
@@ -1624,8 +1562,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="coastcast-config.js?v=5.2.0"></script>
-  <script src="app.js?v=5.2.0"></script>
+  
+  <script src="app.js?v=4.0.0"></script>
 </body>
 </html>

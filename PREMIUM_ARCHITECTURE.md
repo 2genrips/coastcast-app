@@ -1,9 +1,9 @@
-# CoastCast Premium — v5.0 production architecture
+# AnglerSignal Premium — v5.0 production architecture
 
-Target price: **$4.99/month** for CoastCast Premium.
+Target price: **$4.99/month** for AnglerSignal Premium.
 
 ## Effective access types
-- `free` — core CoastCast.
+- `free` — core AnglerSignal.
 - `play` — paid Google Play Premium.
 - `family` — Premium inherited from an active Premium family owner; no second subscription.
 - `complimentary` — owner/admin granted Premium, expiring or non-expiring.

@@ -1,4 +1,4 @@
-# CoastCast 4.0 — Free vs Premium product direction
+# AnglerSignal 4.0 — Free vs Premium product direction
 
 ## Free
 - Quick Answer
@@ -6,7 +6,7 @@
 - Basic daily forecast
 - Basic map/location access
 - Starter catch logbook
-- Enough information to understand and trust CoastCast
+- Enough information to understand and trust AnglerSignal
 
 ## Premium — $4.99/month
 - Full hourly / 7-day forecast intelligence

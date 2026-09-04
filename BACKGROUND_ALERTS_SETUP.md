@@ -1,10 +1,10 @@
-# CoastCast Background Alerts — backend foundation
+# AnglerSignal Background Alerts — backend foundation
 
 v5.0 creates a `coastcast_push_subscriptions` table and keeps the PWA service worker push-ready.
 
 For true closed-app alerts, production still needs:
 1. A VAPID key pair.
-2. Browser push-subscription registration from CoastCast.
+2. Browser push-subscription registration from AnglerSignal.
 3. A trusted scheduled backend worker that evaluates saved forecast watches.
 4. Web Push delivery to matching subscriptions.
 5. For the Google Play packaged app, notification permission and Android-specific testing.

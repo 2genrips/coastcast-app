@@ -1,8 +1,8 @@
-# CoastCast 2.2 Brand Guide
+# AnglerSignal 2.2 Brand Guide
 
 ## Primary identity
 - Emblem: compass + fish + wave + location cue.
-- Wordmark: COASTCAST / FISHING FORECAST.
+- Wordmark: ANGLERSIGNAL / FISHING FORECAST.
 - Tone: premium marine utility, not cartoon fishing artwork.
 
 ## Core palette

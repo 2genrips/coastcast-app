@@ -1,16 +1,16 @@
-# CoastCast v5.0 launch setup order
+# AnglerSignal v5.0 launch setup order
 
 You do not have to activate all of this immediately. Uploading v5.0 to GitHub Pages first will keep the fishing app working.
 
 ## Phase 1 — Install v5.0 app
-Upload the v5.0 files to the existing CoastCast GitHub repository and commit to `main`.
+Upload the v5.0 files to the existing AnglerSignal GitHub repository and commit to `main`.
 
 ## Phase 2 — Turn on real accounts
 1. Create/open Supabase.
 2. Run `SUPABASE_SETUP.sql`.
 3. Run `COASTCAST_LAUNCH_BACKEND.sql`.
 4. Add the public Supabase URL and publishable key to `coastcast-config.js`.
-5. Create your CoastCast account.
+5. Create your AnglerSignal account.
 6. Make yourself owner using `ADMIN_SETUP.md`.
 
 ## Phase 3 — Test access types

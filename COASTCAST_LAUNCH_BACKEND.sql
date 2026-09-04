@@ -1,4 +1,4 @@
--- CoastCast v5.0 Launch Backend
+-- AnglerSignal v5.0 Launch Backend
 -- Supabase/Postgres foundation for real accounts, server-side Premium access,
 -- family sharing, complimentary/lifetime grants, admin tools and purchase records.
 -- Run after SUPABASE_SETUP.sql. Safe to re-run where noted.
@@ -309,7 +309,7 @@ begin
   if not public.coastcast_is_admin() then raise exception 'Admin access required'; end if;
   if src not in ('complimentary','lifetime','promo','beta') then raise exception 'Invalid admin grant source'; end if;
   select id into target from auth.users where lower(email)=lower(trim(p_email)) limit 1;
-  if target is null then raise exception 'No CoastCast account exists for that email'; end if;
+  if target is null then raise exception 'No AnglerSignal account exists for that email'; end if;
   if src='lifetime' then p_expires_at := null; end if;
   insert into public.coastcast_entitlements(user_id,access_level,source,status,starts_at,expires_at,granted_by,note,updated_at)
   values(target,'premium',src,'active',now(),p_expires_at,auth.uid(),p_note,now())
@@ -331,7 +331,7 @@ declare target uuid;
 begin
   if not public.coastcast_is_admin() then raise exception 'Admin access required'; end if;
   select id into target from auth.users where lower(email)=lower(trim(p_email)) limit 1;
-  if target is null then raise exception 'No CoastCast account exists for that email'; end if;
+  if target is null then raise exception 'No AnglerSignal account exists for that email'; end if;
   update public.coastcast_entitlements set status='revoked',updated_at=now(),note=coalesce(p_note,note) where user_id=target;
   insert into public.coastcast_entitlement_audit(user_id,action,access_level,source,actor_id,note)
   select target,'revoke',access_level,source,auth.uid(),p_note from public.coastcast_entitlements where user_id=target;
@@ -341,6 +341,6 @@ $$;
 grant execute on function public.coastcast_admin_revoke_access(text,text) to authenticated;
 
 -- IMPORTANT BOOTSTRAP STEP:
--- After creating YOUR CoastCast owner account, copy its UUID from Authentication > Users
+-- After creating YOUR AnglerSignal owner account, copy its UUID from Authentication > Users
 -- and run this once, replacing the placeholder:
 -- insert into public.coastcast_admins(user_id,role) values ('YOUR-USER-UUID','owner') on conflict(user_id) do update set role='owner';

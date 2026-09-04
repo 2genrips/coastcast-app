@@ -1,0 +1,18 @@
+ANGLERSIGNAL v5.1 — PHONE SETUP NEXT
+
+Your current live coastcast-config.js stays in GitHub. Do not delete or replace it.
+
+1) Upload this v5.1 folder contents to your existing GitHub repo.
+2) In Supabase SQL Editor, paste and Run:
+   LAUNCH_COMPLIANCE_SETUP_ANDROID.txt
+3) Supabase > Edge Functions > Deploy a new function > Via Editor.
+   Function name: delete-account
+   Paste DELETE_ACCOUNT_EDGE_FUNCTION_ANDROID.txt
+   Deploy with JWT verification ON.
+4) Deploy another function:
+   Function name: request-account-deletion
+   Paste REQUEST_DELETION_EDGE_FUNCTION_ANDROID.txt
+   This is the public request-only endpoint. Configure it so JWT verification is OFF.
+5) Add supportEmail and legalEntity to your existing live coastcast-config.js before store release.
+
+Do not put service-role keys, secret keys, private VAPID keys, or Google service-account JSON in GitHub.

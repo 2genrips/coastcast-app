@@ -1,0 +1,39 @@
+import { createClient } from 'npm:@supabase/supabase-js@2';
+
+const cors={
+  'Access-Control-Allow-Origin':'*',
+  'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods':'POST, OPTIONS',
+};
+const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{...cors,'Content-Type':'application/json'}});
+
+Deno.serve(async(req)=>{
+  if(req.method==='OPTIONS')return new Response('ok',{headers:cors});
+  if(req.method!=='POST')return json({error:'POST required'},405);
+  try{
+    const url=Deno.env.get('SUPABASE_URL')!;
+    const publishableJson=Deno.env.get('SUPABASE_PUBLISHABLE_KEYS');
+    const secretJson=Deno.env.get('SUPABASE_SECRET_KEYS');
+    const publishable=publishableJson?JSON.parse(publishableJson).default:Deno.env.get('SUPABASE_ANON_KEY')!;
+    const secret=secretJson?JSON.parse(secretJson).default:Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const token=(req.headers.get('Authorization')||'').replace(/^Bearer\s+/i,'');
+    if(!token)return json({error:'Sign in required'},401);
+
+    const userClient=createClient(url,publishable,{global:{headers:{Authorization:`Bearer ${token}`}},auth:{persistSession:false}});
+    const {data:userData,error:userErr}=await userClient.auth.getUser(token);
+    if(userErr||!userData.user)return json({error:'Invalid AnglerSignal session'},401);
+
+    const admin=createClient(url,secret,{auth:{persistSession:false}});
+    const uid=userData.user.id;
+    const {data:adminRow}=await admin.from('coastcast_admins').select('role').eq('user_id',uid).maybeSingle();
+    if(adminRow)return json({error:'Owner/admin accounts must be demoted manually before deletion.'},403);
+
+    // Tables reference auth.users with ON DELETE CASCADE/SET NULL, so deleting the auth user removes linked data.
+    const {error:deleteErr}=await admin.auth.admin.deleteUser(uid);
+    if(deleteErr)throw deleteErr;
+    return json({ok:true,deleted:true});
+  }catch(err){
+    console.error(err);
+    return json({error:err instanceof Error?err.message:'Account deletion failed'},500);
+  }
+});
