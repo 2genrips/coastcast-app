@@ -1,5 +1,5 @@
-const CACHE='coastcast-v3.1.0';
-const CORE=['./','./index.html','./styles.css?v=3.1.0','./app.js?v=3.1.0','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-192-v31.png','./icon-512-v31.png','./apple-touch-icon.png','./favicon-32.png','./og-image.png','./brand-emblem.png','./brand-watermark.png','./brand-primary.png'];
+const CACHE='coastcast-v3.1.1';
+const CORE=['./','./index.html','./styles.css?v=3.1.1','./app.js?v=3.1.1','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-192-v31.png','./icon-512-v31.png','./apple-touch-icon.png','./favicon-32.png','./og-image.png','./brand-emblem.png','./brand-watermark.png','./brand-primary.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
 });

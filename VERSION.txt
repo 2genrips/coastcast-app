@@ -1,3 +1,2 @@
-CoastCast 3.1.0
-Ocean Network + Quick Answer + Premium Entitlement Foundation
-Build date: 2026-09-04
+CoastCast 3.1.1
+Ocean Network Browser Compatibility Hotfix

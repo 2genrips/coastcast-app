@@ -1,20 +1,9 @@
-# CoastCast 3.1 — Simple Power + Premium Foundation
+# CoastCast 3.1.1 — Ocean Network browser hotfix
 
-## Biggest changes
-- New **CoastCast Quick Answer** on Home: GO / PROMISING / HOLD, best window, best target, recommended bait, and wind/surf in one glance.
-- New **Simple Home** mode hides advanced Home panels without removing them. Users can switch to Full Home at any time; Forecast, Scout, Trips and Logbook remain available.
-- New **Premium entitlement architecture preview** covering Free, Paid Premium ($4.99/month target), Family Premium, Complimentary Premium and Lifetime grants.
-- New Profile Membership card and plan/access dialog.
-- Beta access simulator lets the developer preview Free, Paid, Family, Complimentary and Lifetime UI states.
-- Selected advanced actions are marked as Premium and show the membership sheet when Free preview is active.
-- Added server-side entitlement SQL foundation and launch architecture notes.
-- **Important:** beta access preview is intentionally local for testing. Production premium access must be verified server-side / through store billing.
-
-## Ocean Network carried forward
-- NOAA/NDBC observed-ocean reality check
-- Forecast-vs-observed agreement score
-- Recent station wave trend
-- Trip Ocean Reality Check
-
-## Preserved
-Everything from v2.3 remains: nationwide live forecast, NOAA tides, NWS alerts, verified tackle intelligence, Coast Watch, 7-day trip calendar, Destination Intelligence, Daily Brief, Command Center, Scout, Species/Bait/Catch Intelligence, Trips, Community, tackle inventory, offline packs, backups and cloud sync.
+- Fixes the Android/GitHub Pages **Failed to fetch** problem shown by direct NDBC text feeds.
+- Ocean Network now tries NDBC observations first, then automatically falls back to NOAA CO-OPS observed coastal stations.
+- CO-OPS fallback can provide measured wind, water temperature and barometric pressure when those sensors are available.
+- Model Agreement now works with the observed fields that are actually available; a missing wave sensor no longer makes the whole Ocean Network fail.
+- Station provenance is shown as NDBC or CO-OPS.
+- Existing live weather, marine forecast, NOAA tides, tackle, membership and all saved user data remain unchanged.
+- NDBC direct browser access is still best-effort; full observed-wave coverage will eventually move behind the CoastCast backend/proxy for launch reliability.

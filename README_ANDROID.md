@@ -1,15 +1,9 @@
-# CoastCast 3.1 — Android / GitHub Pages update
+# CoastCast 3.1.1 Android update
 
-1. Extract the ZIP on Android.
-2. Upload **everything inside `coastcast_v3.1`** to the root of your existing CoastCast GitHub repository.
-3. Replace matching files and commit to `main`.
-4. Wait for GitHub Pages to redeploy.
-5. Fully close CoastCast and reopen it. If the old build remains, open the Pages URL in Chrome and refresh once.
+Upload every file in this folder to the root of the existing CoastCast GitHub repository and replace matching files. Commit to `main`, wait for GitHub Pages, then fully close and reopen CoastCast.
 
-## First test
-- Home: verify **CoastCast Quick Answer** appears near the top.
-- Tap **Show all tools** and confirm the advanced Home panels appear.
-- Profile: open **Membership** and test the Free / Premium / Family / Complimentary previews.
-- Turn on Live Data and test the **Ocean Network** observation section.
-
-The beta entitlement selector is only for testing UI. It is not launch security.
+## Test
+1. Turn on Live Data.
+2. Open **Ocean Network**.
+3. Tap **Refresh ocean network**.
+4. If NDBC cannot be fetched directly by Android Chrome, CoastCast should now try NOAA CO-OPS automatically instead of stopping at `Failed to fetch`.

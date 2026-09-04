@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast 3.1 is a nationwide coastal fishing command center with Ocean Network verification with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CoastCast 3.1.1 is a nationwide coastal fishing command center with Ocean Network verification with live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -15,8 +15,8 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=3.1.0" />
-  <title>CoastCast 3.1</title>
+  <link rel="stylesheet" href="styles.css?v=3.1.1" />
+  <title>CoastCast 3.1.1</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -25,7 +25,7 @@
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>COAST</span><b>CAST</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">3.1</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">3.1.1</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -140,7 +140,7 @@
 
         <section class="panel ocean-network-panel advanced-home premium-surface" id="oceanNetworkPanel">
           <div class="section-heading">
-            <div><div class="eyebrow">OCEAN NETWORK • NOAA/NDBC</div><h2>Forecast vs. what the ocean is doing</h2></div>
+            <div><div class="eyebrow">OCEAN NETWORK • NOAA OBSERVATIONS</div><h2>Forecast vs. what the ocean is doing</h2></div>
             <span id="oceanNetworkBadge" class="tiny-pill">NOT CHECKED</span>
           </div>
           <p class="section-note">CoastCast looks for a nearby National Data Buoy Center observation and compares measured wind, waves and water temperature with the forecast model. Offshore observations may differ from the beach itself.</p>
@@ -546,7 +546,7 @@
             <div class="ocean-history-head"><strong>Recent station wave trend</strong><small id="oceanHistoryNote">No recent station history loaded.</small></div>
             <canvas id="oceanObservationCanvas" width="900" height="250" aria-label="Recent observed wave height trend"></canvas>
           </div>
-          <p class="micro-note">NDBC observations are measured at the station location and may be offshore. CoastCast uses them as a reality check for the forecast—not as an exact measurement at your feet.</p>
+          <p class="micro-note">NOAA observations are measured at the reporting station and may be offshore, in an inlet or inside a harbor. CoastCast uses them as a reality check for the forecast—not as an exact measurement at your feet.</p>
         </section>
 
         <section class="panel">
@@ -1464,7 +1464,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. CoastCast is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CoastCast backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">CoastCast v3.1 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">CoastCast v3.1.1 is an active development build. No business database can guarantee 100% completeness, so CoastCast shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -1491,6 +1491,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=3.1.0"></script>
+  <script src="app.js?v=3.1.1"></script>
 </body>
 </html>

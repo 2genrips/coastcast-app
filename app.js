@@ -718,17 +718,68 @@
       }return out;
     },
 
+    async loadCoopsOceanNetwork(lat,lon){
+      const checked=new Date().toISOString();
+      try{
+        const urls=[
+          'https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json?type=met',
+          'https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json?type=watertemp'
+        ];
+        const settled=await Promise.allSettled(urls.map(u=>this.fetchJSON(u,14000)));
+        const byId=new Map();
+        for(const r of settled){
+          if(r.status!=='fulfilled')continue;
+          const rows=r.value?.stations||r.value?.stationList||[];
+          for(const st of rows){
+            const slat=Number(st.lat),slon=Number(st.lng??st.lon);
+            if(!st?.id||!Number.isFinite(slat)||!Number.isFinite(slon))continue;
+            const distance=this.haversine(lat,lon,slat,slon);
+            if(distance>250)continue;
+            const prev=byId.get(String(st.id))||{};
+            byId.set(String(st.id),{...prev,...st,id:String(st.id),lat:slat,lon:slon,distance});
+          }
+        }
+        const stations=[...byId.values()].sort((a,b)=>a.distance-b.distance).slice(0,10);
+        if(!stations.length)throw new Error('No nearby NOAA CO-OPS observation station found');
+        const getLatest=async(id,product)=>{
+          const q=new URLSearchParams({date:'latest',station:id,product,units:'metric',time_zone:'gmt',application:'CoastCast',format:'json'});
+          try{
+            const d=await this.fetchJSON('https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?'+q.toString(),8000);
+            if(d?.error)return null;
+            const row=Array.isArray(d?.data)?d.data[0]:null;
+            return row||null;
+          }catch(_){return null;}
+        };
+        for(const st of stations){
+          const [wind,temp,press]=await Promise.all([getLatest(st.id,'wind'),getLatest(st.id,'water_temperature'),getLatest(st.id,'air_pressure')]);
+          const windMps=this.ndbcNumber(wind?.s),windDir=this.ndbcNumber(wind?.d),gustMps=this.ndbcNumber(wind?.g),waterC=this.ndbcNumber(temp?.v),pressureHpa=this.ndbcNumber(press?.v);
+          const available=[windMps,waterC,pressureHpa].filter(v=>v!=null).length;
+          if(!available)continue;
+          const times=[wind?.t,temp?.t,press?.t].filter(Boolean).map(t=>String(t).replace(' ','T')+'Z');
+          let time=null;for(const t of times){const ms=Date.parse(t);if(Number.isFinite(ms)&&(!time||ms>Date.parse(time)))time=new Date(ms).toISOString();}
+          const obs={id:st.id,lat:st.lat,lon:st.lon,distance:st.distance,time,windDir,windMps,gustMps,waveM:null,period:null,avgPeriod:null,waveDir:null,pressureHpa,airC:null,waterC,visibility:null,tide:null,provider:'CO-OPS'};
+          return{status:'live',station:{id:st.id,name:st.name||`NOAA CO-OPS ${st.id}`,lat:st.lat,lon:st.lon,distance:st.distance,provider:'CO-OPS',url:`https://tidesandcurrents.noaa.gov/stationhome.html?id=${encodeURIComponent(st.id)}`},observation:obs,history:[],lastChecked:checked,error:null};
+        }
+        throw new Error('Nearby NOAA CO-OPS stations had no current meteorological/ocean observations');
+      }catch(e){return{status:'fallback',station:null,observation:null,history:[],lastChecked:checked,error:String(e?.message||'CO-OPS observations unavailable')};}
+    },
+
     async loadOceanNetwork(lat,lon){
-      const checked=new Date().toISOString();try{
-        const text=await this.fetchText('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt',12000);const obs=this.parseNdbcLatest(text,lat,lon);if(!obs)throw new Error('No nearby reporting station found');
-        let history=[];try{history=this.parseNdbcStationHistory(await this.fetchText(`https://www.ndbc.noaa.gov/data/realtime2/${encodeURIComponent(obs.id)}.txt`,9000),obs.id);}catch(_){ }
-        return{status:'live',station:{id:obs.id,name:`NDBC Station ${obs.id}`,lat:obs.lat,lon:obs.lon,distance:obs.distance,url:`https://www.ndbc.noaa.gov/station_page.php?station=${encodeURIComponent(obs.id)}`},observation:obs,history,lastChecked:checked,error:null};
-      }catch(e){return{status:'fallback',station:null,observation:null,history:[],lastChecked:checked,error:String(e?.message||'NDBC unavailable')};}
+      const checked=new Date().toISOString();
+      let ndbcError=null;
+      try{
+        const text=await this.fetchText('https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt',10000);const obs=this.parseNdbcLatest(text,lat,lon);if(!obs)throw new Error('No nearby reporting NDBC station found');
+        let history=[];try{history=this.parseNdbcStationHistory(await this.fetchText(`https://www.ndbc.noaa.gov/data/realtime2/${encodeURIComponent(obs.id)}.txt`,7000),obs.id);}catch(_){ }
+        return{status:'live',station:{id:obs.id,name:`NDBC Station ${obs.id}`,lat:obs.lat,lon:obs.lon,distance:obs.distance,provider:'NDBC',url:`https://www.ndbc.noaa.gov/station_page.php?station=${encodeURIComponent(obs.id)}`},observation:{...obs,provider:'NDBC'},history,lastChecked:checked,error:null};
+      }catch(e){ndbcError=String(e?.message||'NDBC browser fetch unavailable');}
+      const coops=await this.loadCoopsOceanNetwork(lat,lon);
+      if(coops?.observation){coops.error=ndbcError?`NDBC browser feed unavailable; using NOAA CO-OPS observed station instead.`:null;return coops;}
+      return{status:'fallback',station:null,observation:null,history:[],lastChecked:checked,error:`Observed-ocean sources unavailable in this browser. NDBC: ${ndbcError||'unavailable'}; CO-OPS: ${coops?.error||'unavailable'}`};
     },
 
     async refreshOceanNetwork(){
       if(!this.state.live){this.showToast('Turn on Live Data first.');return;}const {lat,lon}=this.state.location;this.state.oceanNetwork={...this.state.oceanNetwork,status:'loading'};this.state.sourceHealth.buoy='loading';this.renderSourceHealth();this.renderOceanNetwork();
-      const d=await this.loadOceanNetwork(lat,lon);this.state.oceanNetwork=d;this.state.sourceHealth.buoy=d.observation?'live':'fallback';this.save();this.renderSourceHealth();this.renderOceanNetwork();this.renderTripOceanCheck();this.renderCommandCenter();this.showToast(d.observation?`Ocean Network connected to ${d.station.id}.`:'No nearby NDBC observation could be loaded from this browser.');
+      const d=await this.loadOceanNetwork(lat,lon);this.state.oceanNetwork=d;this.state.sourceHealth.buoy=d.observation?'live':'fallback';this.save();this.renderSourceHealth();this.renderOceanNetwork();this.renderTripOceanCheck();this.renderCommandCenter();this.showToast(d.observation?`Ocean Network connected to ${d.station.provider||'NOAA'} ${d.station.id}.`:'No nearby NOAA observation could be loaded from this browser.');
     },
 
     oceanReality(){
@@ -741,9 +792,9 @@
 
     renderOceanNetwork(){
       if(!this.$('oceanNetworkPanel'))return;const r=this.oceanReality(),net=this.state.oceanNetwork||{},badge=this.$('oceanNetworkBadge');const status=net.status||'idle';badge.textContent=status==='live'?'OBSERVED LIVE':status==='loading'?'CHECKING':status==='fallback'?'FORECAST ONLY':'NOT CHECKED';badge.className=`tiny-pill ${status==='live'?'ready-pill':status==='loading'?'caution-pill':''}`;
-      if(!r.available){this.$('oceanStationName').textContent=status==='loading'?'Searching NDBC network…':'No observation station loaded';this.$('oceanStationMeta').textContent=net.error||'Live forecasts still work even when an observation station is unavailable.';['oceanAgreementScore','oceanObsWind','oceanObsWave','oceanObsWater','oceanObsPressure'].forEach(id=>this.$(id).textContent='—');this.$('oceanWindDelta').textContent='Forecast only';this.$('oceanWaveDelta').textContent='Forecast only';this.$('oceanWaterDelta').textContent='Forecast only';this.$('oceanObsAge').textContent='Observation —';this.$('oceanNetworkCall').textContent='Forecast model is not currently verified by a nearby NDBC observation in this browser.';this.renderForecastTruth();this.drawOceanObservationChart();return;}
-      this.$('oceanStationName').textContent=r.station?.name||`NDBC Station ${net.observation.id}`;this.$('oceanStationMeta').textContent=`Station ${net.observation.id} • ${this.fmt(r.distance,0)} mi from fishing spot • measured ocean conditions`;this.$('oceanAgreementScore').textContent=r.agreement??'—';this.$('oceanObsWind').textContent=r.windObs==null?'—':`${this.fmt(r.windObs,0)} mph`;this.$('oceanObsWave').textContent=r.waveObs==null?'—':`${this.fmt(r.waveObs,1)} ft`;this.$('oceanObsWater').textContent=r.waterObs==null?'—':`${this.fmt(r.waterObs,0)}°F`;this.$('oceanObsPressure').textContent=r.pressureObs==null?'—':`${this.fmt(this.hpaToInHg(r.pressureObs),2)} in`;this.$('oceanWindDelta').textContent=this.oceanDeltaText(r.deltas.wind,'mph');this.$('oceanWaveDelta').textContent=this.oceanDeltaText(r.deltas.wave,'ft');this.$('oceanWaterDelta').textContent=this.oceanDeltaText(r.deltas.water,'°F');this.$('oceanObsAge').textContent=r.ageHours==null?'Observation time unavailable':`${this.fmt(r.ageHours,1)} hr old`;
-      let call='Observed conditions broadly support the loaded marine forecast.';if(r.agreement!=null&&r.agreement<60)call='The buoy and model are diverging. Recheck surf and wind before committing to the trip.';else if(r.ageHours!=null&&r.ageHours>4)call='The station observation is getting stale. Treat the forecast as primary until a fresher report arrives.';else if(r.distance!=null&&r.distance>100)call='The nearest reporting station is distant. Use the observation as regional context, not a beach measurement.';this.$('oceanNetworkCall').textContent=call;this.renderForecastTruth();this.drawOceanObservationChart();
+      if(!r.available){this.$('oceanStationName').textContent=status==='loading'?'Searching NOAA observation networks…':'No observation station loaded';this.$('oceanStationMeta').textContent=net.error||'Live forecasts still work even when an observation station is unavailable.';['oceanAgreementScore','oceanObsWind','oceanObsWave','oceanObsWater','oceanObsPressure'].forEach(id=>this.$(id).textContent='—');this.$('oceanWindDelta').textContent='Forecast only';this.$('oceanWaveDelta').textContent='Forecast only';this.$('oceanWaterDelta').textContent='Forecast only';this.$('oceanObsAge').textContent='Observation —';this.$('oceanNetworkCall').textContent='Forecast model is not currently verified by a nearby NOAA observation in this browser.';this.renderForecastTruth();this.drawOceanObservationChart();return;}
+      this.$('oceanStationName').textContent=r.station?.name||`NDBC Station ${net.observation.id}`;this.$('oceanStationMeta').textContent=`${r.station?.provider||'NOAA'} station ${net.observation.id} • ${this.fmt(r.distance,0)} mi from fishing spot • measured coastal/ocean conditions`;this.$('oceanAgreementScore').textContent=r.agreement??'—';this.$('oceanObsWind').textContent=r.windObs==null?'—':`${this.fmt(r.windObs,0)} mph`;this.$('oceanObsWave').textContent=r.waveObs==null?'—':`${this.fmt(r.waveObs,1)} ft`;this.$('oceanObsWater').textContent=r.waterObs==null?'—':`${this.fmt(r.waterObs,0)}°F`;this.$('oceanObsPressure').textContent=r.pressureObs==null?'—':`${this.fmt(this.hpaToInHg(r.pressureObs),2)} in`;this.$('oceanWindDelta').textContent=this.oceanDeltaText(r.deltas.wind,'mph');this.$('oceanWaveDelta').textContent=this.oceanDeltaText(r.deltas.wave,'ft');this.$('oceanWaterDelta').textContent=this.oceanDeltaText(r.deltas.water,'°F');this.$('oceanObsAge').textContent=r.ageHours==null?'Observation time unavailable':`${this.fmt(r.ageHours,1)} hr old`;
+      let call='Observed conditions broadly support the loaded marine forecast.';if(r.agreement!=null&&r.agreement<60)call='The observed station and model are diverging. Recheck surf and wind before committing to the trip.';else if(r.ageHours!=null&&r.ageHours>4)call='The station observation is getting stale. Treat the forecast as primary until a fresher report arrives.';else if(r.distance!=null&&r.distance>100)call='The nearest reporting station is distant. Use the observation as regional context, not a beach measurement.';this.$('oceanNetworkCall').textContent=call;this.renderForecastTruth();this.drawOceanObservationChart();
     },
 
     renderForecastTruth(){
@@ -755,7 +806,7 @@
     },
 
     renderTripOceanCheck(){
-      if(!this.$('tripOceanSummary'))return;const r=this.oceanReality(),badge=this.$('tripOceanBadge');if(!r.available){badge.textContent='FORECAST ONLY';this.$('tripOceanSummary').textContent='No nearby NDBC observation is loaded. Your live model forecast remains available.';this.$('tripOceanAgreement').textContent='—';this.$('tripOceanDistance').textContent='—';this.$('tripOceanAge').textContent='—';return;}badge.textContent=r.agreement>=75?'MATCHING':r.agreement>=55?'RECHECK':'DIVERGING';badge.className=`tiny-pill ${r.agreement>=75?'ready-pill':r.agreement>=55?'caution-pill':'danger-pill'}`;this.$('tripOceanAgreement').textContent=`${r.agreement}%`;this.$('tripOceanDistance').textContent=`${this.fmt(r.distance,0)} mi`;this.$('tripOceanAge').textContent=r.ageHours==null?'—':`${this.fmt(r.ageHours,1)} hr`;this.$('tripOceanSummary').textContent=r.agreement>=75?'Observed wind/waves broadly support the loaded forecast. Still check the beach itself before fishing.':r.agreement>=55?'Observed ocean conditions differ enough to justify another look before departure.':'The buoy and model are meaningfully different. Recheck the latest surf, wind and official warnings before driving.';
+      if(!this.$('tripOceanSummary'))return;const r=this.oceanReality(),badge=this.$('tripOceanBadge');if(!r.available){badge.textContent='FORECAST ONLY';this.$('tripOceanSummary').textContent='No nearby NOAA observed station is loaded. Your live model forecast remains available.';this.$('tripOceanAgreement').textContent='—';this.$('tripOceanDistance').textContent='—';this.$('tripOceanAge').textContent='—';return;}badge.textContent=r.agreement>=75?'MATCHING':r.agreement>=55?'RECHECK':'DIVERGING';badge.className=`tiny-pill ${r.agreement>=75?'ready-pill':r.agreement>=55?'caution-pill':'danger-pill'}`;this.$('tripOceanAgreement').textContent=`${r.agreement}%`;this.$('tripOceanDistance').textContent=`${this.fmt(r.distance,0)} mi`;this.$('tripOceanAge').textContent=r.ageHours==null?'—':`${this.fmt(r.ageHours,1)} hr`;this.$('tripOceanSummary').textContent=r.agreement>=75?'Available observed conditions broadly support the loaded forecast. Still check the beach itself before fishing.':r.agreement>=55?'Observed ocean conditions differ enough to justify another look before departure.':'The observed station and model are meaningfully different. Recheck the latest surf, wind and official warnings before driving.';
     },
 
     async loadWeather(lat,lon){
