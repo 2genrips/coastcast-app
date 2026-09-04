@@ -1,20 +1,34 @@
-# CoastCast v2.0.2 — Multi-Source Tackle Intelligence
+# CoastCast 2.1 — Premium Rebrand + Destination Intelligence
 
-## Why this update exists
-The v2.0.1 strict filter stopped false bait pins such as government offices and libraries, but it also exposed the opposite problem: open map data can be incomplete and may miss legitimate bait/tackle businesses.
+## Rebrand integration
+- New CoastCast compass/fish/wave emblem is now the primary in-app mark.
+- Rebuilt Android/PWA icons from the new emblem.
+- Added the new semi-transparent CoastCast watermark behind the app.
+- Refined the navy/aqua visual system, header, panels, navigation, buttons and score presentation.
+- Added new social/open-graph artwork.
+- Added a v2.1 brand guide and reusable brand assets.
 
-## Tackle-store improvements
-- CoastCast now **merges** shop results from multiple providers instead of stopping after the first source returns something.
-- Optional Geoapify Places integration for a dedicated nationwide fishing-store category.
-- Expanded OpenStreetMap/Overpass search checks names, fishing shop categories, descriptions, and product tags.
-- Nominatim and Photon text searches remain secondary discovery sources with strict validation.
-- Separate **Tackle-shop search radius** from the normal fishing-area scan radius; default is 20 miles.
-- Up to 18 validated shop results can be retained, with up to 8 shown in lists.
-- Results show provenance badges: VERIFIED, PLACES, OSM, or SEARCH.
-- Verified regional catalogs are **merged with** live discovery instead of being used only after total failure.
-- Holden Beach now includes a larger verified fallback catalog sourced from current fishing-store/business and coastal-fishing references.
-- Old v2.0.1 shop cache is bypassed with a new v3 cache key.
-- CoastCast still refuses to place an unrelated business on the Bait layer just to fill the map.
+## New Destination Intelligence
+Home now includes a Destination Intelligence panel that combines:
+- coastal region
+- best current target species
+- species score
+- public fishing/access place count
+- public-access source status
+- verified/live tackle-shop count
+- water temperature
+- live-data confidence
 
-## Accuracy policy
-No POI/business database is perfectly complete or current. CoastCast now prioritizes dedicated fishing-store categories, verified local evidence, provider provenance, and no-fake-result behavior rather than claiming 100% completeness.
+The panel has direct actions to:
+- scan and rank nearby fishing spots
+- search verified tackle shops around the fishing destination
+
+## Data integrity
+- v2.0.2 tackle verification remains intact.
+- Unrelated businesses are still rejected from Bait/Tackle pins.
+- Dedicated tackle radius and optional Geoapify integration remain available.
+- Existing v2.0.x data migrates into v2.1.
+
+## Storage
+New local state key: `coastcast-v21-state`.
+Previous CoastCast state remains readable for migration.

@@ -315,3 +315,115 @@ h1{font-size:32px;letter-spacing:.01em;font-weight:700}.section-heading h2{font-
 /* v2.0.2 tackle-shop accuracy */
 .shop-source-badge{display:inline-flex;align-items:center;margin-left:.4rem;padding:.12rem .38rem;border:1px solid rgba(101,216,204,.35);border-radius:999px;font-size:.58rem;line-height:1.2;letter-spacing:.06em;color:#8fe7dc;vertical-align:middle;background:rgba(20,98,105,.2)}
 .settings-actions{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin:.25rem 0 .65rem}.settings-actions .secondary-button,.settings-actions .primary-button{min-height:46px;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center}@media(max-width:420px){.settings-actions{grid-template-columns:1fr}}
+
+
+/* === CoastCast 2.1 Rebrand + Destination Intelligence === */
+:root{
+  --brand-navy:#06182A;
+  --brand-deep:#04131F;
+  --brand-ocean:#0B3F6F;
+  --brand-blue:#1479E8;
+  --brand-aqua:#16C7D8;
+  --brand-ice:#DFF8FF;
+  --brand-seafoam:#59E0C0;
+}
+body{
+  background:
+    radial-gradient(circle at 52% -12%,rgba(22,199,216,.15),transparent 34%),
+    radial-gradient(circle at 18% 55%,rgba(20,121,232,.07),transparent 34%),
+    linear-gradient(180deg,#05131f,#071d2d 42%,#05131f);
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background-image:url("branding/coastcast-watermark-ice.png");
+  background-repeat:no-repeat;
+  background-position:center 34%;
+  background-size:min(78vw,680px);
+  opacity:.028;
+  filter:saturate(.75);
+}
+.app-shell{z-index:1}
+.topbar{
+  background:linear-gradient(180deg,rgba(4,19,31,.97),rgba(5,24,39,.93));
+  border-bottom:1px solid rgba(83,216,230,.14);
+  box-shadow:0 10px 28px rgba(0,0,0,.14);
+}
+.brand-lockup-v21{gap:9px}
+.brand-emblem-img{
+  width:44px;height:44px;object-fit:contain;display:block;flex:0 0 44px;
+  filter:drop-shadow(0 5px 11px rgba(4,128,212,.18));
+}
+.brand-name{font-family:"Barlow Condensed",Inter,sans-serif;font-size:20px;letter-spacing:.09em}
+.brand-name span{color:#f2fbff}.brand-name b{color:var(--brand-aqua)}
+.brand-kicker{color:#73e7f0;letter-spacing:.24em;font-size:8px}
+.brand-version{
+  margin-left:5px;padding:2px 5px;border-radius:999px;
+  color:#dffbff;background:rgba(22,199,216,.11);border:1px solid rgba(22,199,216,.2);letter-spacing:.05em
+}
+.panel{
+  background:linear-gradient(180deg,rgba(15,42,62,.90),rgba(7,28,44,.94));
+  border-color:rgba(142,220,237,.105);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 12px 34px rgba(0,0,0,.08);
+}
+.panel::selection{background:rgba(22,199,216,.24)}
+.primary-button{
+  background:linear-gradient(135deg,#15c8d9,#59e0c0)!important;
+  color:#042232!important;
+  box-shadow:0 8px 18px rgba(22,199,216,.12)
+}
+.primary-button:hover{filter:brightness(1.04)}
+.secondary-button{border-color:rgba(116,214,231,.16)}
+.eyebrow{color:#62ddec}
+.destination-hub-panel{
+  position:relative;overflow:hidden;
+  border-color:rgba(22,199,216,.22);
+  background:
+    linear-gradient(135deg,rgba(13,53,77,.94),rgba(7,29,45,.96));
+}
+.destination-hub-panel::after{
+  content:"";position:absolute;right:-66px;bottom:-82px;width:250px;height:250px;
+  background:url("branding/coastcast-emblem.png") center/contain no-repeat;
+  opacity:.035;pointer-events:none;filter:saturate(.6);
+}
+.destination-hub-panel>*{position:relative;z-index:1}
+.destination-hub-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.destination-region-badge{
+  white-space:nowrap;border:1px solid rgba(89,224,192,.22);background:rgba(89,224,192,.08);
+  color:#7fe8cb;border-radius:999px;padding:6px 9px;font-size:9px;font-weight:900;letter-spacing:.08em
+}
+.destination-hero-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;margin-top:13px}
+.destination-copy strong{display:block;font-family:"Barlow Condensed",Inter,sans-serif;font-size:24px;line-height:1.05;letter-spacing:.01em;color:#f2fbff}
+.destination-copy p{margin-top:6px;color:#b6cedb;font-size:11px;line-height:1.45}
+.destination-confidence{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex-direction:column;border:5px solid rgba(22,199,216,.68);background:rgba(2,20,32,.62);box-shadow:inset 0 0 0 5px rgba(255,255,255,.025)}
+.destination-confidence strong{font-size:23px;line-height:.9;color:#f1fbff}
+.destination-confidence span{font-size:9px;color:#7bdce9;margin-left:1px}
+.destination-confidence small{font-size:6px;line-height:1.1;text-align:center;color:#8facbb;margin-top:3px;letter-spacing:.08em}
+.destination-metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin-top:14px;background:rgba(154,220,233,.08);border:1px solid rgba(154,220,233,.08);border-radius:14px;overflow:hidden}
+.destination-metric-grid article{background:rgba(4,25,39,.72);padding:10px 8px;min-width:0}
+.destination-metric-grid span{display:block;font-size:7px;color:#72dce8;font-weight:900;letter-spacing:.1em}
+.destination-metric-grid strong{display:block;font-size:14px;line-height:1.15;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.destination-metric-grid small{display:block;font-size:8px;color:#819cab;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.destination-actions{display:grid;grid-template-columns:1.25fr 1fr;gap:8px;margin-top:12px}
+.destination-source-line{font-size:9px;color:#7e9aa9;margin-top:9px;line-height:1.4}
+.location-hero{border-color:rgba(22,199,216,.17)}
+.score-hero{position:relative;overflow:hidden}
+.score-hero::after{content:"";position:absolute;right:-48px;bottom:-68px;width:190px;height:190px;background:url("branding/coastcast-watermark.png") center/contain no-repeat;opacity:.025;pointer-events:none}
+.score-hero>*{position:relative;z-index:1}
+.bottom-nav{background:rgba(4,18,30,.965)!important;border-top-color:rgba(79,217,231,.13)!important}
+.nav-button.active{color:#62e2ed!important}
+.icon-button,.profile-button{background:linear-gradient(180deg,rgba(16,47,69,.96),rgba(8,30,47,.96));border-color:rgba(111,207,224,.14)}
+@media(max-width:560px){
+  .destination-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .destination-actions{grid-template-columns:1fr}
+  .destination-confidence{width:70px;height:70px}
+  body::before{background-size:92vw;background-position:center 38%;opacity:.023}
+}
+@media(max-width:390px){
+  .brand-emblem-img{width:40px;height:40px;flex-basis:40px}
+  .brand-name{font-size:18px}
+  .destination-copy strong{font-size:21px}
+}

@@ -261,7 +261,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v20-state')||localStorage.getItem('coastcast-v18-state')||localStorage.getItem('coastcast-v17-state')||localStorage.getItem('coastcast-v16-state')||localStorage.getItem('coastcast-v15-state')||localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v21-state')||localStorage.getItem('coastcast-v20-state')||localStorage.getItem('coastcast-v18-state')||localStorage.getItem('coastcast-v17-state')||localStorage.getItem('coastcast-v16-state')||localStorage.getItem('coastcast-v15-state')||localStorage.getItem('coastcast-v14-state')||localStorage.getItem('coastcast-v13-state')||localStorage.getItem('coastcast-v12-state')||localStorage.getItem('coastcast-v11-state')||localStorage.getItem('coastcast-v10-state')||localStorage.getItem('coastcast-v9-state')||localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -311,7 +311,7 @@
         community:this.state.community,
         command:this.state.command,liveUpdatedAt:this.state.liveUpdatedAt
       };
-      try{ localStorage.setItem('coastcast-v20-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v21-state',JSON.stringify(payload)); }catch(_){ }
       if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
@@ -338,6 +338,8 @@
       this.$('mapSearchBtn').addEventListener('click',()=>this.openDialog('locationDialog'));
       this.$('settingsBtn').addEventListener('click',()=>this.openSettings());
       this.$('profileBtn')?.addEventListener('click',()=>this.navigate('profile'));
+      this.$('destinationScanBtn')?.addEventListener('click',()=>{this.navigate('map');setTimeout(()=>this.loadMapPlaces(true),180);});
+      this.$('destinationTackleBtn')?.addEventListener('click',()=>{this.navigate('map');setTimeout(()=>this.loadNearbyShops(true),180);});
       this.$('syncBtn').addEventListener('click',()=>this.state.live?this.loadLiveData():this.showToast('Turn on Live Data to refresh internet forecasts.'));
       this.$('liveModeBtn').addEventListener('click',()=>{const s=this.overallDataStatus();if(this.state.live&&s!=='live')this.loadLiveData();else this.setLiveMode(!this.state.live);});
       this.$('liveModeToggle').addEventListener('change',e=>this.setLiveMode(e.target.checked));
@@ -830,13 +832,13 @@
       if(this.state.data)this.state.data.shops=shops;
       if(shops.length){
         if(forceToast){
-          this.state.sourceHealth.shops=shops.some(x=>x.verified)?'verified':'live';this.renderSourceHealth();this.renderShops();this.renderMapLayers();
+          this.state.sourceHealth.shops=shops.some(x=>x.verified)?'verified':'live';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.renderDestinationHub();
           const enhanced=this.state.geoapifyKey?' • enhanced POI enabled':'';
           this.showToast(`Found ${shops.length} fishing/tackle result${shops.length===1?'':'s'} within about ${radiusMiles} miles${enhanced}.`);
         }
         return shops;
       }
-      if(forceToast){this.state.sourceHealth.shops='fallback';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.showToast('No verified bait/tackle shop was found nearby. CoastCast will not place unrelated businesses on the map.');}
+      if(forceToast){this.state.sourceHealth.shops='fallback';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.renderDestinationHub();this.showToast('No verified bait/tackle shop was found nearby. CoastCast will not place unrelated businesses on the map.');}
       return [];
     },
 
@@ -1231,7 +1233,7 @@
 
     renderAll(){
       this.recalculateScores();
-      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderBaitIntelligence();this.renderRegulations();this.renderConditions();this.renderFactors();this.renderOceanIntelligence();this.renderBeachReadiness();
+      this.renderMode();this.renderSourceHealth();this.renderLocation();this.renderDestinationHub();this.renderScore();this.renderSpecies();this.renderSpeciesRankings();this.renderBaitIntelligence();this.renderRegulations();this.renderConditions();this.renderFactors();this.renderOceanIntelligence();this.renderBeachReadiness();
       this.renderTides();this.renderHourly();this.renderDays();this.renderShops();this.renderForecast();this.renderCatchTimeline();this.renderTideWeek();this.renderChecklist();this.renderWaypoints();this.renderLogbook();this.renderCommunity();this.renderSpotIntelligence();
       this.evaluateAlerts({notify:true});this.renderTrips();this.renderSmartDeparture();this.renderHomeAlerts();this.renderProfile();this.renderScout();this.renderGoMode();this.renderGearPlanner();this.renderTripSafety();this.renderPatternMatch();this.renderCatchIntelligence();this.renderTackleBox();this.renderOfflinePacks();this.renderPhotoMemories();this.renderCommandCenter();this.renderOpportunityMatrix();this.renderMissionControl();this.renderAnglerAnalytics();
       if(this.state.view==='map') this.renderMapLayers();
@@ -1425,6 +1427,30 @@
       this.$('forecastLocation').textContent=l.name;
       const saved=this.state.waypoints.some(w=>this.haversine(l.lat,l.lon,w.lat,w.lon)<0.05);
       this.$('favoriteSpotBtn').textContent=saved?'★':'☆';this.$('favoriteSpotBtn').classList.toggle('saved',saved);
+    },
+
+    renderDestinationHub(){
+      const box=this.$('destinationHubPanel');if(!box||!this.state.data)return;
+      const current=this.state.data.current||{},ranked=this.rankSpecies?.()||[],top=ranked[0]||{name:this.state.targetSpecies,score:this.speciesTodayScore(this.state.targetSpecies)};
+      const region=this.coastRegion(),confidence=this.dataConfidence(),places=Array.isArray(this.state.mapPOIs)?this.state.mapPOIs:[],shops=(this.state.data.shops||[]).filter(s=>this.isLikelyTackleShop(s.name,{tags:s.osmTags||{},display_name:s.displayName||'',categories:s.categories||[],verifiedFishing:s.verified===true}));
+      const placeStatus={idle:'Not scanned',loading:'Scanning…',official:'Official access',live:'Public map',search:'Search indexed',verified:'Verified catalog',anchor:'Forecast point',cached:'Cached places',fallback:'Coverage limited'}[this.state.mapPlacesStatus]||'Not scanned';
+      const shopHealth=this.state.sourceHealth?.shops||'demo';const shopLabel=shopHealth==='live'?'Live places':shopHealth==='verified'?'Verified + live':shopHealth==='loading'?'Searching…':shopHealth==='fallback'?'Coverage limited':this.state.live?'Not loaded':'Demo';
+      const score=Number(top.score)||0;let call='PROMISING COAST';if(score>=88&&confidence.score>=72)call='STRONG DESTINATION';else if(score>=76)call='GOOD TRIP OPTION';else if(score<62)call='SCOUT BEFORE DRIVING';
+      this.$('destinationHubTitle').textContent=this.state.location.name;
+      this.$('destinationRegionBadge').textContent=region.toUpperCase();
+      this.$('destinationPrimaryCall').textContent=call;
+      this.$('destinationBrief').textContent=`${top.name} currently ranks ${Math.round(score)}/100 here. ${places.length?`${places.length} mapped fishing/access place${places.length===1?'':'s'} loaded.`:'Public-access coverage has not been scanned yet.'} ${shops.length?`${shops.length} verified fishing/tackle option${shops.length===1?'':'s'} loaded within your tackle radius.`:'Tackle coverage can be searched separately.'}`;
+      this.$('destinationConfidence').textContent=confidence.score;
+      this.$('destinationTopSpecies').textContent=top.name;
+      this.$('destinationTopSpeciesScore').textContent=`${Math.round(score)}/100 today`;
+      this.$('destinationAccessCount').textContent=String(places.length);
+      this.$('destinationAccessStatus').textContent=placeStatus;
+      this.$('destinationShopCount').textContent=String(shops.length);
+      this.$('destinationShopStatus').textContent=shopLabel;
+      this.$('destinationWaterTemp').textContent=Number.isFinite(Number(current.waterTemp))?`${this.fmt(current.waterTemp,0)}°F`:'—';
+      this.$('destinationWaterNote').textContent=`${this.state.targetSpecies} mode`;
+      const liveCore=['weather','marine','tides'].filter(k=>this.state.sourceHealth?.[k]==='live').length;
+      this.$('destinationSourceLine').textContent=`${liveCore}/3 core forecast feeds live • ${region} • ${this.state.tackleRadius||20} mi tackle radius • ${confidence.score}% data confidence`;
     },
 
     renderScore(){
@@ -2546,6 +2572,7 @@
       if(this.$('topSpotScore'))this.$('topSpotScore').textContent=top?top.match:'--';
       if(this.$('topSpotReason'))this.$('topSpotReason').textContent=top?top.reason:'CoastCast will rank named beaches, piers, fishing access, marinas and boat ramps around your selected destination.';
       if(this.$('weekendIntel'))this.$('weekendIntel').innerHTML=bestDay?`<strong>Best trip day:</strong> ${this.escape(bestDay.day)} • ${bestDay.score}/100 • ${this.fmt(bestDay.wave,1)} ft surf • ${this.fmt(bestDay.rain,0)}% rain. ${top?`Start by analyzing <strong>${this.escape(top.name)}</strong> at exact coordinates.`:''}`:'Your best forecast day will appear here.';
+      this.renderDestinationHub();
       const list=this.$('spotIntelList');if(!list)return;
       if(this.state.mapPlacesStatus==='loading'){list.innerHTML='<div class="spot-scan-state"><span class="scan-spinner"></span><strong>Scanning public map data…</strong><small>Looking for named fishing access, beaches, piers, marinas and ramps.</small></div>';return;}
       if(!places.length){list.innerHTML='<div class="empty-state">No public places are loaded yet. Tap <strong>Scan fishing area</strong>. Your saved private spots remain separate.</div>';return;}
@@ -2580,7 +2607,7 @@
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
       try{localStorage.removeItem('coastcast-v12-state');localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{['coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      this.state.live=false;try{['coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CoastCast Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 
 
@@ -2628,7 +2655,7 @@
     },
 
     backupPayload(){
-      return {format:'coastcast-backup',version:'2.0.2',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,liveUpdatedAt:this.state.liveUpdatedAt}};
+      return {format:'coastcast-backup',version:'2.1.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,liveUpdatedAt:this.state.liveUpdatedAt}};
     },
 
     exportBackup(){
