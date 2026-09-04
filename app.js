@@ -26,18 +26,45 @@
     },
 
     presets: {
-      wrightsville: { name:'Wrightsville Beach, NC', lat:34.2085, lon:-77.7964, source:'Popular coast', tideStation:'8658163' },
-      carolina: { name:'Carolina Beach, NC', lat:34.0352, lon:-77.8936, source:'Popular coast' },
-      topsail: { name:'Topsail Beach, NC', lat:34.3655, lon:-77.6305, source:'Popular coast' },
-      surfCity: { name:'Surf City, NC', lat:34.4271, lon:-77.5461, source:'Popular coast' },
-      nagsHead: { name:'Nags Head, NC', lat:35.9574, lon:-75.6241, source:'Popular coast' },
-      myrtle: { name:'Myrtle Beach, SC', lat:33.6891, lon:-78.8867, source:'Popular coast' }
+      ogunquit: { name:'Ogunquit, ME', lat:43.2489, lon:-70.5992, source:'Popular U.S. coast', tideStation:'8419399' },
+      capeCod: { name:'Cape Cod, MA', lat:41.6688, lon:-70.2962, source:'Popular U.S. coast' },
+      montauk: { name:'Montauk, NY', lat:41.0359, lon:-71.9545, source:'Popular U.S. coast' },
+      oceanCityMD: { name:'Ocean City, MD', lat:38.3365, lon:-75.0849, source:'Popular U.S. coast' },
+      virginiaBeach: { name:'Virginia Beach, VA', lat:36.8529, lon:-75.9780, source:'Popular U.S. coast' },
+      wrightsville: { name:'Wrightsville Beach, NC', lat:34.2085, lon:-77.7964, source:'Popular U.S. coast', tideStation:'8658163' },
+      carolina: { name:'Carolina Beach, NC', lat:34.0352, lon:-77.8936, source:'Popular U.S. coast' },
+      myrtle: { name:'Myrtle Beach, SC', lat:33.6891, lon:-78.8867, source:'Popular U.S. coast' },
+      jacksonvilleFL: { name:'Jacksonville Beach, FL', lat:30.2947, lon:-81.3931, source:'Popular U.S. coast' },
+      keyWest: { name:'Key West, FL', lat:24.5551, lon:-81.7800, source:'Popular U.S. coast', tideStation:'8724580' },
+      gulfShores: { name:'Gulf Shores, AL', lat:30.2460, lon:-87.7008, source:'Popular U.S. coast' },
+      biloxi: { name:'Biloxi, MS', lat:30.3960, lon:-88.8853, source:'Popular U.S. coast' },
+      grandIsle: { name:'Grand Isle, LA', lat:29.2366, lon:-89.9873, source:'Popular U.S. coast' },
+      galveston: { name:'Galveston, TX', lat:29.3013, lon:-94.7977, source:'Popular U.S. coast', tideStation:'8771450' },
+      southPadre: { name:'South Padre Island, TX', lat:26.1118, lon:-97.1681, source:'Popular U.S. coast' },
+      sanDiego: { name:'San Diego, CA', lat:32.7157, lon:-117.1611, source:'Popular U.S. coast', tideStation:'9410170' },
+      huntington: { name:'Huntington Beach, CA', lat:33.6595, lon:-117.9988, source:'Popular U.S. coast' },
+      santaCruz: { name:'Santa Cruz, CA', lat:36.9741, lon:-122.0308, source:'Popular U.S. coast' },
+      sanFrancisco: { name:'San Francisco, CA', lat:37.7749, lon:-122.4194, source:'Popular U.S. coast', tideStation:'9414290' },
+      newportOR: { name:'Newport, OR', lat:44.6368, lon:-124.0535, source:'Popular U.S. coast' },
+      westportWA: { name:'Westport, WA', lat:46.8901, lon:-124.1041, source:'Popular U.S. coast' },
+      seattle: { name:'Seattle, WA', lat:47.6062, lon:-122.3321, source:'Popular U.S. coast', tideStation:'9447130' },
+      homer: { name:'Homer, AK', lat:59.6425, lon:-151.5483, source:'Popular U.S. coast' },
+      honolulu: { name:'Honolulu, HI', lat:21.3099, lon:-157.8581, source:'Popular U.S. coast', tideStation:'1612340' }
     },
 
     seedTideStations: [
+      {id:'8418150',name:'Portland, ME',lat:43.6581,lon:-70.2442},
+      {id:'8443970',name:'Boston, MA',lat:42.3539,lon:-71.0503},
+      {id:'8510560',name:'Montauk, NY',lat:41.0483,lon:-71.9594},
       {id:'8658163',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964},
       {id:'8659414',name:'Varnamtown, Lockwoods Folly River, NC',lat:33.93333,lon:-78.21833},
-      {id:'8659665',name:'Bowen Point, Shallotte Inlet, NC',lat:33.91430,lon:-78.37324}
+      {id:'8659665',name:'Bowen Point, Shallotte Inlet, NC',lat:33.91430,lon:-78.37324},
+      {id:'8724580',name:'Key West, FL',lat:24.5508,lon:-81.8081},
+      {id:'8771450',name:'Galveston Pier 21, TX',lat:29.3100,lon:-94.7933},
+      {id:'9410170',name:'San Diego, CA',lat:32.7142,lon:-117.1736},
+      {id:'9414290',name:'San Francisco, CA',lat:37.8063,lon:-122.4659},
+      {id:'9447130',name:'Seattle, WA',lat:47.6026,lon:-122.3393},
+      {id:'1612340',name:'Honolulu, HI',lat:21.3067,lon:-157.8670}
     ],
 
     species: {
@@ -48,7 +75,18 @@
       'Spanish Mackerel': { icon:'➤', abbr:'SM', water:[68,82], tideBias:4, waveIdeal:[0.5,3], note:'Warmer, clearer water and lower-to-moderate seas score best for nearshore Spanish mackerel.' },
       'Black Drum': { icon:'●', abbr:'BD', water:[55,76], tideBias:7, waveIdeal:[0.5,3.5], note:'Structure and current get extra weight, with a broad cool-to-warm water preference.' },
       'Sheepshead': { icon:'▦', abbr:'SH', water:[58,78], tideBias:6, waveIdeal:[0.5,2.5], note:'Moderate current around structure is favored. Excessive surf and wind reduce the score more quickly.' },
-      'Striped Bass': { icon:'↯', abbr:'SB', water:[48,68], tideBias:7, waveIdeal:[1,4], note:'Cooler water, moving tide and low-light windows receive extra weight.' }
+      'Striped Bass': { icon:'↯', abbr:'SB', water:[48,68], tideBias:7, waveIdeal:[1,4], note:'Cooler water, moving tide and low-light windows receive extra weight.' },
+      'Pompano': { icon:'◇', abbr:'PO', water:[68,82], tideBias:5, waveIdeal:[1,3.5], note:'Warm water, clean moving surf and moderate wave action score best for pompano.' },
+      'Snook': { icon:'S', abbr:'SN', water:[70,86], tideBias:7, waveIdeal:[0.5,3], note:'Warm water and moving tide near inlets, passes and structure receive extra weight.' },
+      'Tarpon': { icon:'T', abbr:'TP', water:[74,88], tideBias:6, waveIdeal:[0.5,4], note:'Warm water, bait movement and low-light tidal windows receive stronger weight.' },
+      'Surfperch': { icon:'P', abbr:'SP', water:[48,64], tideBias:6, waveIdeal:[1.5,5], note:'Pacific surfperch mode favors cool water, working surf and moving tide along sandy beaches.' },
+      'California Halibut': { icon:'H', abbr:'CH', water:[55,70], tideBias:6, waveIdeal:[0.5,3], note:'Moderate Pacific conditions, current edges and lower surf score higher.' },
+      'Lingcod': { icon:'L', abbr:'LC', water:[44,60], tideBias:4, waveIdeal:[1,5], note:'Cool Pacific water and manageable swell near rocky structure receive extra weight.' },
+      'Rockfish': { icon:'R', abbr:'RF', water:[44,62], tideBias:4, waveIdeal:[1,5], note:'Cool water and manageable sea state near rocky structure score best.' },
+      'Pacific Halibut': { icon:'H', abbr:'PH', water:[40,56], tideBias:4, waveIdeal:[1,5], note:'Alaska and North Pacific mode favors cool water and manageable swell.' },
+      'Salmon': { icon:'S', abbr:'SA', water:[42,60], tideBias:5, waveIdeal:[0.5,4], note:'Cool water, moving tide and low-light periods receive extra weight in Pacific and Alaska waters.' },
+      'Bonefish': { icon:'B', abbr:'BO', water:[74,86], tideBias:6, waveIdeal:[0.2,2.5], note:'Warm shallow water and moving flats tides score higher in Hawaiʻi.' },
+      'Trevally': { icon:'G', abbr:'GT', water:[74,86], tideBias:6, waveIdeal:[0.5,4], note:'Warm water, current and bait movement receive stronger weight in Hawaiʻi.' }
     },
 
     mock: {
@@ -128,7 +166,7 @@
 
     restore(){
       try{
-        const raw=localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
+        const raw=localStorage.getItem('coastcast-v8-state')||localStorage.getItem('coastcast-v7-state')||localStorage.getItem('coastcast-v6-state')||localStorage.getItem('coastcast-v5-state')||localStorage.getItem('coastcast-v4-state')||localStorage.getItem('coastcast-v3-state')||localStorage.getItem('coastcast-state-v1');
         if(!raw) return;
         const saved=JSON.parse(raw);
         if(saved.location) this.state.location=saved.location;
@@ -148,7 +186,7 @@
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
         waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips
       };
-      try{ localStorage.setItem('coastcast-v7-state',JSON.stringify(payload)); }catch(_){ }
+      try{ localStorage.setItem('coastcast-v8-state',JSON.stringify(payload)); }catch(_){ }
     },
 
     bindNavigation(){
@@ -298,18 +336,25 @@
 
     async searchLocations(){
       const q=this.$('locationSearchInput').value.trim(); if(q.length<3){this.showToast('Enter at least 3 characters.');return;}
-      const box=this.$('locationSearchResults'); box.innerHTML='<div class="empty-state">Searching…</div>';
+      const box=this.$('locationSearchResults'); box.innerHTML='<div class="empty-state">Searching U.S. coast locations…</div>';
+      let results=[];
       try{
-        const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&countrycodes=us&q='+encodeURIComponent(q);
-        const results=await this.fetchJSON(url,12000);
-        if(!Array.isArray(results)||!results.length){box.innerHTML='<div class="empty-state">No locations found.</div>';return;}
-        box.innerHTML=results.map((r,i)=>`<button type="button" class="search-result-button" data-search-index="${i}"><strong>${this.escape((r.display_name||'').split(',').slice(0,3).join(','))}</strong><span>${Number(r.lat).toFixed(4)}, ${Number(r.lon).toFixed(4)}</span></button>`).join('');
-        this.$$('.search-result-button').forEach(btn=>btn.addEventListener('click',()=>{
-          const r=results[Number(btn.dataset.searchIndex)];
-          this.state.location={key:'custom',name:(r.display_name||q).split(',').slice(0,3).join(','),lat:Number(r.lat),lon:Number(r.lon),source:'Location search'};
-          this.onLocationChanged();
-        }));
-      }catch(_){ box.innerHTML='<div class="empty-state">Search service did not respond. Try a popular coast or your phone location.</div>'; }
+        const url='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&countrycodes=us&q='+encodeURIComponent(q);
+        const rows=await this.fetchJSON(url,9000); if(Array.isArray(rows)) results=rows;
+      }catch(_){ }
+      if(!results.length){
+        try{
+          const data=await this.fetchJSON('https://photon.komoot.io/api/?limit=8&q='+encodeURIComponent(q+', USA'),9000);
+          results=(data?.features||[]).map(f=>{const c=f?.geometry?.coordinates||[],p=f?.properties||{};return{lat:c[1],lon:c[0],display_name:[p.name,p.city||p.county,p.state,'USA'].filter(Boolean).join(', ')}}).filter(r=>Number.isFinite(Number(r.lat))&&Number.isFinite(Number(r.lon)));
+        }catch(_){ }
+      }
+      if(!results.length){box.innerHTML='<div class="empty-state">No location service responded. Try a popular U.S. coast or your phone location.</div>';return;}
+      box.innerHTML=results.map((r,i)=>`<button type="button" class="search-result-button" data-search-index="${i}"><strong>${this.escape((r.display_name||q).split(',').slice(0,4).join(','))}</strong><span>${Number(r.lat).toFixed(4)}, ${Number(r.lon).toFixed(4)}</span></button>`).join('');
+      this.$$('.search-result-button').forEach(btn=>btn.addEventListener('click',()=>{
+        const r=results[Number(btn.dataset.searchIndex)];
+        this.state.location={key:'custom',name:(r.display_name||q).split(',').slice(0,4).join(','),lat:Number(r.lat),lon:Number(r.lon),source:'U.S. coast location search'};
+        this.onLocationChanged();
+      }));
     },
 
     async reverseGeocode(lat,lon){
@@ -462,6 +507,12 @@
       const endpoints=['https://overpass.private.coffee/api/interpreter','https://overpass-api.de/api/interpreter'];
       for(const endpoint of endpoints){
         try{const data=await this.fetchOverpass(endpoint,query,7000);(data?.elements||[]).forEach(el=>{const t=el.tags||{};const slat=el.lat??el.center?.lat,slon=el.lon??el.center?.lon;add(t.name||'',slat,slon,[t.shop==='fishing'?'Fishing shop':'Bait / tackle',t.opening_hours||'Hours not listed'].filter(Boolean),'OpenStreetMap');});if(normalized.length)break;}catch(_){ }
+      }
+      if(!normalized.length){
+        try{
+          const textShops=await this.genericTextTackleShops();
+          textShops.forEach(s=>add(s.name,s.lat,s.lon,s.tags,s.source));
+        }catch(_){ }
       }
       if(!normalized.length&&this.isHoldenArea()){
         const verified=await this.verifiedHoldenShops();
@@ -913,32 +964,149 @@
     async loadMapPlaces(forceToast=false){
       if(this.state.mapPlacesStatus==='loading')return;
       const {lat,lon}=this.state.location;const cacheKey=this.mapPlacesCacheKey();
-      if(!forceToast){const cached=this.readPlaceCache(cacheKey);if(cached?.length){this.state.mapPOIs=cached;this.state.mapPlacesStatus='cached';this.renderSpotIntelligence();this.renderMapLayers();return cached;}}
+      if(!forceToast){const cached=this.readPlaceCache(cacheKey);if(cached?.length&&!cached.some(x=>x.id==='selected-coast-anchor')){this.state.mapPOIs=cached;this.state.mapPlacesStatus='cached';this.renderSpotIntelligence();this.renderMapLayers();return cached;}}
       this.state.mapPlacesStatus='loading';this.renderSpotIntelligence();
-      const radiusMeters=Math.min(32000,Math.max(5000,Math.round(this.state.radius*1609.344)));
+      const radiusMiles=Math.min(20,Math.max(3,Number(this.state.radius)||10));
+      const radiusMeters=Math.min(32000,Math.max(5000,Math.round(radiusMiles*1609.344)));
       const query=`[out:json][timeout:12];(nwr(around:${radiusMeters},${lat},${lon})["leisure"="fishing"];nwr(around:${radiusMeters},${lat},${lon})["sport"="fishing"];nwr(around:${radiusMeters},${lat},${lon})["man_made"="pier"]["name"];nwr(around:${radiusMeters},${lat},${lon})["leisure"="marina"]["name"];nwr(around:${radiusMeters},${lat},${lon})["leisure"="slipway"]["name"];nwr(around:${radiusMeters},${lat},${lon})["natural"="beach"]["name"];nwr(around:${radiusMeters},${lat},${lon})["waterway"="dock"]["name"];);out center tags;`;
       const seen=new Set(),items=[];
       const addItem=(item)=>{
         const plat=Number(item.lat),plon=Number(item.lon);if(!Number.isFinite(plat)||!Number.isFinite(plon))return;
-        const display=(item.name||'Public access').trim();const key=display.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,28)+':'+plat.toFixed(3)+':'+plon.toFixed(3);if(seen.has(key))return;seen.add(key);
-        const p={id:item.id||`verified-${seen.size}`,name:display,type:item.type||'Public access',lat:plat,lon:plon,distance:this.haversine(lat,lon,plat,plon),tags:item.tags||{},source:item.source||'OpenStreetMap'};
+        const distance=this.haversine(lat,lon,plat,plon);if(distance>Math.max(radiusMiles*1.6,12))return;
+        const display=(item.name||'Public access').trim();const key=display.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,32)+':'+plat.toFixed(4)+':'+plon.toFixed(4);if(seen.has(key))return;seen.add(key);
+        const p={id:item.id||`place-${seen.size}`,name:display,type:item.type||'Public access',lat:plat,lon:plon,distance,tags:item.tags||{},source:item.source||'Public map data'};
         p.match=this.mapPlaceMatchScore(p);p.reason=item.reason||this.mapPlaceReason(p);items.push(p);
       };
-      for(const endpoint of ['https://overpass.private.coffee/api/interpreter','https://overpass-api.de/api/interpreter']){
+
+      let provider='';
+
+      // Use an official state access layer when CoastCast has one registered for the selected coast.
+      try{
+        const official=await this.loadOfficialAccessPlaces(radiusMiles);
+        official.forEach(addItem);
+        if(items.length)provider='official';
+      }catch(_){ }
+
+      // OpenStreetMap remains useful for named fishing-specific places and businesses.
+      if(!items.length){
+        for(const endpoint of ['https://overpass.private.coffee/api/interpreter','https://overpass-api.de/api/interpreter']){
+          try{
+            const data=await this.fetchOverpass(endpoint,query,7000);
+            (data?.elements||[]).forEach(el=>{const tags=el.tags||{};const plat=Number(el.lat??el.center?.lat),plon=Number(el.lon??el.center?.lon);if(!Number.isFinite(plat)||!Number.isFinite(plon))return;const type=this.classifyMapPlace(tags);const name=(tags.name||'').trim();if(!name&&type!=='Fishing access')return;addItem({id:`osm-${el.type||'x'}-${el.id}`,name:name||'Fishing access',type,lat:plat,lon:plon,tags:{access:tags.access||'',surface:tags.surface||'',operator:tags.operator||''},source:'OpenStreetMap'});});
+            if(items.length){provider='live';break;}
+          }catch(_){ }
+        }
+      }
+
+      // Sparse OSM tagging should not force a zero. Search named public-access terms
+      // around the selected town as a generalized no-key fallback.
+      if(!items.length){
         try{
-          const data=await this.fetchOverpass(endpoint,query,7000);
-          (data?.elements||[]).forEach(el=>{const tags=el.tags||{};const plat=Number(el.lat??el.center?.lat),plon=Number(el.lon??el.center?.lon);if(!Number.isFinite(plat)||!Number.isFinite(plon))return;const type=this.classifyMapPlace(tags);const name=(tags.name||'').trim();if(!name&&type!=='Fishing access')return;addItem({id:`osm-${el.type||'x'}-${el.id}`,name:name||'Fishing access',type,lat:plat,lon:plon,tags:{access:tags.access||'',surface:tags.surface||'',operator:tags.operator||''},source:'OpenStreetMap'});});
-          if(items.length)break;
+          const textPlaces=await this.genericTextMapPlaces(radiusMiles);
+          textPlaces.forEach(addItem);
+          if(items.length)provider='search';
         }catch(_){ }
       }
-      let usedVerified=false;
+
+      // Keep the verified Holden catalog as a final safety net for that town.
       if(!items.length&&this.isHoldenArea()){
-        const verified=await this.verifiedHoldenMapPlaces();verified.forEach(addItem);usedVerified=items.length>0;
+        const verified=await this.verifiedHoldenMapPlaces();verified.forEach(addItem);if(items.length)provider='verified';
       }
+
+      // Nationwide safety net: CoastCast can always analyze the selected coastal coordinate.
+      // This is deliberately NOT labeled public access. It keeps forecasting usable while
+      // clearly telling the angler to verify legal/public access locally.
+      if(!items.length){
+        addItem({id:'selected-coast-anchor',name:this.state.location.name,type:'Coastal destination',lat,lon,source:'Selected fishing destination',reason:`Forecast-ready ${this.coastRegion()} coordinate • public access not verified by the current map providers`});
+        if(items.length)provider='anchor';
+      }
+
       items.sort((a,b)=>b.match-a.match||a.distance-b.distance);
-      this.state.mapPOIs=items.slice(0,35);
-      if(this.state.mapPOIs.length){this.state.mapPlacesStatus=usedVerified?'verified':'live';this.writePlaceCache(cacheKey,this.state.mapPOIs);this.renderSpotIntelligence();this.renderMapLayers();if(forceToast)this.showToast(usedVerified?`Loaded ${this.state.mapPOIs.length} verified Holden Beach access point${this.state.mapPOIs.length===1?'':'s'}.`:`Scanned ${this.state.mapPOIs.length} public fishing/access place${this.state.mapPOIs.length===1?'':'s'}.`);return this.state.mapPOIs;}
-      this.state.mapPlacesStatus='fallback';this.state.mapPOIs=[];this.renderSpotIntelligence();if(forceToast)this.showToast('Public place providers returned no usable places. Saved spots and live forecasts still work.');return [];
+      this.state.mapPOIs=items.slice(0,40);
+      if(this.state.mapPOIs.length){
+        this.state.mapPlacesStatus=provider||'live';if(provider!=='anchor')this.writePlaceCache(cacheKey,this.state.mapPOIs);this.renderSpotIntelligence();this.renderMapLayers();
+        if(forceToast){
+          const copy=provider==='official'?`Loaded ${this.state.mapPOIs.length} official state coastal access site${this.state.mapPOIs.length===1?'':'s'}.`:provider==='verified'?`Loaded ${this.state.mapPOIs.length} verified local access point${this.state.mapPOIs.length===1?'':'s'}.`:provider==='search'?`Found ${this.state.mapPOIs.length} indexed coastal place${this.state.mapPOIs.length===1?'':'s'} using location search.`:provider==='anchor'?`No verified public access was indexed here, so CoastCast loaded your selected ${this.coastRegion()} coordinate for live analysis.`:`Scanned ${this.state.mapPOIs.length} public fishing/access place${this.state.mapPOIs.length===1?'':'s'}.`;
+          this.showToast(copy);
+        }
+        return this.state.mapPOIs;
+      }
+      this.state.mapPlacesStatus='fallback';this.state.mapPOIs=[];this.renderSpotIntelligence();if(forceToast)this.showToast('No indexed public access was returned, but nationwide live forecasting still works at the selected coast point.');return [];
+    },
+
+    coastRegion(){
+      const l=this.state.location||{};const lat=Number(l.lat),lon=Number(l.lon),name=String(l.name||'');
+      if(/hawai|honolulu|maui|oahu|kauai/i.test(name)||(lat>=18&&lat<=23&&lon>=-161.5&&lon<=-154.5))return'Hawaiʻi';
+      if(/alaska|,\s*ak\b/i.test(name)||(lat>=51&&lon<=-130))return'Alaska';
+      if(lon<=-115)return'Pacific Coast';
+      if(lat<=31.6&&lon>=-98.5&&lon<=-80.0)return'Gulf Coast';
+      return'Atlantic Coast';
+    },
+
+    coastRegionSpecies(){
+      const r=this.coastRegion();
+      if(r==='Pacific Coast')return['Surfperch','California Halibut','Lingcod','Rockfish','Striped Bass','Salmon'];
+      if(r==='Alaska')return['Pacific Halibut','Salmon','Rockfish','Lingcod'];
+      if(r==='Hawaiʻi')return['Bonefish','Trevally'];
+      if(r==='Gulf Coast')return['Red Drum','Speckled Trout','Flounder','Pompano','Snook','Tarpon','Spanish Mackerel','Sheepshead'];
+      return['Striped Bass','Bluefish','Red Drum','Flounder','Black Drum','Spanish Mackerel','Speckled Trout'];
+    },
+
+    isNorthCarolinaCoast(){
+      const l=this.state.location||{};const name=String(l.name||'');const lat=Number(l.lat),lon=Number(l.lon);
+      if(/north carolina|,\s*nc\b/i.test(name))return true;
+      return Number.isFinite(lat)&&Number.isFinite(lon)&&lat>=33.75&&lat<=36.65&&lon>=-78.65&&lon<=-75.20;
+    },
+
+    async loadOfficialAccessPlaces(radiusMiles=10){
+      // Provider registry: official state sources can be added without changing the nationwide core.
+      if(this.isNorthCarolinaCoast()) return this.loadNcDcmAccessPlaces(radiusMiles);
+      return [];
+    },
+
+    async loadNcDcmAccessPlaces(radiusMiles=10){
+      const l=this.state.location||{};const lat=Number(l.lat),lon=Number(l.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon))return[];
+      const base='https://services2.arcgis.com/kCu40SDxsCGcuUWO/ArcGIS/rest/services/DCM_Beach_and_Waterfront_Access/FeatureServer/0/query';
+      const params=new URLSearchParams({
+        f:'json',where:'1=1',geometry:`${lon},${lat}`,geometryType:'esriGeometryPoint',inSR:'4326',spatialRel:'esriSpatialRelIntersects',
+        distance:String(Math.min(20,Math.max(3,radiusMiles))),units:'esriSRUnit_StatuteMile',
+        outFields:'OBJECTID,ACCESS_ID,PLACE,ACCESS_LOC,PARKING,RESTRM,SHOWER,HAND_BEACH,VEH_ACCESS,ACESS_TYPE,PARKING_OPTIONS,KayakCanoeLaunch,PRK_FEE',
+        returnGeometry:'true',outSR:'4326',resultRecordCount:'120'
+      });
+      const data=await this.fetchJSON(`${base}?${params.toString()}`,9000);if(data?.error)throw new Error(data.error.message||'NC DCM query failed');
+      const features=Array.isArray(data?.features)?data.features:[];
+      return features.map((f,i)=>{
+        const a=f.attributes||{},g=f.geometry||{};const plat=Number(g.y),plon=Number(g.x);if(!Number.isFinite(plat)||!Number.isFinite(plon))return null;
+        const accessType=String(a.ACESS_TYPE||'').toLowerCase();const loc=String(a.ACCESS_LOC||'').trim();const site=String(a.ACCESS_ID||'').trim();const town=String(a.PLACE||'').trim();
+        const type=accessType.includes('beach')?'Beach':'Public access';const name=site||loc||`${town||'NC'} public coastal access`;
+        const amenities=[];if(Number(a.PARKING)>0)amenities.push(`${Math.round(Number(a.PARKING))} parking`);if(a.RESTRM==='Y')amenities.push('restroom');if(a.SHOWER==='Y')amenities.push('shower');if(a.HAND_BEACH==='Y')amenities.push('accessible beach access');if(a.KayakCanoeLaunch==='Y')amenities.push('kayak/canoe launch');if(a.PRK_FEE==='Y')amenities.push('paid parking');
+        const detail=[loc,town,amenities.join(' • ')].filter(Boolean).join(' • ');
+        return{id:`ncdcm-${a.OBJECTID||a.NCDCM_ID||i}-${plat.toFixed(5)}`,name,type,lat:plat,lon:plon,source:'Official • NC DEQ Coastal Management',reason:`Official NC public ${type.toLowerCase()}${detail?` • ${detail}`:''}`,tags:{official:'NC DEQ',parking:a.PARKING||0,restroom:a.RESTRM||'',shower:a.SHOWER||'',vehicle:a.VEH_ACCESS||''}};
+      }).filter(Boolean);
+    },
+
+    async genericTextMapPlaces(radiusMiles=10){
+      const l=this.state.location||{};const lat=Number(l.lat),lon=Number(l.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon))return[];
+      const town=String(l.name||'').split(',').slice(0,2).join(',').trim();const maxDistance=Math.max(12,radiusMiles*1.6);const out=[],seen=new Set();
+      const terms=[['public beach access','Beach'],['fishing pier','Pier'],['public fishing access','Fishing access'],['boat ramp','Boat ramp'],['public waterfront access','Public access']];
+      const add=(r,type,source)=>{const plat=Number(r.lat),plon=Number(r.lon);if(!Number.isFinite(plat)||!Number.isFinite(plon))return;const d=this.haversine(lat,lon,plat,plon);if(d>maxDistance)return;const display=String(r.display_name||r.name||'').split(',').slice(0,2).join(',').trim();if(!display)return;const key=`${display.toLowerCase()}:${plat.toFixed(4)}:${plon.toFixed(4)}`;if(seen.has(key))return;seen.add(key);out.push({id:`text-${out.length}-${plat.toFixed(4)}`,name:display,type,lat:plat,lon:plon,source,reason:`${type} found near ${town||'selected fishing area'} • ${d.toFixed(1)} mi away`});};
+      for(const [term,type] of terms){
+        const q=[term,town].filter(Boolean).join(' ');
+        try{
+          const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=us&q=${encodeURIComponent(q)}`;const rows=await this.fetchJSON(url,6500);if(Array.isArray(rows))rows.forEach(r=>add(r,type,'Location search • OpenStreetMap'));
+        }catch(_){ }
+        if(out.length>=8)break;
+        await this.sleep(900);
+      }
+      if(out.length)return out;
+      for(const [term,type] of terms.slice(0,3)){
+        try{
+          const q=[term,town].filter(Boolean).join(' ');const data=await this.fetchJSON(`https://photon.komoot.io/api/?limit=5&q=${encodeURIComponent(q)}`,6500);(data?.features||[]).forEach((f,i)=>{const c=f?.geometry?.coordinates||[],p=f?.properties||{};add({lat:c[1],lon:c[0],display_name:[p.name,p.city||p.county,p.state].filter(Boolean).join(', ')},type,'Location search • Photon');});
+        }catch(_){ }
+        if(out.length>=5)break;
+        await this.sleep(200);
+      }
+      return out;
     },
 
     isHoldenArea(){const l=this.state.location||{};return /holden beach/i.test(String(l.name||''))||this.haversine(Number(l.lat)||0,Number(l.lon)||0,33.9135061,-78.3038892)<=18;},
@@ -967,6 +1135,20 @@
       return out;
     },
 
+    async genericTextTackleShops(){
+      const l=this.state.location||{};const lat=Number(l.lat),lon=Number(l.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon))return[];
+      const town=String(l.name||'').split(',').slice(0,3).join(',').trim();const maxDistance=Math.max(18,(Number(this.state.radius)||10)*2);const out=[],seen=new Set();
+      const add=(name,plat,plon,source)=>{plat=Number(plat);plon=Number(plon);if(!name||!Number.isFinite(plat)||!Number.isFinite(plon))return;const d=this.haversine(lat,lon,plat,plon);if(d>maxDistance)return;const key=name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,28)+':'+plat.toFixed(3)+':'+plon.toFixed(3);if(seen.has(key))return;seen.add(key);out.push({name,lat:plat,lon:plon,source,tags:['Bait / tackle','Location search']});};
+      for(const term of ['bait and tackle','fishing tackle','bait shop']){
+        const q=`${term} ${town}`;
+        try{const rows=await this.fetchJSON(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=us&q=${encodeURIComponent(q)}`,6000);(rows||[]).forEach(r=>add(String(r.display_name||'').split(',')[0],r.lat,r.lon,'Location search • OpenStreetMap'));}catch(_){ }
+        if(out.length>=5)break;await this.sleep(350);
+      }
+      if(out.length)return out;
+      try{const data=await this.fetchJSON(`https://photon.komoot.io/api/?limit=8&q=${encodeURIComponent('bait tackle '+town)}`,6500);(data?.features||[]).forEach(f=>{const c=f?.geometry?.coordinates||[],p=f?.properties||{};add(p.name||'Bait & tackle',c[1],c[0],'Location search • Photon');});}catch(_){ }
+      return out;
+    },
+
     async verifiedHoldenShops(){
       const catalog=[
         {name:'Rigged & Ready Bait & Tackle',query:'1096-7 Sabbath Home Road SW, Supply, NC 28462',source:'Verified local shop',tags:['Bait & tackle','Official shop website']},
@@ -979,14 +1161,14 @@
 
     classifyMapPlace(tags){if(tags.leisure==='fishing'||tags.sport==='fishing')return'Fishing access';if(tags.man_made==='pier')return'Pier';if(tags.leisure==='slipway')return'Boat ramp';if(tags.leisure==='marina')return'Marina';if(tags.natural==='beach')return'Beach';if(tags.waterway==='dock')return'Dock';return'Public access';},
     mapPlaceMatchScore(p){let score=this.currentScore();const style=this.state.fishingStyle;const type=p.type;let bonus=0;if(type==='Fishing access')bonus+=3;if(type==='Beach'&&style==='Surf fishing')bonus+=4;if(type==='Pier'&&style==='Pier fishing')bonus+=5;if(type==='Pier')bonus+=2;if(type==='Boat ramp')bonus-=2;if(type==='Marina')bonus-=3;const distPenalty=Math.min(9,Math.max(0,p.distance-1)*.65);return Math.round(Math.max(35,Math.min(98,score+bonus-distPenalty)));},
-    mapPlaceReason(p){const parts=[p.type,`${this.fmt(p.distance,1)} mi away`];if(p.type==='Beach'&&this.state.fishingStyle==='Surf fishing')parts.push('matches surf mode');else if(p.type==='Pier'&&this.state.fishingStyle==='Pier fishing')parts.push('matches pier mode');else if(p.type==='Fishing access')parts.push('mapped fishing access');parts.push('area conditions preview');return parts.join(' • ');},
+    mapPlaceReason(p){if(p.type==='Coastal destination')return`${this.coastRegion()} forecast coordinate • public access must be verified locally`;const parts=[p.type,`${this.fmt(p.distance,1)} mi away`];if(p.type==='Beach'&&this.state.fishingStyle==='Surf fishing')parts.push('matches surf mode');else if(p.type==='Pier'&&this.state.fishingStyle==='Pier fishing')parts.push('matches pier mode');else if(p.type==='Fishing access')parts.push('mapped fishing access');parts.push('area conditions preview');return parts.join(' • ');},
 
     renderSpotIntelligence(){
       const score=this.currentScore();const days=this.state.data?.days||[];const bestDay=days.length?days.reduce((a,b)=>b.score>a.score?b:a,days[0]):null;
       if(this.$('mapCurrentScore'))this.$('mapCurrentScore').textContent=score;if(this.$('mapScoreSpecies'))this.$('mapScoreSpecies').textContent=this.state.targetSpecies;
       if(this.$('mapBestDay'))this.$('mapBestDay').textContent=bestDay?.day||'--';if(this.$('mapBestDayScore'))this.$('mapBestDayScore').textContent=bestDay?`${bestDay.score}/100 • ${this.fmt(bestDay.wind,0)} mph wind`:'7-day outlook';
       if(this.$('mapPlacesCount'))this.$('mapPlacesCount').textContent=this.state.mapPOIs.length;
-      const statusCopy={idle:'Not scanned',loading:'Scanning…',live:'Live public map',verified:'Verified local catalog',cached:'Cached map data',fallback:'Search unavailable'};if(this.$('spotIntelStatus'))this.$('spotIntelStatus').textContent=statusCopy[this.state.mapPlacesStatus]||'Not scanned';
+      const statusCopy={idle:'Not scanned',loading:'Scanning…',official:'Official state access',live:'National public map',search:'Location search',verified:'Verified local catalog',anchor:'Forecast point only',cached:'Cached map data',fallback:'No indexed access found'};if(this.$('spotIntelStatus'))this.$('spotIntelStatus').textContent=statusCopy[this.state.mapPlacesStatus]||'Not scanned';if(this.$('coastCoverageBadge'))this.$('coastCoverageBadge').textContent=`USA COAST • ${this.coastRegion()} • ${this.coastRegionSpecies().slice(0,3).join(' • ')}`;if(this.$('spotProviderPill'))this.$('spotProviderPill').textContent=this.state.mapPlacesStatus==='official'?'Official state access':this.state.mapPlacesStatus==='anchor'?'Forecast coordinate':'Nationwide coast scan';
       if(this.$('mapCenterLabel'))this.$('mapCenterLabel').textContent=this.state.location.name;
       const places=[...this.state.mapPOIs].sort((a,b)=>b.match-a.match||a.distance-b.distance);const top=places[0]||null;this.state.selectedIntelSpot=top;
       const analyze=this.$('topSpotAnalyzeBtn'),save=this.$('topSpotSaveBtn');if(analyze)analyze.disabled=!top;if(save)save.disabled=!top;
@@ -1018,7 +1200,7 @@
       this.state.waypoints.forEach(w=>{const m=L.marker([w.lat,w.lon],{icon:this.markerIcon('saved','★')}).bindPopup(`<strong>${this.escape(w.name)}</strong><br>${this.escape(w.notes||'Private saved spot')}`);m.addTo(map);this.state.mapLayers.spots.push(m);});
       this.state.catches.forEach(c=>{const lat=c.privacy==='private'?c.lat+.003:c.lat,lon=c.privacy==='private'?c.lon+.003:c.lon;const m=L.circleMarker([lat,lon],{radius:6,color:'#dff9ee',weight:2,fillColor:'#4FDFB5',fillOpacity:.95}).bindPopup(`<strong>${this.escape(c.species)}</strong><br>${this.escape(c.privacy==='private'?'Private catch — offset on map':c.location)}`);m.addTo(map);this.state.mapLayers.catches.push(m);});
       (this.state.data?.shops||[]).forEach((s,i)=>{if(!Number.isFinite(Number(s.lat))||!Number.isFinite(Number(s.lon)))return;const m=L.marker([s.lat,s.lon],{icon:this.markerIcon('bait',String(i+1))}).bindPopup(`<strong>${this.escape(s.name)}</strong><br>${this.fmt(s.distance,1)} mi from fishing spot<div class="popup-actions"><a href="${this.mapsUrl(s.lat,s.lon,s.name)}" target="_blank" rel="noopener">To shop</a><a href="${this.mapsRouteUrl(s.lat,s.lon,l.lat,l.lon)}" target="_blank" rel="noopener">Shop → spot</a></div>`);m.addTo(map);this.state.mapLayers.shops.push(m);});
-      this.applyMapFilter();this.$('mapSelection').innerHTML=`Centered on <strong>${this.escape(l.name)}</strong> • ${this.currentScore()}/100 current area score • ${this.state.mapPOIs.length} public places scanned.`;
+      this.applyMapFilter();this.$('mapSelection').innerHTML=`Centered on <strong>${this.escape(l.name)}</strong> • ${this.coastRegion()} • ${this.currentScore()}/100 current area score • ${this.state.mapPOIs.length} indexed spot${this.state.mapPOIs.length===1?'':'s'}.`;
     },
     typeAbbr(type){return({'Fishing access':'F','Pier':'P','Beach':'B','Boat ramp':'R','Marina':'M','Dock':'D'})[type]||'•';},
     setMapFilter(filter,button){this.state.mapFilter=filter;this.$$('.filter-chip').forEach(b=>b.classList.toggle('active',b===button));this.applyMapFilter();},
@@ -1028,7 +1210,7 @@
     resetApp(){
       if(!confirm('Reset saved CoastCast spots, catches, settings and preferences?')) return;
       try{localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
+      this.state.live=false;try{localStorage.removeItem('coastcast-v8-state');}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CoastCast reset.');
     },
 
     snapshotConditions(){

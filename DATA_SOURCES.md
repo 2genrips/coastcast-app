@@ -1,9 +1,16 @@
-# CoastCast v0.7.2 data sources
+# CoastCast v0.8.0 Data Sources
 
-Forecast sources remain Open-Meteo weather/marine and NOAA CO-OPS tides.
+## Nationwide forecast core
+- Open-Meteo Weather API — weather, temperature, rain, pressure, wind and related forecast fields.
+- Open-Meteo Marine API — waves, swell, sea-surface temperature and marine forecast fields where model coverage is available.
+- NOAA CO-OPS Tides & Currents — nearest tide-prediction station discovery and tide predictions across U.S. coasts.
 
-Map place discovery uses OpenStreetMap Overpass first. For Holden Beach, CoastCast now has a verified fallback catalog based on the Town of Holden Beach / Brunswick Islands public-access information and NC Wildlife Resources Commission fishing-access data. Address-only verified places are geocoded with Nominatim, then Photon as a fallback.
+## Nationwide location / map discovery
+- OpenStreetMap / Overpass — indexed fishing access, beaches, piers, marinas, ramps and related places.
+- Nominatim and Photon — location search and fallback discovery.
+- State/local official access providers — optional provider adapters. NC Division of Coastal Management is currently integrated as an official state layer.
 
-The Holden Beach Boating Access Area is anchored with NCWRC's published coordinates: 33.91625683, -78.26749257.
+## National access-data strategy
+There is no single open, documented, browser-friendly public-access API that provides complete legal beach/pier/shore access for every U.S. coastline. NOAA Fisheries maintains a large Public Fishing Access Site Register for much of the Atlantic/Gulf plus Hawaiʻi, and USGS publishes a nationwide public boat-ramp dataset, but production integration should respect each source's access method and update process.
 
-Tackle search uses Overpass first, then verified Holden Beach shop addresses if needed.
+CoastCast therefore separates **forecast coverage** from **verified access coverage**. A forecast can be calculated at a coastal coordinate even when no public-access site is returned. Unverified coordinates are never labeled as legal/public access.
