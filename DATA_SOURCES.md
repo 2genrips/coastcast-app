@@ -48,3 +48,7 @@ NOAA tide prediction requests now load approximately seven days of high/low pred
 
 ## v1.6 derived intelligence
 Beach Readiness, Catch Forecast Timeline, and Smart Departure are CoastCast-derived planning outputs calculated locally from the already loaded Weather, Marine, NOAA tide, NWS alert, species, and user-preference data. They do not add a new external data provider and should not be treated as a safety guarantee.
+
+
+## v1.7 local/offline features
+Tackle inventory, shopping lists, catch photos and offline trip packs are stored locally in the PWA. Offline trip packs are forecast snapshots, not live data, and should be refreshed when connectivity returns.

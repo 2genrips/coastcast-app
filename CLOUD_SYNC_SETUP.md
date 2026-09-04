@@ -28,3 +28,6 @@ Your Supabase password is never saved by CoastCast. The project URL and anon/pub
 ## Background alerts
 
 v1.1 makes the service worker push-ready, but **24/7 alerts still require a backend worker plus web-push delivery**. The current app does not claim to monitor forecasts while fully closed.
+
+
+v1.7 sync payloads can include tackle inventory, shopping lists, offline trip packs and compressed catch photos. Large photo-heavy backups may increase Supabase row size; keep catch photos compressed and reasonable in number.

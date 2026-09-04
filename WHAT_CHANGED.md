@@ -1,20 +1,21 @@
-# CoastCast v1.6 — What Changed
+# CoastCast v1.7 — What Changed
 
-## Beach Readiness
-- New 0–100 planning-readiness score that weighs the fishing window, wind, surf, weather, live-source confidence, and NWS hazard status.
-- Explicit planning call: Strong Trip Window, Go With a Conditions Check, Wait/Recheck, or Hold & Review Official Warnings.
-- This is intentionally a trip-planning score, not a safety guarantee.
+## My Tackle Box
+- Track bait, lures, rigs, weights, hooks, leader, safety gear and other supplies.
+- Quantity controls with READY / LOW / OUT status.
+- Build a trip shopping list from low-stock items plus the current CoastCast bait and gear plan.
 
-## Catch Forecast Timeline
-- New species-specific hourly timeline on Forecast.
-- Ranks the three strongest 3-hour windows for the currently selected species.
-- Tap any top window to carry it directly into Smart Departure.
+## Offline Trip Pack
+- Save a compact trip snapshot before entering weak-service areas.
+- Stores location, target species, CoastCast score, Beach Readiness, weather, wind, surf, water temperature, bait/rig plan, departure timing, Safety Guard and tide snapshot.
+- Offline packs remain on the device and are included in CoastCast backup/cloud payloads.
 
-## Smart Departure
-- Enter approximate drive time, setup time, and optional bait-stop time.
-- CoastCast works backward from the selected fishing window to calculate Leave By and Arrive/Setup times in destination-local time.
-- One-tap Android share of a compact CoastCast Trip Brief, with text-file fallback.
+## Catch Photo Log
+- Add an optional catch photo from Android camera/gallery.
+- Photos are resized and compressed before local storage.
+- New Photo Memories section in Logbook.
+- Catch cards display saved photos.
 
-## Data portability
-- Smart Departure preferences are included in local state, backups, and cloud payloads.
-- Existing v1.5 data migrates forward automatically.
+## Data
+- v1.7 local state migrates automatically from v1.6 and earlier.
+- Tackle inventory, shopping list, offline packs and catch photos are included in backup/cloud sync payloads.

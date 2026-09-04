@@ -1,2 +1,2 @@
-CoastCast v1.6.0
-Beach Readiness + Catch Forecast Timeline + Smart Departure
+CoastCast v1.7.0
+Tackle Box + Offline Trip Pack + Catch Photo Log

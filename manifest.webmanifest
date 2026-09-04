@@ -1,7 +1,7 @@
 {
   "name": "CoastCast Fishing Forecast",
   "short_name": "CoastCast",
-  "description": "Nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, NWS alerts, Beach Readiness, Catch Forecast Timeline, Smart Departure, Scout, species intelligence and catch learning.",
+  "description": "Nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, NWS alerts, Beach Readiness, Catch Forecast Timeline, Smart Departure, Scout, species intelligence, tackle inventory, offline trip packs and catch photos.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",

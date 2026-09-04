@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, NWS safety alerts, Beach Readiness, Catch Forecast Timeline, Smart Departure planning, species and bait intelligence, Scout spot ranking, live fishing sessions, trips and a private catch logbook." />
+  <meta name="description" content="CoastCast is a nationwide coastal fishing planner with live weather, marine conditions, NOAA tides, NWS safety alerts, Beach Readiness, species and bait intelligence, Scout spot ranking, tackle inventory, offline trip packs, catch photos, live sessions, trips and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,7 +16,7 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species insights and nearby bait & tackle." />
   <meta property="og:image" content="og-image.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=1.6.0" />
+  <link rel="stylesheet" href="styles.css?v=1.7.0" />
   <title>CoastCast</title>
 </head>
 <body>
@@ -709,6 +709,35 @@
           <p class="micro-note">Gear suggestions are planning guidance. Adjust terminal tackle, weights and safety equipment to local conditions and your own experience.</p>
         </section>
 
+
+        <section class="panel offline-pack-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">OFFLINE TRIP PACK</div><h2>Take the plan with you</h2></div>
+            <span id="offlinePackBadge" class="tiny-pill">0 saved</span>
+          </div>
+          <p class="section-note">Save a compact snapshot of your destination, species, tide, weather, surf, bait plan, Safety Guard and departure plan before cell service gets weak.</p>
+          <button id="saveOfflinePackBtn" class="primary-button full" type="button">Save current trip for offline use</button>
+          <div id="offlinePackList" class="offline-pack-list"><div class="empty-state">No offline trip packs yet.</div></div>
+          <p class="micro-note">Offline packs are saved on this device. They are snapshots, not live forecasts; recheck official conditions whenever you have service.</p>
+        </section>
+
+        <section class="panel tackle-box-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">MY TACKLE BOX</div><h2>Inventory & shopping list</h2></div>
+            <button id="addTackleBtn" class="primary-button tiny" type="button">+ Item</button>
+          </div>
+          <div class="tackle-stat-strip">
+            <div><span>TRACKED</span><strong id="tackleCount">0</strong></div>
+            <div><span>LOW / OUT</span><strong id="tackleLowCount">0</strong></div>
+            <button id="generateShoppingBtn" class="secondary-button small" type="button">Build shopping list</button>
+          </div>
+          <div id="tackleInventory" class="tackle-inventory"><div class="empty-state">Add your hooks, rigs, lures, bait, weights and other fishing supplies.</div></div>
+          <div class="section-heading shopping-heading">
+            <div><div class="eyebrow">TRIP SHOPPING</div><h3>What should I pick up?</h3></div>
+          </div>
+          <div id="shoppingList" class="shopping-list"><div class="empty-state">Generate a list from low-stock tackle and the current bait plan.</div></div>
+        </section>
+
         <section class="panel">
           <div class="section-heading"><div><div class="eyebrow">SAVED TRIPS</div><h2>My trip plans</h2></div><span class="tiny-pill">Newest first</span></div>
           <div id="savedTripList" class="trip-card-list"><div class="empty-state">Build a Smart Trip and it will be saved here.</div></div>
@@ -774,6 +803,16 @@
           <div id="catchIntelHero" class="catch-intel-hero"></div>
           <div id="catchIntelMetrics" class="catch-intel-metrics"></div>
           <div id="catchIntelBars" class="catch-intel-bars"></div>
+        </section>
+
+
+        <section class="panel photo-memory-panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">PHOTO MEMORIES</div><h2>Your catches at a glance</h2></div>
+            <span id="photoMemoryBadge" class="tiny-pill">0 recent</span>
+          </div>
+          <p class="section-note">Add an optional photo when you log a catch. CoastCast compresses it for phone storage and keeps it with your private logbook backup.</p>
+          <div id="photoMemoryGrid" class="photo-memory-grid"><div class="empty-state">Catch photos will appear here.</div></div>
         </section>
 
         <section class="panel">
@@ -957,10 +996,47 @@
         <label class="field-group"><span>Weight (lb)</span><input id="catchWeight" class="text-control" type="number" min="0" max="500" step="0.1" inputmode="decimal" /></label>
       </div>
       <label class="field-group"><span>Bait / lure</span><input id="catchBait" class="text-control" maxlength="80" placeholder="Cut mullet, shrimp, paddletail..." /></label>
+      <div class="field-group catch-photo-field">
+        <span>Catch photo <small>(optional)</small></span>
+        <input id="catchPhotoInput" class="file-control" type="file" accept="image/*" capture="environment" />
+        <div id="catchPhotoPreview" class="catch-photo-preview"><span>Optional • add a catch photo from your camera or gallery</span></div>
+        <button id="removeCatchPhotoBtn" class="link-button" type="button" hidden>Remove photo</button>
+      </div>
       <label class="field-group"><span>Notes</span><textarea id="catchNotes" class="text-control textarea" maxlength="400" placeholder="Structure, retrieve, water clarity, bite details..."></textarea></label>
       <label class="field-group"><span>Location privacy</span><select id="catchPrivacy" class="select-control"><option value="private">Private — exact location stays mine</option><option value="water">Water only — show general area</option><option value="public">Public — share fishing location</option></select></label>
       <div class="snapshot-card"><strong>Conditions snapshot</strong><span id="catchSnapshot">Current CoastCast conditions will be saved with this catch.</span></div>
       <div class="sheet-actions"><button class="secondary-button" value="cancel" type="submit">Cancel</button><button id="saveCatchBtn" class="primary-button" type="button">Save catch</button></div>
+    </form>
+  </dialog>
+
+
+  <!-- TACKLE ITEM DIALOG -->
+  <dialog id="tackleDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">MY TACKLE BOX</div><h2>Add tackle item</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <label class="field-group"><span>Item name</span><input id="tackleName" class="text-control" maxlength="70" placeholder="3 oz pyramid sinkers, paddletails, circle hooks..." /></label>
+      <div class="two-col">
+        <label class="field-group"><span>Category</span><select id="tackleCategory" class="select-control"><option>Bait / Lure</option><option>Hooks / Terminal</option><option>Weights</option><option>Line / Leader</option><option>Rig</option><option>Safety</option><option>Other</option></select></label>
+        <label class="field-group"><span>Quantity</span><input id="tackleQty" class="text-control" type="number" min="0" max="999" step="1" value="1" inputmode="numeric"/></label>
+      </div>
+      <label class="field-group"><span>Low-stock alert at</span><input id="tackleMinQty" class="text-control" type="number" min="0" max="999" step="1" value="1" inputmode="numeric"/></label>
+      <label class="field-group"><span>Notes</span><textarea id="tackleNotes" class="text-control textarea" maxlength="180" placeholder="Size, color, brand, where you keep it..."></textarea></label>
+      <div class="sheet-actions"><button class="secondary-button" value="cancel" type="submit">Cancel</button><button id="saveTackleBtn" class="primary-button" type="button">Add to tackle box</button></div>
+    </form>
+  </dialog>
+
+  <!-- OFFLINE PACK DIALOG -->
+  <dialog id="offlinePackDialog" class="sheet-dialog">
+    <form class="sheet-card offline-pack-sheet" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">OFFLINE TRIP PACK</div><h2 id="offlinePackTitle">Saved trip</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <div id="offlinePackDetail" class="offline-pack-detail"></div>
+      <div class="sheet-actions"><button class="primary-button full" value="cancel" type="submit">Done</button></div>
     </form>
   </dialog>
 
@@ -1055,7 +1131,7 @@
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
       <label class="field-group"><span>Nearby shop radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <div class="settings-note">CoastCast v1.3 Beta is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
+      <div class="settings-note">CoastCast v1.7 Beta is an active development build. Species scores are planning guidance, not a guarantee of fish activity. Always verify official regulations and marine safety conditions.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
     </form>
   </dialog>
@@ -1082,6 +1158,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js?v=1.6.0"></script>
+  <script src="app.js?v=1.7.0"></script>
 </body>
 </html>
