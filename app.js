@@ -19,7 +19,7 @@
       savedTripPlans: [],
       alertRules: [],
       alertMatches: [],
-      profile: {name:'AnglerSignal Angler',homeCoast:'',favoriteSpecies:'Red Drum'},
+      profile: {name:'CastVector Angler',homeCoast:'',favoriteSpecies:'Red Drum'},
       cloud: {url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null},
       scout: {running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null},
       goMode: {active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]},
@@ -356,7 +356,7 @@
     },
 
     bindControls(){
-      document.addEventListener('click',e=>{const gated=e.target.closest?.('[data-premium]');if(!gated||this.hasPremium())return;e.preventDefault();e.stopPropagation();if(typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();this.showToast(`${gated.dataset.premium||'This tool'} is part of AnglerSignal Premium.`);this.openMembershipDialog();},true);
+      document.addEventListener('click',e=>{const gated=e.target.closest?.('[data-premium]');if(!gated||this.hasPremium())return;e.preventDefault();e.stopPropagation();if(typeof e.stopImmediatePropagation==='function')e.stopImmediatePropagation();this.showToast(`${gated.dataset.premium||'This tool'} is part of CastVector Premium.`);this.openMembershipDialog();},true);
       this.$('quickBuildPlanBtn')?.addEventListener('click',()=>this.buildCommandPlan({navigateToTrips:true}));
       this.$('quickDetailsBtn')?.addEventListener('click',()=>this.setExperienceMode('full',true));
       this.$('quickSimpleBtn')?.addEventListener('click',()=>this.setExperienceMode(this.state.experience?.mode==='simple'?'full':'simple',true));
@@ -505,7 +505,7 @@
       this.$('cloudAutoSyncToggle')?.addEventListener('change',e=>{this.state.cloud.autoSync=!!e.target.checked;this.save();this.renderProfile();});
       this.$('refreshServerAccessBtn')?.addEventListener('click',()=>this.refreshServerAccess({quiet:false}));
       this.$('deleteAccountBtn')?.addEventListener('click',()=>this.openDeleteAccountDialog());
-      this.$('confirmDeleteAccountBtn')?.addEventListener('click',()=>this.deleteAnglerSignalAccount());
+      this.$('confirmDeleteAccountBtn')?.addEventListener('click',()=>this.deleteCastVectorAccount());
       this.$('acceptFamilyInviteBtn')?.addEventListener('click',()=>this.acceptFamilyInvite());
       this.$('manageFamilyCrewBtn')?.addEventListener('click',()=>this.openFamilyCrewServer());
       this.$('familyServerInviteBtn')?.addEventListener('click',()=>this.serverFamilyInvite());
@@ -542,7 +542,7 @@
 
     openPlanner(){
       this.$('tripSpecies').value=this.state.targetSpecies;
-      this.$('plannerResult').textContent='Choose your preferences and AnglerSignal will rank the week for that species.';
+      this.$('plannerResult').textContent='Choose your preferences and CastVector will rank the week for that species.';
       this.openDialog('plannerDialog');
     },
 
@@ -558,7 +558,7 @@
 
     async requestNotificationPermission(){
       if(typeof Notification==='undefined'){this.showToast('Device notifications are not available in this browser.');return;}
-      try{const result=await Notification.requestPermission();if(result==='granted'){this.showToast('Device notifications enabled for AnglerSignal checks.');const b=this.$('enableNotificationsBtn');if(b)b.textContent='Device notifications enabled';this.evaluateAlerts({notify:true});}else this.showToast('Notification permission was not enabled.');}catch(_){this.showToast('Could not request notification permission.');}
+      try{const result=await Notification.requestPermission();if(result==='granted'){this.showToast('Device notifications enabled for CastVector checks.');const b=this.$('enableNotificationsBtn');if(b)b.textContent='Device notifications enabled';this.evaluateAlerts({notify:true});}else this.showToast('Notification permission was not enabled.');}catch(_){this.showToast('Could not request notification permission.');}
     },
 
     openWaypointDialog(){
@@ -776,7 +776,7 @@
         const stations=[...byId.values()].sort((a,b)=>a.distance-b.distance).slice(0,10);
         if(!stations.length)throw new Error('No nearby NOAA CO-OPS observation station found');
         const getLatest=async(id,product)=>{
-          const q=new URLSearchParams({date:'latest',station:id,product,units:'metric',time_zone:'gmt',application:'AnglerSignal',format:'json'});
+          const q=new URLSearchParams({date:'latest',station:id,product,units:'metric',time_zone:'gmt',application:'CastVector',format:'json'});
           try{
             const d=await this.fetchJSON('https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?'+q.toString(),8000);
             if(d?.error)return null;
@@ -832,7 +832,7 @@
     },
 
     renderForecastTruth(){
-      if(!this.$('forecastTruthPanel'))return;const r=this.oceanReality(),badge=this.$('forecastTruthBadge');if(!r.available){badge.textContent=this.state.oceanNetwork?.status==='loading'?'CHECKING':'NO STATION';this.$('forecastTruthSummary').textContent='The marine forecast is loaded without a nearby observed-ocean comparison.';[['truthWind','truthWindNote'],['truthWave','truthWaveNote'],['truthWater','truthWaterNote'],['truthPressure','truthPressureNote']].forEach(([a,b])=>{this.$(a).textContent='—';this.$(b).textContent='Forecast only';});return;}badge.textContent=`${r.agreement??'—'}% AGREEMENT`;badge.className=`tiny-pill ${r.agreement>=75?'ready-pill':r.agreement>=55?'caution-pill':'danger-pill'}`;this.$('forecastTruthSummary').textContent=`Station ${r.station?.id||''} is ${this.fmt(r.distance,0)} miles from the selected fishing location. AnglerSignal is comparing its most recent observation with the current forecast model.`;const pair=(id,note,obs,fc,unit,dec=0)=>{this.$(id).textContent=obs==null?'—':`${this.fmt(obs,dec)}${unit}`;this.$(note).textContent=fc==null?'Forecast —':`Forecast ${this.fmt(fc,dec)}${unit}`;};pair('truthWind','truthWindNote',r.windObs,r.windFc,' mph',0);pair('truthWave','truthWaveNote',r.waveObs,r.waveFc,' ft',1);pair('truthWater','truthWaterNote',r.waterObs,r.waterFc,'°F',0);pair('truthPressure','truthPressureNote',r.pressureObs==null?null:this.hpaToInHg(r.pressureObs),r.pressureFc==null?null:this.hpaToInHg(r.pressureFc),' in',2);
+      if(!this.$('forecastTruthPanel'))return;const r=this.oceanReality(),badge=this.$('forecastTruthBadge');if(!r.available){badge.textContent=this.state.oceanNetwork?.status==='loading'?'CHECKING':'NO STATION';this.$('forecastTruthSummary').textContent='The marine forecast is loaded without a nearby observed-ocean comparison.';[['truthWind','truthWindNote'],['truthWave','truthWaveNote'],['truthWater','truthWaterNote'],['truthPressure','truthPressureNote']].forEach(([a,b])=>{this.$(a).textContent='—';this.$(b).textContent='Forecast only';});return;}badge.textContent=`${r.agreement??'—'}% AGREEMENT`;badge.className=`tiny-pill ${r.agreement>=75?'ready-pill':r.agreement>=55?'caution-pill':'danger-pill'}`;this.$('forecastTruthSummary').textContent=`Station ${r.station?.id||''} is ${this.fmt(r.distance,0)} miles from the selected fishing location. CastVector is comparing its most recent observation with the current forecast model.`;const pair=(id,note,obs,fc,unit,dec=0)=>{this.$(id).textContent=obs==null?'—':`${this.fmt(obs,dec)}${unit}`;this.$(note).textContent=fc==null?'Forecast —':`Forecast ${this.fmt(fc,dec)}${unit}`;};pair('truthWind','truthWindNote',r.windObs,r.windFc,' mph',0);pair('truthWave','truthWaveNote',r.waveObs,r.waveFc,' ft',1);pair('truthWater','truthWaterNote',r.waterObs,r.waterFc,'°F',0);pair('truthPressure','truthPressureNote',r.pressureObs==null?null:this.hpaToInHg(r.pressureObs),r.pressureFc==null?null:this.hpaToInHg(r.pressureFc),' in',2);
     },
 
     drawOceanObservationChart(){
@@ -884,7 +884,7 @@
       this.state.selectedTideStation=station;
       const start=new Date(),end=new Date(); end.setDate(end.getDate()+7);
       const params=new URLSearchParams({
-        product:'predictions',application:'AnglerSignal',begin_date:this.formatDateYYYYMMDD(start),end_date:this.formatDateYYYYMMDD(end),
+        product:'predictions',application:'CastVector',begin_date:this.formatDateYYYYMMDD(start),end_date:this.formatDateYYYYMMDD(end),
         datum:'MLLW',station:station.id,time_zone:'lst_ldt',units:'english',interval:'hilo',format:'json'
       });
       const data=await this.fetchJSON('https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?'+params.toString(),14000);
@@ -928,7 +928,7 @@
 
     shopCacheKey(){const l=this.state.location;return `coastcast-shops-v3:${Number(l.lat).toFixed(2)}:${Number(l.lon).toFixed(2)}:${this.state.tackleRadius||20}:${this.state.geoapifyKey?'ga':'open'}`;},
     clearShopCache(){try{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&/^coastcast-shops-v[123]:/.test(k))localStorage.removeItem(k);}}catch(_){}},
-    renderPlacesProviderStatus(){const el=this.$('placesProviderStatus');if(!el)return;el.innerHTML=this.state.geoapifyKey?'<strong>Enhanced nationwide POI enabled.</strong> Geoapify fishing-store data will be merged with OpenStreetMap and AnglerSignal verified catalogs.':'<strong>Open-data mode.</strong> AnglerSignal is using OpenStreetMap plus verified local catalogs. Add the free Geoapify key below for a broader nationwide fishing-store dataset.';},
+    renderPlacesProviderStatus(){const el=this.$('placesProviderStatus');if(!el)return;el.innerHTML=this.state.geoapifyKey?'<strong>Enhanced nationwide POI enabled.</strong> Geoapify fishing-store data will be merged with OpenStreetMap and CastVector verified catalogs.':'<strong>Open-data mode.</strong> CastVector is using OpenStreetMap plus verified local catalogs. Add the free Geoapify key below for a broader nationwide fishing-store dataset.';},
     readPlaceCache(key,maxAge=6*3600000){try{const raw=localStorage.getItem(key);if(!raw)return null;const v=JSON.parse(raw);if(Date.now()-v.savedAt>maxAge)return null;return Array.isArray(v.items)?v.items:null;}catch(_){return null;}},
     writePlaceCache(key,items){try{localStorage.setItem(key,JSON.stringify({savedAt:Date.now(),items}));}catch(_){ }},
 
@@ -1017,7 +1017,7 @@
         }
         return shops;
       }
-      if(forceToast){this.state.sourceHealth.shops='fallback';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.renderDestinationHub();this.showToast('No verified bait/tackle shop was found nearby. AnglerSignal will not place unrelated businesses on the map.');}
+      if(forceToast){this.state.sourceHealth.shops='fallback';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.renderDestinationHub();this.showToast('No verified bait/tackle shop was found nearby. CastVector will not place unrelated businesses on the map.');}
       return [];
     },
 
@@ -1232,7 +1232,7 @@
       if(this.$('regStateCode'))this.$('regStateCode').textContent=code?`${this.stateNames[code]} (${code})`:'State not detected';
       if(this.$('regStateTitle'))this.$('regStateTitle').textContent=src?`${this.stateNames[code]} official fishing rules`:'Official fishing rules';
       if(this.$('regSourceBadge'))this.$('regSourceBadge').textContent=src?src.name:'Choose a U.S. coastal state';
-      const msg=this.$('regulationMessage');if(msg)msg.innerHTML=src?`AnglerSignal detected <strong>${this.escape(this.stateNames[code])}</strong>. Check the official source for current <strong>${this.escape(this.state.targetSpecies)}</strong> size, bag, season, gear and closure rules before keeping fish.`:'AnglerSignal could not confidently detect the state from this location name. Open/change the destination to include the state before checking regulations.';
+      const msg=this.$('regulationMessage');if(msg)msg.innerHTML=src?`CastVector detected <strong>${this.escape(this.stateNames[code])}</strong>. Check the official source for current <strong>${this.escape(this.state.targetSpecies)}</strong> size, bag, season, gear and closure rules before keeping fish.`:'CastVector could not confidently detect the state from this location name. Open/change the destination to include the state before checking regulations.';
       const b=this.$('openRegsBtn');if(b){b.disabled=!src;b.textContent=src?'Open official regulations':'State not detected';}
       const key=this.regulationCheckKey(),check=key?this.state.regChecks?.[key]:null,today=this.localDateKey(new Date());
       const fresh=!!(check&&check.date===today);
@@ -1365,7 +1365,7 @@
       const live=this.state.sourceHealth?.alerts==='live';
       if(level>=2)return{level,status:'HIGH RISK',title:'Hazardous conditions flagged',detail:reasons.slice(0,3).join(' • ')||'Serious coastal hazards are present.',className:'high'};
       if(level===1)return{level,status:'CAUTION',title:'Extra caution before you go',detail:reasons.slice(0,3).join(' • ')||'Review conditions before leaving.',className:'caution'};
-      return{level,status:live?'LOWER RISK':'VERIFY',title:live?'No major point alert found':'Official alert check not confirmed',detail:live?'NWS returned no active point alerts, and loaded surf/wind are below AnglerSignal caution thresholds. Local hazards can still exist.':'Refresh Live Data and check posted local warnings before departure.',className:live?'lower':'verify'};
+      return{level,status:live?'LOWER RISK':'VERIFY',title:live?'No major point alert found':'Official alert check not confirmed',detail:live?'NWS returned no active point alerts, and loaded surf/wind are below CastVector caution thresholds. Local hazards can still exist.':'Refresh Live Data and check posted local warnings before departure.',className:live?'lower':'verify'};
     },
     renderOceanIntelligence(){
       if(!this.$('tideStageNow'))return;const ti=this.tideIntel(),moon=this.lunarInfo(),sun=this.state.data?.sun||{};
@@ -1389,7 +1389,7 @@
     renderTripSafety(){
       if(!this.$('tripSafetyBadge'))return;const s=this.safetyAssessment(),regKey=this.regulationCheckKey?.(),regOk=!!(regKey&&this.state.regChecks?.[regKey]?.date===this.localDateKey(new Date())),items=this.gearItems?.()||[],checked=this.state.gearPlan?.checked||{},gearPct=items.length?Math.round(items.filter(i=>checked[i.key]).length/items.length*100):0;
       const rows=[{ok:s.level===0,label:'Beach/weather hazards',detail:s.status==='LOWER RISK'?'No major NWS point alert found; still verify local flags.':s.detail,warn:s.level>0},{ok:regOk,label:'Regulations review',detail:regOk?'Marked checked today.':'Official regulations have not been marked checked today.',warn:!regOk},{ok:gearPct>=75,label:'Gear readiness',detail:`${gearPct}% of Smart Gear Planner checked.`,warn:gearPct<75},{ok:this.state.sourceHealth?.weather==='live'&&this.state.sourceHealth?.marine==='live'&&this.state.sourceHealth?.tides==='live',label:'Forecast sources',detail:'Weather, marine and tide feeds '+((this.state.sourceHealth?.weather==='live'&&this.state.sourceHealth?.marine==='live'&&this.state.sourceHealth?.tides==='live')?'are live.':'need a refresh or are using fallback.'),warn:false}];
-      const caution=rows.some(r=>r.warn);this.$('tripSafetyBadge').textContent=s.level>=2?'HOLD / REVIEW':caution?'CAUTION':'READY CHECK';this.$('tripSafetyBadge').className=`tiny-pill ${s.level>=2?'danger-pill':caution?'caution-pill':'ready-pill'}`;this.$('tripSafetySummary').textContent=s.level>=2?'Do not rely on the fishing score until the flagged hazards are resolved and official warnings are reviewed.':caution?'The trip may be fishable, but one or more planning checks still need attention.':'Core AnglerSignal departure checks look favorable. Verify the beach in person before entering the water.';
+      const caution=rows.some(r=>r.warn);this.$('tripSafetyBadge').textContent=s.level>=2?'HOLD / REVIEW':caution?'CAUTION':'READY CHECK';this.$('tripSafetyBadge').className=`tiny-pill ${s.level>=2?'danger-pill':caution?'caution-pill':'ready-pill'}`;this.$('tripSafetySummary').textContent=s.level>=2?'Do not rely on the fishing score until the flagged hazards are resolved and official warnings are reviewed.':caution?'The trip may be fishable, but one or more planning checks still need attention.':'Core CastVector departure checks look favorable. Verify the beach in person before entering the water.';
       this.$('tripSafetyChecklist').innerHTML=rows.map(r=>`<div class="trip-safety-row ${r.ok?'ok':r.warn?'warn':'info'}"><span>${r.ok?'✓':r.warn?'!':'i'}</span><div><strong>${this.escape(r.label)}</strong><small>${this.escape(r.detail)}</small></div></div>`).join('');
     },
 
@@ -1427,15 +1427,15 @@
         let expiry='';
         if(server.expires_at){try{expiry=`Access through ${new Date(server.expires_at).toLocaleDateString()}`;}catch(_){expiry='Expiring access';}}
         else expiry=premium?(source==='family'?'No separate subscription required':'Active server-verified access'):'Upgrade to unlock advanced tools';
-        return {premium,badge:source==='family'?'FAMILY PREMIUM':source==='complimentary'?'COMPLIMENTARY':source==='lifetime'?'LIFETIME':source==='promo'?'PROMO':premium?'PREMIUM':'FREE',title:premium?'AnglerSignal Premium':'AnglerSignal Free',source:labels[source]||source,expiry,server:true};
+        return {premium,badge:source==='family'?'FAMILY PREMIUM':source==='complimentary'?'COMPLIMENTARY':source==='lifetime'?'LIFETIME':source==='promo'?'PROMO':premium?'PREMIUM':'FREE',title:premium?'CastVector Premium':'CastVector Free',source:labels[source]||source,expiry,server:true};
       }
       const m=this.state.membership||{},preview=m.preview||'premium';
       const map={
-        free:{premium:false,badge:'FREE',title:'AnglerSignal Free',source:'Free access preview',expiry:'Upgrade to unlock advanced tools'},
-        premium:{premium:true,badge:'PREMIUM',title:'AnglerSignal Premium',source:'Paid Premium preview',expiry:'$4.99/month at launch'},
-        family:{premium:true,badge:'FAMILY PREMIUM',title:'AnglerSignal Premium',source:'Family Premium preview',expiry:'No separate subscription for this family member'},
-        complimentary:{premium:true,badge:'COMPLIMENTARY',title:'AnglerSignal Premium',source:'Owner-granted complimentary preview',expiry:'Expiration or lifetime can be set by admin'},
-        lifetime:{premium:true,badge:'LIFETIME',title:'AnglerSignal Premium',source:'Owner-granted lifetime preview',expiry:'No expiration'}
+        free:{premium:false,badge:'FREE',title:'CastVector Free',source:'Free access preview',expiry:'Upgrade to unlock advanced tools'},
+        premium:{premium:true,badge:'PREMIUM',title:'CastVector Premium',source:'Paid Premium preview',expiry:'$4.99/month at launch'},
+        family:{premium:true,badge:'FAMILY PREMIUM',title:'CastVector Premium',source:'Family Premium preview',expiry:'No separate subscription for this family member'},
+        complimentary:{premium:true,badge:'COMPLIMENTARY',title:'CastVector Premium',source:'Owner-granted complimentary preview',expiry:'Expiration or lifetime can be set by admin'},
+        lifetime:{premium:true,badge:'LIFETIME',title:'CastVector Premium',source:'Owner-granted lifetime preview',expiry:'No expiration'}
       };
       return map[preview]||map.premium;
     },
@@ -1463,8 +1463,8 @@
       const snap=this.membershipSnapshot(),app=this.$('app');
       app?.classList.toggle('free-preview',!snap.premium);
       if(this.$('membershipBadge')){this.$('membershipBadge').textContent=snap.server?snap.badge:(this.state.membership?.source==='beta'&&snap.premium?`BETA ${snap.badge}`:snap.badge);this.$('membershipBadge').className=`membership-badge ${snap.premium?'':'free'}`;}
-      if(this.$('membershipTitle'))this.$('membershipTitle').textContent=snap.server?snap.title:(this.state.membership?.source==='beta'&&snap.premium?'AnglerSignal Premium Beta':snap.title);
-      if(this.$('membershipSummary'))this.$('membershipSummary').textContent=snap.server?(snap.premium?'Premium is verified by the AnglerSignal server for this signed-in account.':'This signed-in account currently has Free access.'):(snap.premium?'Full AnglerSignal tools are available in this access tier.':'Free mode keeps the core fishing answer useful while advanced intelligence is reserved for Premium.');
+      if(this.$('membershipTitle'))this.$('membershipTitle').textContent=snap.server?snap.title:(this.state.membership?.source==='beta'&&snap.premium?'CastVector Premium Beta':snap.title);
+      if(this.$('membershipSummary'))this.$('membershipSummary').textContent=snap.server?(snap.premium?'Premium is verified by the CastVector server for this signed-in account.':'This signed-in account currently has Free access.'):(snap.premium?'Full CastVector tools are available in this access tier.':'Free mode keeps the core fishing answer useful while advanced intelligence is reserved for Premium.');
       if(this.$('membershipSource'))this.$('membershipSource').textContent=snap.source;
       if(this.$('membershipExpiry'))this.$('membershipExpiry').textContent=snap.expiry;
       if(this.$('membershipDialogTitle'))this.$('membershipDialogTitle').textContent=snap.title;
@@ -1472,7 +1472,7 @@
       if(this.$('serverAccessBadge'))this.$('serverAccessBadge').textContent=this.state.backend?.installed?'SERVER VERIFIED':(this.cloudSignedIn()?'BACKEND NOT INSTALLED':'SIGN IN REQUIRED');
       if(this.$('serverAccessSummary')){
         const email=this.state.cloud?.email||this.state.cloud?.session?.user?.email||'';
-        this.$('serverAccessSummary').innerHTML=this.cloudSignedIn()?`<strong>${this.escape(email||'Signed in')}</strong><span>${this.state.backend?.installed?`${this.escape(snap.source)} • ${snap.premium?'Premium active':'Free access'}`:'Account connected. Install the v5 launch backend to turn on server-verified access.'}</span>`:`<strong>No AnglerSignal account connected</strong><span>Sign in to activate server-verified Premium, family and complimentary access.</span>`;
+        this.$('serverAccessSummary').innerHTML=this.cloudSignedIn()?`<strong>${this.escape(email||'Signed in')}</strong><span>${this.state.backend?.installed?`${this.escape(snap.source)} • ${snap.premium?'Premium active':'Free access'}`:'Account connected. Install the v5 launch backend to turn on server-verified access.'}</span>`:`<strong>No CastVector account connected</strong><span>Sign in to activate server-verified Premium, family and complimentary access.</span>`;
       }
       if(this.$('openAdminConsoleBtn'))this.$('openAdminConsoleBtn').hidden=!this.state.backend?.isAdmin;
     },
@@ -1484,13 +1484,13 @@
     },
 
     async rpc(name,payload={}){
-      if(!await this.refreshSessionIfNeeded())throw new Error('Sign in to your AnglerSignal account first.');
+      if(!await this.refreshSessionIfNeeded())throw new Error('Sign in to your CastVector account first.');
       const c=this.state.cloud;const r=await fetch(`${c.url}/rest/v1/rpc/${name}`,{method:'POST',headers:this.cloudHeaders(c.session.access_token),body:JSON.stringify(payload)});let b=null;try{b=await r.json();}catch(_){b=null;}if(!r.ok)throw new Error(b?.message||b?.hint||`Backend request failed (${r.status})`);return b;
     },
 
     async refreshServerAccess({quiet=false}={}){
-      if(!this.cloudSignedIn()){if(!quiet)this.showToast('Sign in to AnglerSignal Account first.');return;}
-      try{const access=await this.rpc('coastcast_my_access',{});this.state.backend={...this.state.backend,installed:true,lastAccessCheck:new Date().toISOString(),isAdmin:!!access?.is_admin};this.state.membership={...this.state.membership,server:access,source:'server',status:access?.status||'active'};this.save();this.renderMembership();this.renderProfile();await this.refreshFamilyServer({quiet:true});if(!quiet)this.showToast(`${this.membershipSnapshot().badge} access verified by server.`);}catch(err){const notInstalled=/function|schema cache|could not find/i.test(String(err.message||''));this.state.backend={...this.state.backend,installed:!notInstalled,lastAccessCheck:new Date().toISOString()};if(notInstalled)this.state.membership.server=null;this.save();this.renderMembership();if(!quiet)this.showToast(notInstalled?'Install COASTCAST_LAUNCH_BACKEND.sql to activate real entitlements.':(err.message||'Could not verify server access.'));}
+      if(!this.cloudSignedIn()){if(!quiet)this.showToast('Sign in to CastVector Account first.');return;}
+      try{const access=await this.rpc('coastcast_my_access',{});this.state.backend={...this.state.backend,installed:true,lastAccessCheck:new Date().toISOString(),isAdmin:!!access?.is_admin};this.state.membership={...this.state.membership,server:access,source:'server',status:access?.status||'active'};this.save();this.renderMembership();this.renderProfile();await this.refreshFamilyServer({quiet:true});if(!quiet)this.showToast(`${this.membershipSnapshot().badge} access verified by server.`);}catch(err){const notInstalled=/function|schema cache|could not find/i.test(String(err.message||''));this.state.backend={...this.state.backend,installed:!notInstalled,lastAccessCheck:new Date().toISOString()};if(notInstalled)this.state.membership.server=null;this.save();this.renderMembership();if(!quiet)this.showToast(notInstalled?'Install CASTVECTOR_LAUNCH_BACKEND.sql to activate real entitlements.':(err.message||'Could not verify server access.'));}
     },
 
     async refreshFamilyServer({quiet=false}={}){
@@ -1524,7 +1524,7 @@
     openAdminConsole(){if(!this.state.backend?.isAdmin){this.showToast('Owner/Admin access required.');return;}this.openDialog('adminConsoleDialog');this.adminLoadAccessList();},
     async adminGrantAccess(){
       const email=(this.$('adminEmail')?.value||'').trim(),source=this.$('adminSource')?.value||'complimentary',days=Number(this.$('adminDays')?.value||0),note=(this.$('adminNote')?.value||'').trim();
-      if(!email)return this.showToast('Enter an existing AnglerSignal account email.');let expires=null;if(source!=='lifetime'&&days>0)expires=new Date(Date.now()+days*86400000).toISOString();
+      if(!email)return this.showToast('Enter an existing CastVector account email.');let expires=null;if(source!=='lifetime'&&days>0)expires=new Date(Date.now()+days*86400000).toISOString();
       try{await this.rpc('coastcast_admin_grant_access',{p_email:email,p_source:source,p_expires_at:expires,p_note:note||null});this.showToast(`${source} Premium granted.`);await this.adminLoadAccessList();}catch(err){this.showToast(err.message||'Could not grant access.');}
     },
     async adminRevokeAccess(){const email=(this.$('adminEmail')?.value||'').trim(),note=(this.$('adminNote')?.value||'').trim();if(!email)return this.showToast('Enter an account email.');if(!confirm(`Revoke direct Premium for ${email}?`))return;try{await this.rpc('coastcast_admin_revoke_access',{p_email:email,p_note:note||null});this.showToast('Direct Premium revoked.');await this.adminLoadAccessList();}catch(err){this.showToast(err.message||'Could not revoke access.');}},
@@ -1561,7 +1561,7 @@
     renderQuickAnswer(){
       if(!this.$('quickAnswerPanel')||!this.state.data)return;const q=this.quickAnswerData();
       this.$('quickAnswerHeadline').textContent=q.headline;this.$('quickDecisionBadge').textContent=q.decision;this.$('quickDecisionBadge').className=`quick-decision-badge ${q.cls}`;
-      this.$('quickAnswerSummary').textContent=q.cls==='go'?`AnglerSignal sees a strong ${q.species} opportunity. The key window is ${q.window}.`:`Best current ${q.species} opportunity: ${q.window}. Use the details if you want to see the full reasoning.`;
+      this.$('quickAnswerSummary').textContent=q.cls==='go'?`CastVector sees a strong ${q.species} opportunity. The key window is ${q.window}.`:`Best current ${q.species} opportunity: ${q.window}. Use the details if you want to see the full reasoning.`;
       this.$('quickWhen').textContent=q.window;this.$('quickWhenNote').textContent=`${q.bestScore}/100 opportunity`;
       this.$('quickTarget').textContent=q.species;this.$('quickTargetNote').textContent='Species Intelligence';
       this.$('quickBait').textContent=String(q.bait).replace(/^./,m=>m.toUpperCase());this.$('quickBaitNote').textContent='Bait Intelligence';
@@ -1611,11 +1611,11 @@
     setCommandMode(mode){if(!['bite','calm','weather','confidence'].includes(mode))return;this.state.command.mode=mode;this.save();this.renderCommandCenter();this.renderOpportunityMatrix();this.renderMissionControl();},
 
     renderCommandCenter(){
-      if(!this.$('commandCall')||!this.state.data)return;const r=this.commandRecommendation(),b=r.best||{},win=b.window||{label:'—',score:0};this.$$('.command-mode').forEach(x=>x.classList.toggle('active',x.dataset.commandMode===r.mode));this.$('commandBadge').textContent=r.badge;this.$('commandBadge').className=`command-badge ${r.cls}`;this.$('commandCall').textContent=r.call;this.$('commandHeadline').textContent=r.headline;this.$('commandSummary').textContent=`Priority: ${r.modeLabel}. AnglerSignal ranked ${r.species}, the 7-day forecast, beach readiness and live-source confidence together.`;this.$('commandConfidence').textContent=r.confidence.score;this.$('commandSpecies').textContent=r.species;this.$('commandSpeciesScore').textContent=`${r.speciesScore}/100 today`;this.$('commandDay').textContent=b.day?.day||b.day?.date||'—';this.$('commandDayScore').textContent=b.score?`${b.score}/100 command score`:'—';this.$('commandWindow').textContent=win.label||'—';this.$('commandWindowScore').textContent=win.score?`${win.score}/100 window`:'Best hourly block';this.$('commandReadiness').textContent=`${r.readiness.score}/100`;this.$('commandReadinessCall').textContent=r.readiness.badge||'Check';const c=this.state.data.current||{},f=[['Species',r.speciesScore,r.speciesScore>=82?'good':r.speciesScore>=68?'watch':'low'],['Wind',this.num(c.windSpeed,0)<=10?'GOOD':this.num(c.windSpeed,0)<=16?'WATCH':'ROUGH',this.num(c.windSpeed,0)<=10?'good':this.num(c.windSpeed,0)<=16?'watch':'low'],['Surf',this.num(c.waveHeight,0)<=3?'GOOD':this.num(c.waveHeight,0)<=5?'WATCH':'ROUGH',this.num(c.waveHeight,0)<=3?'good':this.num(c.waveHeight,0)<=5?'watch':'low'],['Data',`${r.confidence.score}%`,r.confidence.score>=75?'good':r.confidence.score>=55?'watch':'low']];this.$('commandFactors').innerHTML=f.map(x=>`<div class="command-factor ${x[2]}"><span>${this.escape(x[0])}</span><strong>${this.escape(String(x[1]))}</strong></div>`).join('');const lp=this.state.command?.lastPlan;this.$('commandPlanStatus').textContent=lp?`Last Command Plan: ${lp.species} • ${lp.day} • ${lp.window} • ${this.prettyDate(lp.created)}`:'No Command Plan saved yet.';
+      if(!this.$('commandCall')||!this.state.data)return;const r=this.commandRecommendation(),b=r.best||{},win=b.window||{label:'—',score:0};this.$$('.command-mode').forEach(x=>x.classList.toggle('active',x.dataset.commandMode===r.mode));this.$('commandBadge').textContent=r.badge;this.$('commandBadge').className=`command-badge ${r.cls}`;this.$('commandCall').textContent=r.call;this.$('commandHeadline').textContent=r.headline;this.$('commandSummary').textContent=`Priority: ${r.modeLabel}. CastVector ranked ${r.species}, the 7-day forecast, beach readiness and live-source confidence together.`;this.$('commandConfidence').textContent=r.confidence.score;this.$('commandSpecies').textContent=r.species;this.$('commandSpeciesScore').textContent=`${r.speciesScore}/100 today`;this.$('commandDay').textContent=b.day?.day||b.day?.date||'—';this.$('commandDayScore').textContent=b.score?`${b.score}/100 command score`:'—';this.$('commandWindow').textContent=win.label||'—';this.$('commandWindowScore').textContent=win.score?`${win.score}/100 window`:'Best hourly block';this.$('commandReadiness').textContent=`${r.readiness.score}/100`;this.$('commandReadinessCall').textContent=r.readiness.badge||'Check';const c=this.state.data.current||{},f=[['Species',r.speciesScore,r.speciesScore>=82?'good':r.speciesScore>=68?'watch':'low'],['Wind',this.num(c.windSpeed,0)<=10?'GOOD':this.num(c.windSpeed,0)<=16?'WATCH':'ROUGH',this.num(c.windSpeed,0)<=10?'good':this.num(c.windSpeed,0)<=16?'watch':'low'],['Surf',this.num(c.waveHeight,0)<=3?'GOOD':this.num(c.waveHeight,0)<=5?'WATCH':'ROUGH',this.num(c.waveHeight,0)<=3?'good':this.num(c.waveHeight,0)<=5?'watch':'low'],['Data',`${r.confidence.score}%`,r.confidence.score>=75?'good':r.confidence.score>=55?'watch':'low']];this.$('commandFactors').innerHTML=f.map(x=>`<div class="command-factor ${x[2]}"><span>${this.escape(x[0])}</span><strong>${this.escape(String(x[1]))}</strong></div>`).join('');const lp=this.state.command?.lastPlan;this.$('commandPlanStatus').textContent=lp?`Last Command Plan: ${lp.species} • ${lp.day} • ${lp.window} • ${this.prettyDate(lp.created)}`:'No Command Plan saved yet.';
     },
 
     buildCommandPlan({navigateToTrips=true,toast=true}={}){
-      if(!this.state.data)return;const r=this.commandRecommendation();if(!r.best)return this.showToast('A forecast is needed before building a Command Plan.');this.state.targetSpecies=r.species;this.state.scout.species=r.species;this.state.forecastDay=r.best.index;this.recalculateScores();const timeline=this.catchForecastWindows(r.best.index),w=timeline.top[0]||timeline.blocks[0];if(w)this.state.departure.selectedWindow={dayIndex:r.best.index,startIndex:w.index,label:w.label,score:w.score,species:r.species,bestTime:w.best?.time||'',selectedAt:new Date().toISOString()};const bait=this.baitIntelligence(r.species);this.state.goMode.baitPlan={species:r.species,primary:bait.primary,backup:bait.backup,rig:bait.rig,presentation:bait.presentation,terminal:bait.terminal,created:new Date().toISOString()};const plan={id:Date.now(),location:this.state.location.name,lat:this.state.location.lat,lon:this.state.location.lon,species:r.species,day:r.best.day?.day||r.best.day?.date||'Best day',score:r.best.score,window:w?.label||r.best.window?.label||'Best window',priority:`command:${r.mode}`,created:new Date().toISOString(),confidence:r.confidence.score,readiness:r.readiness.score};this.state.savedTripPlans.unshift(plan);this.state.savedTripPlans=this.state.savedTripPlans.slice(0,24);this.state.command.lastPlan={...plan};this.save();this.populateSpeciesControls();this.renderAll();if(navigateToTrips)this.navigate('trips');if(toast)this.showToast('Complete AnglerSignal Command Plan built.');return plan;
+      if(!this.state.data)return;const r=this.commandRecommendation();if(!r.best)return this.showToast('A forecast is needed before building a Command Plan.');this.state.targetSpecies=r.species;this.state.scout.species=r.species;this.state.forecastDay=r.best.index;this.recalculateScores();const timeline=this.catchForecastWindows(r.best.index),w=timeline.top[0]||timeline.blocks[0];if(w)this.state.departure.selectedWindow={dayIndex:r.best.index,startIndex:w.index,label:w.label,score:w.score,species:r.species,bestTime:w.best?.time||'',selectedAt:new Date().toISOString()};const bait=this.baitIntelligence(r.species);this.state.goMode.baitPlan={species:r.species,primary:bait.primary,backup:bait.backup,rig:bait.rig,presentation:bait.presentation,terminal:bait.terminal,created:new Date().toISOString()};const plan={id:Date.now(),location:this.state.location.name,lat:this.state.location.lat,lon:this.state.location.lon,species:r.species,day:r.best.day?.day||r.best.day?.date||'Best day',score:r.best.score,window:w?.label||r.best.window?.label||'Best window',priority:`command:${r.mode}`,created:new Date().toISOString(),confidence:r.confidence.score,readiness:r.readiness.score};this.state.savedTripPlans.unshift(plan);this.state.savedTripPlans=this.state.savedTripPlans.slice(0,24);this.state.command.lastPlan={...plan};this.save();this.populateSpeciesControls();this.renderAll();if(navigateToTrips)this.navigate('trips');if(toast)this.showToast('Complete CastVector Command Plan built.');return plan;
     },
 
     renderOpportunityMatrix(){
@@ -1625,7 +1625,7 @@
     handleMatrixClick(e){const b=e.target.closest('[data-matrix-species][data-matrix-day]');if(!b)return;const species=b.dataset.matrixSpecies,day=Math.max(0,Math.min(6,Number(b.dataset.matrixDay)||0));if(this.species[species])this.state.targetSpecies=species;this.state.forecastDay=day;this.save();this.populateSpeciesControls();this.recalculateScores();this.renderAll();this.navigate('forecast');this.showToast(`${species} • day ${day+1} loaded into Forecast.`);},
 
     missionReadiness(){
-      const safety=this.safetyAssessment(),conf=this.dataConfidence(),regKey=this.regulationCheckKey?.(),regOk=!!(regKey&&this.state.regChecks?.[regKey]?.date===this.localDateKey(new Date())),gear=this.gearItems?.()||[],checked=this.state.gearPlan?.checked||{},gearPct=gear.length?Math.round(gear.filter(i=>checked[i.key]).length/gear.length*100):0,hasBait=!!this.state.goMode?.baitPlan,hasPlan=!!this.state.command?.lastPlan,hasOffline=(this.state.offlinePacks||[]).some(p=>this.haversine(Number(p.location?.lat)||0,Number(p.location?.lon)||0,Number(this.state.location.lat)||0,Number(this.state.location.lon)||0)<.3);const rows=[{ok:hasPlan,label:'Command Plan',detail:hasPlan?'Complete plan saved for this AnglerSignal session.':'Build the one-tap Command Plan.'},{ok:conf.score>=70,label:'Forecast confidence',detail:`${conf.score}% source confidence.`},{ok:safety.level<2,label:'Safety Guard',detail:safety.level<2?safety.status:'High-level condition needs official review.',block:safety.level>=2},{ok:regOk,label:'Regulations',detail:regOk?'Marked reviewed today.':'Official rules not marked checked today.'},{ok:hasBait,label:'Bait & rig plan',detail:hasBait?`${this.titleCase(this.state.goMode.baitPlan.primary)} • ${this.state.goMode.baitPlan.rig}`:'Load a target-specific bait plan.'},{ok:gearPct>=70,label:'Gear planner',detail:`${gearPct}% packed.`},{ok:hasOffline,label:'Offline pack',detail:hasOffline?'Current coast snapshot is saved.':'Optional: save an offline trip pack.'}];const required=rows.filter(x=>x.label!=='Offline pack'),done=required.filter(x=>x.ok).length,pct=Math.round(done/required.length*100);return{rows,pct,blocked:safety.level>=2,ready:pct>=82&&!rows.some(x=>x.block),gearPct,conf};
+      const safety=this.safetyAssessment(),conf=this.dataConfidence(),regKey=this.regulationCheckKey?.(),regOk=!!(regKey&&this.state.regChecks?.[regKey]?.date===this.localDateKey(new Date())),gear=this.gearItems?.()||[],checked=this.state.gearPlan?.checked||{},gearPct=gear.length?Math.round(gear.filter(i=>checked[i.key]).length/gear.length*100):0,hasBait=!!this.state.goMode?.baitPlan,hasPlan=!!this.state.command?.lastPlan,hasOffline=(this.state.offlinePacks||[]).some(p=>this.haversine(Number(p.location?.lat)||0,Number(p.location?.lon)||0,Number(this.state.location.lat)||0,Number(this.state.location.lon)||0)<.3);const rows=[{ok:hasPlan,label:'Command Plan',detail:hasPlan?'Complete plan saved for this CastVector session.':'Build the one-tap Command Plan.'},{ok:conf.score>=70,label:'Forecast confidence',detail:`${conf.score}% source confidence.`},{ok:safety.level<2,label:'Safety Guard',detail:safety.level<2?safety.status:'High-level condition needs official review.',block:safety.level>=2},{ok:regOk,label:'Regulations',detail:regOk?'Marked reviewed today.':'Official rules not marked checked today.'},{ok:hasBait,label:'Bait & rig plan',detail:hasBait?`${this.titleCase(this.state.goMode.baitPlan.primary)} • ${this.state.goMode.baitPlan.rig}`:'Load a target-specific bait plan.'},{ok:gearPct>=70,label:'Gear planner',detail:`${gearPct}% packed.`},{ok:hasOffline,label:'Offline pack',detail:hasOffline?'Current coast snapshot is saved.':'Optional: save an offline trip pack.'}];const required=rows.filter(x=>x.label!=='Offline pack'),done=required.filter(x=>x.ok).length,pct=Math.round(done/required.length*100);return{rows,pct,blocked:safety.level>=2,ready:pct>=82&&!rows.some(x=>x.block),gearPct,conf};
     },
 
     renderMissionControl(){
@@ -1634,16 +1634,16 @@
 
     launchCommandTrip(){const m=this.missionReadiness();if(m.blocked){this.showToast('Safety Guard is blocking one-tap launch. Review official warnings first.');return;}if(!this.state.command?.lastPlan)this.buildCommandPlan({navigateToTrips:false,toast:false});this.startGoMode();},
 
-    commandShareText(){const r=this.commandRecommendation(),p=this.departurePlan(),bait=this.baitIntelligence(r.species),c=this.state.data?.current||{};return `AnglerSignal 4.0 Command Brief\n${this.state.location.name}\nCall: ${r.call}\nTarget: ${r.species} • ${r.speciesScore}/100 today\nBest day: ${r.best?.day?.day||r.best?.day?.date||'—'} • ${r.best?.score||'—'}/100\nBest window: ${r.best?.window?.label||'—'}\nData confidence: ${r.confidence.score}%\nReadiness: ${r.readiness.score}/100\nBait: ${this.titleCase(bait.primary)} • ${bait.rig}\nWind: ${this.compass(c.windDir)} ${this.fmt(c.windSpeed,0)} mph\nSurf: ${this.fmt(c.waveHeight,1)} ft @ ${this.fmt(c.wavePeriod,0)} sec${p?.leaveText?`\nLeave by: ${p.leaveText}`:''}\nSafety Guard: ${r.safety.status}\nVerify access, official warnings and current regulations before fishing.`;},
+    commandShareText(){const r=this.commandRecommendation(),p=this.departurePlan(),bait=this.baitIntelligence(r.species),c=this.state.data?.current||{};return `CastVector 4.0 Command Brief\n${this.state.location.name}\nCall: ${r.call}\nTarget: ${r.species} • ${r.speciesScore}/100 today\nBest day: ${r.best?.day?.day||r.best?.day?.date||'—'} • ${r.best?.score||'—'}/100\nBest window: ${r.best?.window?.label||'—'}\nData confidence: ${r.confidence.score}%\nReadiness: ${r.readiness.score}/100\nBait: ${this.titleCase(bait.primary)} • ${bait.rig}\nWind: ${this.compass(c.windDir)} ${this.fmt(c.windSpeed,0)} mph\nSurf: ${this.fmt(c.waveHeight,1)} ft @ ${this.fmt(c.wavePeriod,0)} sec${p?.leaveText?`\nLeave by: ${p.leaveText}`:''}\nSafety Guard: ${r.safety.status}\nVerify access, official warnings and current regulations before fishing.`;},
 
-    async shareCommandBrief(){const text=this.commandShareText();try{if(navigator.share){await navigator.share({title:'AnglerSignal 4.0 Command Brief',text});}else{const b=new Blob([text],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='coastcast-command-brief.txt';a.click();setTimeout(()=>URL.revokeObjectURL(u),300);}this.showToast('Command brief ready to share.');}catch(e){if(e?.name!=='AbortError')this.showToast('Could not share the Command Brief.');}},
+    async shareCommandBrief(){const text=this.commandShareText();try{if(navigator.share){await navigator.share({title:'CastVector 4.0 Command Brief',text});}else{const b=new Blob([text],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='castvector-command-brief.txt';a.click();setTimeout(()=>URL.revokeObjectURL(u),300);}this.showToast('Command brief ready to share.');}catch(e){if(e?.name!=='AbortError')this.showToast('Could not share the Command Brief.');}},
 
     personalAnalytics(){
       const catches=this.state.catches||[],complete=catches.filter(c=>c.bait||c.conditionData||c.conditions),speciesCounts={},baitCounts={},waterCounts={},tideCounts={},timeCounts={};let wind=[],wave=[],water=[];for(const c of catches){speciesCounts[c.species]=(speciesCounts[c.species]||0)+1;if(c.bait)baitCounts[c.bait]=(baitCounts[c.bait]||0)+1;const w=this.generalizeWater(c.location||c.water||'');if(w)waterCounts[w]=(waterCounts[w]||0)+1;const tide=this.catchTide(c)||'Unknown tide';tideCounts[tide]=(tideCounts[tide]||0)+1;const tb=this.catchTimeBucket(c.date);timeCounts[tb]=(timeCounts[tb]||0)+1;const d=c.conditionData||{};if(Number.isFinite(Number(d.wind)))wind.push(Number(d.wind));if(Number.isFinite(Number(d.wave)))wave.push(Number(d.wave));if(Number.isFinite(Number(d.water)))water.push(Number(d.water));}const top=obj=>Object.entries(obj).sort((a,b)=>b[1]-a[1])[0]||['—',0],topSpecies=top(speciesCounts),topBait=top(baitCounts),topWater=top(waterCounts),topTide=top(tideCounts),topTime=top(timeCounts),depth=Math.min(100,Math.round(catches.length*6+complete.length*4));return{count:catches.length,depth,topSpecies,topBait,topWater,topTide,topTime,avgWind:wind.length?this.average(wind):null,avgWave:wave.length?this.average(wave):null,avgWater:water.length?this.average(water):null};
     },
 
     renderAnglerAnalytics(){
-      if(!this.$('analyticsMetrics'))return;const a=this.personalAnalytics(),stage=a.depth>=80?'STRONG PROFILE':a.depth>=45?'LEARNING FAST':a.depth>0?'LEARNING':'NEEDS CATCHES';this.$('analyticsConfidence').textContent=stage;this.$('analyticsHeadline').textContent=a.count?`AnglerSignal is learning from ${a.count} logged catch${a.count===1?'':'es'}. Your strongest repeated patterns are shown below.`:'Log catches with bait, time and conditions to unlock your personal fishing profile.';this.$('analyticsLearningText').textContent=`${a.depth}%`;this.$('analyticsLearningBar').style.width=`${a.depth}%`;const metrics=[['TOP SPECIES',a.topSpecies[0],`${a.topSpecies[1]} catches`],['TOP BAIT',a.topBait[0],`${a.topBait[1]} logged`],['BEST WATER',a.topWater[0],`${a.topWater[1]} catches`],['BEST TIME',a.topTime[0],`${a.topTime[1]} catches`]];this.$('analyticsMetrics').innerHTML=metrics.map(x=>`<article class="analytics-metric"><span>${this.escape(x[0])}</span><strong>${this.escape(x[1])}</strong><small>${this.escape(x[2])}</small></article>`).join('');const patterns=[['Tide pattern',a.topTide[0],`${a.topTide[1]} catches`],['Average wind',a.avgWind==null?'Need condition data':`${this.fmt(a.avgWind,0)} mph`,'From catches with saved conditions'],['Average surf',a.avgWave==null?'Need condition data':`${this.fmt(a.avgWave,1)} ft`,'From catches with saved conditions'],['Average water temp',a.avgWater==null?'Need condition data':`${this.fmt(a.avgWater,0)}°F`,'From catches with saved conditions']];this.$('analyticsPatterns').innerHTML=patterns.map(x=>`<div class="analytics-pattern"><div><strong>${this.escape(x[0])}</strong><small>${this.escape(x[2])}</small></div><b>${this.escape(x[1])}</b></div>`).join('');
+      if(!this.$('analyticsMetrics'))return;const a=this.personalAnalytics(),stage=a.depth>=80?'STRONG PROFILE':a.depth>=45?'LEARNING FAST':a.depth>0?'LEARNING':'NEEDS CATCHES';this.$('analyticsConfidence').textContent=stage;this.$('analyticsHeadline').textContent=a.count?`CastVector is learning from ${a.count} logged catch${a.count===1?'':'es'}. Your strongest repeated patterns are shown below.`:'Log catches with bait, time and conditions to unlock your personal fishing profile.';this.$('analyticsLearningText').textContent=`${a.depth}%`;this.$('analyticsLearningBar').style.width=`${a.depth}%`;const metrics=[['TOP SPECIES',a.topSpecies[0],`${a.topSpecies[1]} catches`],['TOP BAIT',a.topBait[0],`${a.topBait[1]} logged`],['BEST WATER',a.topWater[0],`${a.topWater[1]} catches`],['BEST TIME',a.topTime[0],`${a.topTime[1]} catches`]];this.$('analyticsMetrics').innerHTML=metrics.map(x=>`<article class="analytics-metric"><span>${this.escape(x[0])}</span><strong>${this.escape(x[1])}</strong><small>${this.escape(x[2])}</small></article>`).join('');const patterns=[['Tide pattern',a.topTide[0],`${a.topTide[1]} catches`],['Average wind',a.avgWind==null?'Need condition data':`${this.fmt(a.avgWind,0)} mph`,'From catches with saved conditions'],['Average surf',a.avgWave==null?'Need condition data':`${this.fmt(a.avgWave,1)} ft`,'From catches with saved conditions'],['Average water temp',a.avgWater==null?'Need condition data':`${this.fmt(a.avgWater,0)}°F`,'From catches with saved conditions']];this.$('analyticsPatterns').innerHTML=patterns.map(x=>`<div class="analytics-pattern"><div><strong>${this.escape(x[0])}</strong><small>${this.escape(x[2])}</small></div><b>${this.escape(x[1])}</b></div>`).join('');
     },
 
     planningReadiness(){
@@ -1726,9 +1726,9 @@
       this.$('departureBrief').innerHTML=`Leave by <strong>${this.escape(p.leaveText)}</strong> to allow ${p.drive} min drive${p.bait?`, ${p.bait} min bait stop`:''} and ${p.setup} min setup. Target <strong>${this.escape(p.fishText)}</strong> for ${this.escape(p.window.species)}. Start with ${this.escape(this.titleCase(bait.primary))}${shop?` • nearest loaded shop: ${this.escape(shop.name)}`:''}.`;
     },
 
-    departureShareText(){const p=this.departurePlan();if(!p||p.start==null)return'';const bait=this.baitIntelligence(p.window.species),c=this.state.data?.current||{},s=this.safetyAssessment();return `AnglerSignal Trip Brief\n${this.state.location.name}\nTarget: ${p.window.species} (${p.window.score}/100)\nLeave by: ${p.leaveText}\nArrive/setup: ${p.arriveText}\nFish: ${p.fishText}\nBait: ${this.titleCase(bait.primary)} • ${bait.rig}\nWind: ${this.compass(c.windDir)} ${this.fmt(c.windSpeed,0)} mph\nSurf: ${this.fmt(c.waveHeight,1)} ft @ ${this.fmt(c.wavePeriod,0)} sec\nSafety Guard: ${s.status}\nVerify local access, beach flags and current regulations before fishing.`;},
+    departureShareText(){const p=this.departurePlan();if(!p||p.start==null)return'';const bait=this.baitIntelligence(p.window.species),c=this.state.data?.current||{},s=this.safetyAssessment();return `CastVector Trip Brief\n${this.state.location.name}\nTarget: ${p.window.species} (${p.window.score}/100)\nLeave by: ${p.leaveText}\nArrive/setup: ${p.arriveText}\nFish: ${p.fishText}\nBait: ${this.titleCase(bait.primary)} • ${bait.rig}\nWind: ${this.compass(c.windDir)} ${this.fmt(c.windSpeed,0)} mph\nSurf: ${this.fmt(c.waveHeight,1)} ft @ ${this.fmt(c.wavePeriod,0)} sec\nSafety Guard: ${s.status}\nVerify local access, beach flags and current regulations before fishing.`;},
 
-    async shareDepartureBrief(){const text=this.departureShareText();if(!text){this.showToast('Build a departure plan first.');return;}try{if(navigator.share){await navigator.share({title:'AnglerSignal Trip Brief',text});this.showToast('Trip brief shared.');}else{const blob=new Blob([text],{type:'text/plain'}),url=URL.createObjectURL(blob),el=document.createElement('a');el.href=url;el.download='coastcast-trip-brief.txt';el.click();setTimeout(()=>URL.revokeObjectURL(url),300);this.showToast('Trip brief downloaded.');}}catch(e){if(e?.name!=='AbortError')this.showToast('Could not share the trip brief.');}},
+    async shareDepartureBrief(){const text=this.departureShareText();if(!text){this.showToast('Build a departure plan first.');return;}try{if(navigator.share){await navigator.share({title:'CastVector Trip Brief',text});this.showToast('Trip brief shared.');}else{const blob=new Blob([text],{type:'text/plain'}),url=URL.createObjectURL(blob),el=document.createElement('a');el.href=url;el.download='castvector-trip-brief.txt';el.click();setTimeout(()=>URL.revokeObjectURL(url),300);this.showToast('Trip brief downloaded.');}}catch(e){if(e?.name!=='AbortError')this.showToast('Could not share the trip brief.');}},
 
     overallDataStatus(){
       if(this.state.loading) return 'loading';
@@ -2037,7 +2037,7 @@
     saveCatch(){
       const species=this.$('catchSpecies').value||this.state.targetSpecies;
       const catchDate=this.$('catchDateTime').value||new Date().toISOString();const item={id:Date.now(),species,date:catchDate,length:this.$('catchLength').value,weight:this.$('catchWeight').value,bait:this.$('catchBait').value.trim(),notes:this.$('catchNotes').value.trim(),privacy:this.$('catchPrivacy').value,location:this.state.location.name,lat:this.state.location.lat,lon:this.state.location.lon,conditions:this.snapshotConditions(),conditionData:this.conditionSnapshotData(catchDate),score:this.currentScore(),sessionId:this.state.goMode?.active?this.state.goMode.sessionId:null,photo:this._catchPhotoDraft||''};
-      this.state.catches.unshift(item);this.save();this.closeDialog('catchDialog');this.$('catchForm').reset();this.clearCatchPhoto(false);this.ensureCatchDate();this.renderLogbook();this.renderCommunity();this.renderMapLayers();this.renderPatternMatch();this.renderGoMode();this.showToast(this.state.goMode?.active?'Catch added to your live fishing session.':'Catch saved with AnglerSignal conditions.');
+      this.state.catches.unshift(item);this.save();this.closeDialog('catchDialog');this.$('catchForm').reset();this.clearCatchPhoto(false);this.ensureCatchDate();this.renderLogbook();this.renderCommunity();this.renderMapLayers();this.renderPatternMatch();this.renderGoMode();this.showToast(this.state.goMode?.active?'Catch added to your live fishing session.':'Catch saved with CastVector conditions.');
     },
 
     renderLogbook(){
@@ -2049,9 +2049,9 @@
 
     renderPersonalInsights(){
       const c=this.state.catches,box=this.$('personalInsights');
-      if(!c.length){box.innerHTML='<div class="personal-insight"><strong>Start building your fishing pattern</strong><span>Log catches with bait, size and conditions. AnglerSignal will summarize your strongest patterns here.</span></div>';return;}
+      if(!c.length){box.innerHTML='<div class="personal-insight"><strong>Start building your fishing pattern</strong><span>Log catches with bait, size and conditions. CastVector will summarize your strongest patterns here.</span></div>';return;}
       const topSpecies=this.mode(c.map(x=>x.species));const topBait=this.mode(c.map(x=>x.bait).filter(Boolean))||'Not enough bait data';const avgScore=Math.round(this.average(c.map(x=>Number(x.score)||0).filter(Boolean)))||0;
-      box.innerHTML=`<div class="personal-insight"><strong>Most logged species: ${this.escape(topSpecies||'—')}</strong><span>${c.filter(x=>x.species===topSpecies).length} catch${c.filter(x=>x.species===topSpecies).length===1?'':'es'} in your logbook.</span></div><div class="personal-insight"><strong>Most-used successful bait: ${this.escape(topBait)}</strong><span>This is based only on catches you have personally logged.</span></div><div class="personal-insight"><strong>Average saved AnglerSignal score: ${avgScore||'—'}</strong><span>As your log grows, this can become a personalized condition profile.</span></div>`;
+      box.innerHTML=`<div class="personal-insight"><strong>Most logged species: ${this.escape(topSpecies||'—')}</strong><span>${c.filter(x=>x.species===topSpecies).length} catch${c.filter(x=>x.species===topSpecies).length===1?'':'es'} in your logbook.</span></div><div class="personal-insight"><strong>Most-used successful bait: ${this.escape(topBait)}</strong><span>This is based only on catches you have personally logged.</span></div><div class="personal-insight"><strong>Average saved CastVector score: ${avgScore||'—'}</strong><span>As your log grows, this can become a personalized condition profile.</span></div>`;
     },
 
     renderCatchList(){
@@ -2076,14 +2076,14 @@
 
     renderPatternMatch(){
       if(!this.$('patternMatchScore'))return;const p=this.personalPattern();this.$('patternMatchScore').textContent=p.score==null?'--':String(p.score);this.$('patternCatchCount').textContent=`${p.count} catch${p.count===1?'':'es'}`;this.$('patternTopBait').textContent=p.topBait;this.$('patternBestTime').textContent=p.bestTime;this.$('patternConfidence').textContent=p.count?`${p.confidence}% confidence`:'Learning';
-      if(!p.count){this.$('patternMatchLabel').textContent='Build your fishing pattern';this.$('patternMatchDetail').textContent=`Log ${this.state.targetSpecies} catches and AnglerSignal will compare today with the conditions that have worked for you.`;return;}
+      if(!p.count){this.$('patternMatchLabel').textContent='Build your fishing pattern';this.$('patternMatchDetail').textContent=`Log ${this.state.targetSpecies} catches and CastVector will compare today with the conditions that have worked for you.`;return;}
       const label=p.score>=85?'Very similar to your successful days':p.score>=70?'Good personal match':p.score>=55?'Some familiar signals':'Different from your usual success pattern';this.$('patternMatchLabel').textContent=label;this.$('patternMatchDetail').textContent=`Based on ${p.count} ${this.state.targetSpecies} catch${p.count===1?'':'es'}. Your strongest history signal is ${p.topBait}, with ${p.bestTime.toLowerCase()} producing the most logged catches.`;
     },
 
     renderCatchIntelligence(){
       if(!this.$('catchIntelHero'))return;const all=this.state.catches,target=this.targetCatchHistory(),p=this.personalPattern();this.$('catchIntelConfidence').textContent=target.length?`${target.length} ${this.state.targetSpecies}`:`${all.length} catches`;
-      if(!all.length){this.$('catchIntelHero').innerHTML='<strong>Your personal fishing model starts here</strong>Log catches with bait, time and AnglerSignal conditions. After a few trips, this screen will show your strongest patterns.';this.$('catchIntelMetrics').innerHTML='<div><span>TOP BAIT</span><strong>—</strong></div><div><span>BEST TIME</span><strong>—</strong></div><div><span>BEST TIDE</span><strong>—</strong></div><div><span>MATCH NOW</span><strong>—</strong></div>';this.$('catchIntelBars').innerHTML='';return;}
-      const base=target.length?target:all;const avgScore=Math.round(this.average(base.map(c=>Number(c.score)).filter(Number.isFinite)))||0;const topSpecies=this.mode(all.map(c=>c.species))||'—';this.$('catchIntelHero').innerHTML=`<strong>${this.escape(this.state.targetSpecies)} personal model</strong>${target.length?`AnglerSignal has ${target.length} successful ${this.escape(this.state.targetSpecies)} record${target.length===1?'':'s'} to compare against today's conditions.`:`You have ${all.length} catches logged. Target ${this.escape(this.state.targetSpecies)} catches will make this model species-specific.`}`;
+      if(!all.length){this.$('catchIntelHero').innerHTML='<strong>Your personal fishing model starts here</strong>Log catches with bait, time and CastVector conditions. After a few trips, this screen will show your strongest patterns.';this.$('catchIntelMetrics').innerHTML='<div><span>TOP BAIT</span><strong>—</strong></div><div><span>BEST TIME</span><strong>—</strong></div><div><span>BEST TIDE</span><strong>—</strong></div><div><span>MATCH NOW</span><strong>—</strong></div>';this.$('catchIntelBars').innerHTML='';return;}
+      const base=target.length?target:all;const avgScore=Math.round(this.average(base.map(c=>Number(c.score)).filter(Number.isFinite)))||0;const topSpecies=this.mode(all.map(c=>c.species))||'—';this.$('catchIntelHero').innerHTML=`<strong>${this.escape(this.state.targetSpecies)} personal model</strong>${target.length?`CastVector has ${target.length} successful ${this.escape(this.state.targetSpecies)} record${target.length===1?'':'s'} to compare against today's conditions.`:`You have ${all.length} catches logged. Target ${this.escape(this.state.targetSpecies)} catches will make this model species-specific.`}`;
       this.$('catchIntelMetrics').innerHTML=`<div><span>TOP BAIT</span><strong>${this.escape(p.topBait)}</strong></div><div><span>BEST TIME</span><strong>${this.escape(p.bestTime)}</strong></div><div><span>BEST TIDE</span><strong>${this.escape(p.bestTide)}</strong></div><div><span>MATCH NOW</span><strong>${p.score==null?'—':p.score+'%'}</strong></div>`;
       const baitCounts={};base.forEach(c=>{const b=String(c.bait||'').trim();if(b)baitCounts[b]=(baitCounts[b]||0)+1;});const topBaits=Object.entries(baitCounts).sort((a,b)=>b[1]-a[1]).slice(0,4);const max=Math.max(1,...topBaits.map(x=>x[1]));const rows=topBaits.length?topBaits.map(([name,count])=>`<div class="intel-bar-row"><span>${this.escape(name)}</span><div class="intel-bar-track"><div class="intel-bar-fill" style="width:${Math.round(count/max*100)}%"></div></div><strong>${count}</strong></div>`).join(''):`<div class="personal-insight"><strong>Most logged species: ${this.escape(topSpecies)}</strong><span>Add bait/lure names to your catches to build the bait success chart. Average saved score: ${avgScore||'—'}.</span></div>`;this.$('catchIntelBars').innerHTML=rows;
     },
@@ -2136,7 +2136,7 @@
         species:c.species,size:c.length?`${c.length} in`:'',length:c.length||'',weight:c.weight||'',
         ago:this.prettyDate(c.date),date:c.date,bait:c.bait||'Not listed',
         water:c._communityPrecision==='hidden'?'Location hidden':c._communityPrecision==='exact'?c.location:this.generalizeWater(c.location),
-        text:c._communityCaption||c.notes||'Shared a catch with AnglerSignal.',photo:c.photo||'',
+        text:c._communityCaption||c.notes||'Shared a catch with CastVector.',photo:c.photo||'',
         score:c.score||'',conditions:c.conditions||'',lat:c._communityPrecision==='exact'?Number(c.lat):Math.round(Number(c.lat)*10)/10,
         lon:c._communityPrecision==='exact'?Number(c.lon):Math.round(Number(c.lon)*10)/10,likes:0
       }));
@@ -2159,16 +2159,16 @@
       }
       const c=this.state.cloud;
       try{
-        if(!quiet&&this.$('communityModeText'))this.$('communityModeText').textContent='Refreshing AnglerSignal Community…';
+        if(!quiet&&this.$('communityModeText'))this.$('communityModeText').textContent='Refreshing CastVector Community…';
         const r=await this.cloudRequest(`${c.url}/rest/v1/community_catches?select=id,user_id,display_name,species,catch_date,length_in,weight_lb,bait,caption,location_label,location_precision,public_lat,public_lon,coastcast_score,conditions,photo_data,created_at&order=created_at.desc&limit=75`,{method:'GET'});
         const rows=await r.json();if(!r.ok)throw new Error(rows?.message||'Community tables are not available.');
         let reactions=[];try{const rr=await this.cloudRequest(`${c.url}/rest/v1/community_reactions?select=post_id,user_id,reaction&limit=500`,{method:'GET'});const rb=await rr.json();if(rr.ok&&Array.isArray(rb))reactions=rb;}catch(_){}
         const counts={},mine={};reactions.forEach(x=>{counts[x.post_id]=(counts[x.post_id]||0)+1;if(String(x.user_id)===String(c.session.user.id))mine[x.post_id]=true;});
         this._cloudCommunityPosts=(Array.isArray(rows)?rows:[]).map(row=>({
-          id:row.id,cloud:true,own:String(row.user_id)===String(c.session.user.id),user:row.display_name||'AnglerSignal Angler',
+          id:row.id,cloud:true,own:String(row.user_id)===String(c.session.user.id),user:row.display_name||'CastVector Angler',
           species:row.species||'Catch',size:row.length_in?`${row.length_in} in`:'',length:row.length_in||'',weight:row.weight_lb||'',
           ago:this.prettyDate(row.catch_date||row.created_at),date:row.catch_date||row.created_at,bait:row.bait||'Not listed',
-          water:row.location_label||'Location hidden',text:row.caption||'Shared a catch with AnglerSignal.',photo:/^data:image\/(?:jpeg|png|webp);base64,/i.test(String(row.photo_data||''))?row.photo_data:'',
+          water:row.location_label||'Location hidden',text:row.caption||'Shared a catch with CastVector.',photo:/^data:image\/(?:jpeg|png|webp);base64,/i.test(String(row.photo_data||''))?row.photo_data:'',
           score:row.coastcast_score||'',conditions:row.conditions||'',lat:Number(row.public_lat),lon:Number(row.public_lon),
           likes:counts[row.id]||0,userLiked:!!mine[row.id],locationPrecision:row.location_precision||'hidden'
         }));
@@ -2186,7 +2186,7 @@
       if(!badge||!title||!text)return;
       badge.textContent=signed?'CLOUD BETA':'LOCAL PREVIEW';
       badge.classList.toggle('live',signed);badge.classList.toggle('fallback',!signed);
-      title.textContent=signed?'Connected AnglerSignal Community':'Community preview on this device';
+      title.textContent=signed?'Connected CastVector Community':'Community preview on this device';
       if(signed){
         text.textContent=this._communityCloudError?`Cloud connected, but Community tables are not ready: ${this._communityCloudError}`:`Signed in as ${this.state.cloud.email||'your account'}. Public Community posts can sync between devices.`;
       }else text.textContent='Your feed is local until you connect Supabase Community Beta. Catch cards can be shared from Android right now.';
@@ -2210,7 +2210,7 @@
         const localLike=!!this.state.community.reactions?.[p.id],liked=p.userLiked||localLike,likes=Number(p.likes||0)+(localLike&&!p.cloud?1:0);
         const meta=[p.ago,p.water].filter(Boolean).join(' • ');
         const metrics=[p.bait&&`Bait: ${p.bait}`,p.score&&`Score ${p.score}`].filter(Boolean).join(' • ');
-        return `<article class="feed-card" data-community-post="${this.escape(p.id)}"><div class="feed-head"><div class="avatar">${this.escape((p.user||'A')[0])}</div><div><div class="feed-user">${this.escape(p.user||'Angler')}${p.own?' <span class="you-pill">YOU</span>':''}</div><div class="feed-meta">${this.escape(meta)}</div></div></div>${p.photo?`<img class="feed-photo-real" src="${p.photo}" alt="${this.escape(p.species)} catch photo"/>`:`<div class="feed-photo feed-photo-brand" aria-label="Catch photo not shared"><span>${this.escape(this.species[p.species]?.abbr||'AS')}</span><small>ANGLERSIGNAL</small></div>`}<div class="feed-body"><div class="feed-species">${this.escape(p.species)}${p.size?' • '+this.escape(p.size):''}</div><div class="feed-detail">${this.escape(metrics||'Catch details shared by angler')}</div><div class="feed-text">${this.escape(p.text||'')}</div><div class="feed-actions"><button class="feed-action ${liked?'liked':''}" type="button" data-community-like="${this.escape(p.id)}">${liked?'♥':'♡'} ${likes||'Like'}</button>${p.sourceCatchId?`<button class="feed-action" type="button" data-community-card="${this.escape(p.sourceCatchId)}">Catch card</button>`:''}</div></div></article>`;
+        return `<article class="feed-card" data-community-post="${this.escape(p.id)}"><div class="feed-head"><div class="avatar">${this.escape((p.user||'A')[0])}</div><div><div class="feed-user">${this.escape(p.user||'Angler')}${p.own?' <span class="you-pill">YOU</span>':''}</div><div class="feed-meta">${this.escape(meta)}</div></div></div>${p.photo?`<img class="feed-photo-real" src="${p.photo}" alt="${this.escape(p.species)} catch photo"/>`:`<div class="feed-photo feed-photo-brand" aria-label="Catch photo not shared"><span>${this.escape(this.species[p.species]?.abbr||'AS')}</span><small>CASTVECTOR</small></div>`}<div class="feed-body"><div class="feed-species">${this.escape(p.species)}${p.size?' • '+this.escape(p.size):''}</div><div class="feed-detail">${this.escape(metrics||'Catch details shared by angler')}</div><div class="feed-text">${this.escape(p.text||'')}</div><div class="feed-actions"><button class="feed-action ${liked?'liked':''}" type="button" data-community-like="${this.escape(p.id)}">${liked?'♥':'♡'} ${likes||'Like'}</button>${p.sourceCatchId?`<button class="feed-action" type="button" data-community-card="${this.escape(p.sourceCatchId)}">Catch card</button>`:''}</div></div></article>`;
       }).join('');
     },
 
@@ -2240,7 +2240,7 @@
     },
 
     openShareCatchDialog(catchId){
-      if(!this.state.catches.length){this.showToast('Log a catch first, then AnglerSignal can build a share card.');this.navigate('logbook');return;}
+      if(!this.state.catches.length){this.showToast('Log a catch first, then CastVector can build a share card.');this.navigate('logbook');return;}
       const sel=this.$('shareCatchSelect');if(!sel)return;
       sel.innerHTML=this.state.catches.map(c=>`<option value="${c.id}">${this.escape(c.species)} • ${this.escape(this.prettyDate(c.date))}${c.length?` • ${this.escape(c.length)} in`:''}</option>`).join('');
       const chosen=this.state.catches.find(c=>String(c.id)===String(catchId))||this.state.catches[0];sel.value=String(chosen.id);
@@ -2264,10 +2264,10 @@
       const c=this.selectedShareCatch(),box=this.$('shareCatchPreview');if(!box)return;
       if(!c){box.innerHTML='<div class="share-preview-empty">Choose a catch to preview.</div>';return;}
       let precision=this.$('shareLocationPrecision')?.value||'general';
-      if(precision==='exact'&&c.privacy!=='public'){precision='general';this.$('shareLocationPrecision').value='general';if(this.$('shareCatchStatus'))this.$('shareCatchStatus').textContent='Exact Spot is available only when the saved catch privacy is Public. AnglerSignal switched this card to General Water Area.';}
+      if(precision==='exact'&&c.privacy!=='public'){precision='general';this.$('shareLocationPrecision').value='general';if(this.$('shareCatchStatus'))this.$('shareCatchStatus').textContent='Exact Spot is available only when the saved catch privacy is Public. CastVector switched this card to General Water Area.';}
       else if(this.$('shareCatchStatus'))this.$('shareCatchStatus').textContent='The generated image never includes hidden coordinates. Community posts use only the location precision you choose here.';
       const loc=this.shareLocationForCatch(c,precision),caption=(this.$('shareCatchCaption')?.value||'').trim();
-      box.innerHTML=`<article class="share-preview-card">${c.photo?`<img src="${c.photo}" alt="${this.escape(c.species)} catch"/>`:`<div class="share-preview-photo-fallback">${this.escape(this.species[c.species]?.abbr||'AS')}</div>`}<div class="share-preview-overlay"><div class="share-preview-brand">ANGLERSIGNAL <span>FISHING FORECAST</span></div><h3>${this.escape(c.species)}</h3><p>${this.escape([c.length&&`${c.length} in`,c.weight&&`${c.weight} lb`,c.bait].filter(Boolean).join(' • ')||'Logged catch')}</p><div class="share-preview-metrics"><span>${this.escape(loc)}</span><span>Score ${this.escape(c.score||'—')}</span></div>${caption?`<small>${this.escape(caption)}</small>`:''}</div></article>`;
+      box.innerHTML=`<article class="share-preview-card">${c.photo?`<img src="${c.photo}" alt="${this.escape(c.species)} catch"/>`:`<div class="share-preview-photo-fallback">${this.escape(this.species[c.species]?.abbr||'AS')}</div>`}<div class="share-preview-overlay"><div class="share-preview-brand">CASTVECTOR <span>FISHING FORECAST</span></div><h3>${this.escape(c.species)}</h3><p>${this.escape([c.length&&`${c.length} in`,c.weight&&`${c.weight} lb`,c.bait].filter(Boolean).join(' • ')||'Logged catch')}</p><div class="share-preview-metrics"><span>${this.escape(loc)}</span><span>Score ${this.escape(c.score||'—')}</span></div>${caption?`<small>${this.escape(caption)}</small>`:''}</div></article>`;
     },
 
     async imageFromDataUrl(src){
@@ -2291,18 +2291,18 @@
       }else{
         const pg=ctx.createLinearGradient(0,0,1080,610);pg.addColorStop(0,'#0F4055');pg.addColorStop(1,'#0A2434');ctx.fillStyle=pg;ctx.fillRect(0,0,1080,610);
         ctx.fillStyle='#6DE1C5';ctx.font='700 150px system-ui';ctx.textAlign='center';ctx.fillText(this.species[c.species]?.abbr||'AS',540,350);
-        ctx.font='700 34px system-ui';ctx.fillStyle='#DFF8FF';ctx.fillText('ANGLERSIGNAL CATCH',540,420);
+        ctx.font='700 34px system-ui';ctx.fillStyle='#DFF8FF';ctx.fillText('CASTVECTOR CATCH',540,420);
       }
-      ctx.textAlign='left';ctx.fillStyle='#79E3C6';ctx.font='800 38px system-ui';ctx.fillText('ANGLERSIGNAL',70,690);
+      ctx.textAlign='left';ctx.fillStyle='#79E3C6';ctx.font='800 38px system-ui';ctx.fillText('CASTVECTOR',70,690);
       ctx.fillStyle='#9EC9D8';ctx.font='700 22px system-ui';ctx.fillText('PLAN SMARTER. FISH BETTER.',70,726);
       const speciesText=String(c.species||'Catch').slice(0,26),speciesFont=speciesText.length>18?54:speciesText.length>13?64:76;
       ctx.fillStyle='#F4FBFF';ctx.font=`900 ${speciesFont}px system-ui`;ctx.fillText(speciesText,70,825);
       const detail=[c.length&&`${c.length} in`,c.weight&&`${c.weight} lb`,c.bait&&String(c.bait)].filter(Boolean).join('  •  ')||'Logged catch';
       ctx.font='700 34px system-ui';ctx.fillStyle='#CFEAF3';ctx.fillText(detail.slice(0,54),70,880);
       ctx.fillStyle='#0F3346';ctx.fillRect(70,930,940,160);
-      ctx.fillStyle='#86D6EC';ctx.font='700 24px system-ui';ctx.fillText('LOCATION',105,980);ctx.fillText('ANGLERSIGNAL SCORE',650,980);
+      ctx.fillStyle='#86D6EC';ctx.font='700 24px system-ui';ctx.fillText('LOCATION',105,980);ctx.fillText('CASTVECTOR SCORE',650,980);
       ctx.fillStyle='#F4FBFF';ctx.font='800 32px system-ui';ctx.fillText(location.slice(0,30),105,1030);ctx.font='900 48px system-ui';ctx.fillText(String(c.score||'—'),650,1035);
-      const cond=String(c.conditions||'Conditions saved with AnglerSignal').replace(/\s+/g,' ').slice(0,78);
+      const cond=String(c.conditions||'Conditions saved with CastVector').replace(/\s+/g,' ').slice(0,78);
       ctx.fillStyle='#9FC5D2';ctx.font='600 24px system-ui';ctx.fillText(cond,70,1145);
       if(caption){
         ctx.fillStyle='#F4FBFF';ctx.font='600 27px system-ui';
@@ -2310,13 +2310,13 @@
         words.forEach(w=>{const test=(line+' '+w).trim();if(ctx.measureText(test).width>930&&line){lines.push(line);line=w;}else line=test;});if(line)lines.push(line);
         lines.slice(0,2).forEach((line,i)=>ctx.fillText(line,70,1200+i*38));
       }
-      ctx.fillStyle='#6B97A7';ctx.font='600 20px system-ui';ctx.fillText('Shared from AnglerSignal • Location precision controlled by the angler',70,1310);
+      ctx.fillStyle='#6B97A7';ctx.font='600 20px system-ui';ctx.fillText('Shared from CastVector • Location precision controlled by the angler',70,1310);
       const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.9));if(!blob){this.showToast('Could not generate the catch card.');return;}
-      this._shareCardBlob=blob;try{this._shareCardFile=new File([blob],`coastcast-${String(c.species||'catch').toLowerCase().replace(/[^a-z0-9]+/g,'-')}.jpg`,{type:'image/jpeg'});}catch(_){this._shareCardFile=null;}
+      this._shareCardBlob=blob;try{this._shareCardFile=new File([blob],`castvector-${String(c.species||'catch').toLowerCase().replace(/[^a-z0-9]+/g,'-')}.jpg`,{type:'image/jpeg'});}catch(_){this._shareCardFile=null;}
       const url=URL.createObjectURL(blob);if(this._shareCardObjectUrl)URL.revokeObjectURL(this._shareCardObjectUrl);this._shareCardObjectUrl=url;
-      this.$('shareCatchPreview').innerHTML=`<img class="generated-share-card" src="${url}" alt="Generated AnglerSignal catch card"/>`;
+      this.$('shareCatchPreview').innerHTML=`<img class="generated-share-card" src="${url}" alt="Generated CastVector catch card"/>`;
       this.$('shareCatchImageBtn').disabled=false;this.$('shareCatchStatus').textContent='Catch card generated. Use Share image to open the Android share sheet, or download if file sharing is unavailable.';
-      this.showToast('AnglerSignal catch card ready.');
+      this.showToast('CastVector catch card ready.');
     },
 
     async shareCatchImage(){
@@ -2324,10 +2324,10 @@
       const c=this.selectedShareCatch(),file=this._shareCardFile;
       try{
         if(file&&navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-          await navigator.share({title:`${c?.species||'Catch'} • AnglerSignal`,text:'Plan Smarter. Fish Better.',files:[file]});return;
+          await navigator.share({title:`${c?.species||'Catch'} • CastVector`,text:'Plan Smarter. Fish Better.',files:[file]});return;
         }
       }catch(e){if(e?.name==='AbortError')return;}
-      const a=document.createElement('a');a.href=this._shareCardObjectUrl||URL.createObjectURL(this._shareCardBlob);a.download=file?.name||'coastcast-catch-card.jpg';document.body.appendChild(a);a.click();a.remove();this.showToast('Catch card downloaded.');
+      const a=document.createElement('a');a.href=this._shareCardObjectUrl||URL.createObjectURL(this._shareCardBlob);a.download=file?.name||'castvector-catch-card.jpg';document.body.appendChild(a);a.click();a.remove();this.showToast('Catch card downloaded.');
     },
 
     async publishCatchToCommunity(){
@@ -2338,16 +2338,16 @@
       catchItem._communityPrecision=precision;catchItem._communityCaption=caption;
       if(!this.cloudSignedIn()){
         if(!this.state.community.publishedLocalIds.map(String).includes(String(catchItem.id)))this.state.community.publishedLocalIds.unshift(String(catchItem.id));
-        this.save();this.renderCommunity();this.showToast('Published to Local Preview. Connect Cloud Sync to share between AnglerSignal users.');this.closeDialog('shareCatchDialog');this.navigate('community');return;
+        this.save();this.renderCommunity();this.showToast('Published to Local Preview. Connect Cloud Sync to share between CastVector users.');this.closeDialog('shareCatchDialog');this.navigate('community');return;
       }
       const c=this.state.cloud,uid=c.session.user.id;
       const lat=precision==='hidden'?null:precision==='exact'?Number(catchItem.lat):Math.round(Number(catchItem.lat)*10)/10;
       const lon=precision==='hidden'?null:precision==='exact'?Number(catchItem.lon):Math.round(Number(catchItem.lon)*10)/10;
-      const row={user_id:uid,source_catch_id:String(catchItem.id),display_name:this.state.profile?.name||'AnglerSignal Angler',species:catchItem.species,catch_date:catchItem.date||new Date().toISOString(),length_in:catchItem.length?Number(catchItem.length):null,weight_lb:catchItem.weight?Number(catchItem.weight):null,bait:catchItem.bait||'',caption:caption||catchItem.notes||'',location_label:loc,location_precision:precision,public_lat:lat,public_lon:lon,coastcast_score:Number(catchItem.score)||null,conditions:catchItem.conditions||'',photo_data:catchItem.photo&&catchItem.photo.length<550000?catchItem.photo:null};
+      const row={user_id:uid,source_catch_id:String(catchItem.id),display_name:this.state.profile?.name||'CastVector Angler',species:catchItem.species,catch_date:catchItem.date||new Date().toISOString(),length_in:catchItem.length?Number(catchItem.length):null,weight_lb:catchItem.weight?Number(catchItem.weight):null,bait:catchItem.bait||'',caption:caption||catchItem.notes||'',location_label:loc,location_precision:precision,public_lat:lat,public_lon:lon,coastcast_score:Number(catchItem.score)||null,conditions:catchItem.conditions||'',photo_data:catchItem.photo&&catchItem.photo.length<550000?catchItem.photo:null};
       try{
         const r=await this.cloudRequest(`${c.url}/rest/v1/community_catches?on_conflict=user_id,source_catch_id`,{method:'POST',headers:{'Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(row)});
         if(!r.ok){let b={};try{b=await r.json();}catch(_){}throw new Error(b?.message||'Community tables are not ready.');}
-        this.save();await this.loadCloudCommunity({quiet:true});this.closeDialog('shareCatchDialog');this.navigate('community');this.showToast('Catch published to AnglerSignal Community Beta.');
+        this.save();await this.loadCloudCommunity({quiet:true});this.closeDialog('shareCatchDialog');this.navigate('community');this.showToast('Catch published to CastVector Community Beta.');
       }catch(err){
         if(this.$('shareCatchStatus'))this.$('shareCatchStatus').textContent='Cloud publish failed. Run the included SUPABASE_SETUP.sql update, or use Local Preview.';
         this.showToast(err.message||'Could not publish to Community.');
@@ -2427,7 +2427,7 @@
     renderCoastWatch(){
       const box=this.$('coastWatchResults');if(!box)return;const wc=this.state.watchCenter||{},results=Array.isArray(wc.results)?wc.results:[];this.$('coastWatchSpecies').textContent=this.state.targetSpecies;const badge=this.$('coastWatchBadge');if(badge){badge.textContent=wc.running?'SCANNING':results.length?'LIVE RANK':'READY';badge.className=`tiny-pill ${wc.running?'caution-pill':results.length?'ready-pill':''}`;}
       if(this.$('scanFavoritesBtn')){this.$('scanFavoritesBtn').disabled=!!wc.running;this.$('scanFavoritesBtn').textContent=wc.running?'Scanning saved coasts…':'Scan saved coasts';}
-      if(wc.running&&!results.length){box.innerHTML='<div class="coast-watch-loading">Checking saved locations with fresh weather and marine forecasts…</div>';this.$('coastWatchSummary').textContent='AnglerSignal is comparing your saved coasts. Public forecast services can take a few seconds per location.';return;}
+      if(wc.running&&!results.length){box.innerHTML='<div class="coast-watch-loading">Checking saved locations with fresh weather and marine forecasts…</div>';this.$('coastWatchSummary').textContent='CastVector is comparing your saved coasts. Public forecast services can take a few seconds per location.';return;}
       if(!results.length){box.innerHTML='<div class="coast-watch-empty">No multi-location scan yet. Your current fishing location is included automatically, and saved spots are added to the comparison.</div>';this.$('coastWatchSummary').textContent='Save favorite fishing spots, then run Coast Watch to see which destination deserves the drive.';return;}
       const winner=results[0];this.$('coastWatchSummary').innerHTML=`<strong>${this.escape(winner.name)}</strong> currently leads for ${this.escape(wc.species||this.state.targetSpecies)} at <strong>${winner.score}/100</strong> on ${this.escape(winner.bestDay)} around ${this.escape(winner.bestTime)}.`;
       box.innerHTML=results.map((r,i)=>`<article class="coast-watch-card ${i===0?'winner':''}"><div class="coast-watch-rank"><strong>${r.score}</strong><small>${i===0?'LEAD':'SCORE'}</small></div><div><h3>${this.escape(r.name)}</h3><p>${this.escape(r.bestDay)} • best near ${this.escape(r.bestTime)} • ${r.confidence}% forecast confidence</p><div class="coast-watch-metrics"><span>${this.fmt(r.wind,0)} mph wind</span><span>${this.fmt(r.wave,1)} ft surf</span><span>${this.fmt(r.water,0)}°F water</span><span>${this.fmt(r.rain,0)}% rain</span></div></div><div class="coast-watch-actions"><button class="mini-button watch-analyze" data-watch-id="${this.escape(String(r.id))}" type="button">Analyze</button><button class="mini-button watch-plan" data-watch-id="${this.escape(String(r.id))}" type="button">Plan</button><button class="mini-button watch-alert" data-watch-id="${this.escape(String(r.id))}" type="button">Watch</button></div></article>`).join('');
@@ -2457,7 +2457,7 @@
       this.$('savedTripCount').textContent=plans.length;this.$('favoriteSpotCount').textContent=spots.length;this.$('smartAlertCount').textContent=rules.filter(r=>r.enabled!==false).length;
       const ranked=this.rankSpecies?.()||[];const bestSpecies=ranked[0],bestDay=(this.state.data?.days||[]).reduce((a,b)=>!a||b.score>a.score?b:a,null);
       if(this.$('tripHubHeadline'))this.$('tripHubHeadline').textContent=bestSpecies?`${bestSpecies.name} is your strongest target`:'Ready when the coast lines up';
-      if(this.$('tripHubRecommendation'))this.$('tripHubRecommendation').innerHTML=bestSpecies&&bestDay?`<strong>${this.escape(this.state.location.name)}</strong> • ${this.escape(bestSpecies.name)} ${bestSpecies.score}/100 today • strongest general day <strong>${this.escape(bestDay.day)}</strong> ${bestDay.score}/100. Build a trip to rank the week for your exact preferences.`:'Load a forecast and AnglerSignal will combine species conditions, favorites and alert rules here.';
+      if(this.$('tripHubRecommendation'))this.$('tripHubRecommendation').innerHTML=bestSpecies&&bestDay?`<strong>${this.escape(this.state.location.name)}</strong> • ${this.escape(bestSpecies.name)} ${bestSpecies.score}/100 today • strongest general day <strong>${this.escape(bestDay.day)}</strong> ${bestDay.score}/100. Build a trip to rank the week for your exact preferences.`:'Load a forecast and CastVector will combine species conditions, favorites and alert rules here.';
       if(this.$('tripHubBadge'))this.$('tripHubBadge').textContent=this.overallDataStatus()==='live'?'LIVE BETA':this.overallDataStatus()==='partial'?'PARTIAL LIVE':'BETA';
 
       const tripBox=this.$('savedTripList');
@@ -2471,7 +2471,7 @@
       const alertBox=this.$('alertRuleList'),matches=new Map(this.state.alertMatches.map(x=>[String(x.id),x]));
       if(!rules.length)alertBox.innerHTML='<div class="empty-state">No forecast watches yet.</div>';
       else alertBox.innerHTML=rules.map(r=>{const m=matches.get(String(r.id));const active=m?.match;return `<article class="alert-rule-card ${active?'active':''}"><div class="alert-rule-status"><span class="alert-pulse"></span><strong>${active?'MATCH':'WATCHING'}</strong></div><div class="alert-rule-copy"><h3>${this.escape(r.species)} • ${this.escape(r.name)}</h3><p>${Number(r.threshold)}+ score • max wind ${Number(r.maxWind)>=999?'any':`${this.fmt(r.maxWind,0)} mph`} • ${Number(r.days)||7}-day lookahead</p>${active?`<small>${this.escape(active.day)} is ${active.score}/100 • ${this.fmt(active.wind,0)} mph wind • ${this.fmt(active.wave,1)} ft surf</small>`:'<small>No matching window in the loaded forecast.</small>'}</div><div class="alert-rule-actions"><button class="mini-button alert-toggle" data-alert-id="${r.id}" type="button">${r.enabled===false?'Enable':'Pause'}</button><button class="mini-button alert-delete" data-alert-id="${r.id}" type="button">Delete</button></div></article>`}).join('');
-      if(this.$('alertCenterStatus')){const n=this.state.alertMatches.filter(x=>x.match).length;this.$('alertCenterStatus').textContent=n?`${n} watch${n===1?'':'es'} currently match the loaded forecast. Alerts are rechecked on app open and live refresh.`:'Alerts are checked whenever AnglerSignal opens or refreshes live data.';}
+      if(this.$('alertCenterStatus')){const n=this.state.alertMatches.filter(x=>x.match).length;this.$('alertCenterStatus').textContent=n?`${n} watch${n===1?'':'es'} currently match the loaded forecast. Alerts are rechecked on app open and live refresh.`:'Alerts are checked whenever CastVector opens or refreshes live data.';}
     },
 
     handleTripHubClick(e){
@@ -2527,11 +2527,11 @@
 
     scoutCandidatePool(){
       const center=this.state.location,radius=Math.max(5,Number(this.state.scout.radius)||25),seen=[];
-      const add=(p)=>{if(!p||!Number.isFinite(Number(p.lat))||!Number.isFinite(Number(p.lon)))return;const distance=this.haversine(center.lat,center.lon,Number(p.lat),Number(p.lon));if(distance>radius*1.15&&p.id!=='current-scout')return;const dup=seen.some(x=>this.haversine(x.lat,x.lon,Number(p.lat),Number(p.lon))<0.15||x.name.toLowerCase()===String(p.name||'').toLowerCase());if(dup)return;seen.push({id:String(p.id||`scout-${seen.length}-${Math.round(Number(p.lat)*10000)}`),name:p.name||'Coastal spot',lat:Number(p.lat),lon:Number(p.lon),type:p.type||p.source||'Coastal spot',distance,match:Number(p.match)||70,source:p.source||'AnglerSignal'});};
+      const add=(p)=>{if(!p||!Number.isFinite(Number(p.lat))||!Number.isFinite(Number(p.lon)))return;const distance=this.haversine(center.lat,center.lon,Number(p.lat),Number(p.lon));if(distance>radius*1.15&&p.id!=='current-scout')return;const dup=seen.some(x=>this.haversine(x.lat,x.lon,Number(p.lat),Number(p.lon))<0.15||x.name.toLowerCase()===String(p.name||'').toLowerCase());if(dup)return;seen.push({id:String(p.id||`scout-${seen.length}-${Math.round(Number(p.lat)*10000)}`),name:p.name||'Coastal spot',lat:Number(p.lat),lon:Number(p.lon),type:p.type||p.source||'Coastal spot',distance,match:Number(p.match)||70,source:p.source||'CastVector'});};
       add({id:'current-scout',name:center.name,lat:center.lat,lon:center.lon,type:'Current destination',source:center.source,match:this.currentScore()});
       [...(this.state.mapPOIs||[])].sort((a,b)=>(b.match||0)-(a.match||0)).slice(0,20).forEach(add);
       (this.state.waypoints||[]).forEach(w=>add({id:`waypoint-${w.id}`,name:w.name,lat:w.lat,lon:w.lon,type:'Private favorite',source:'Your favorites',match:76}));
-      Object.entries(this.presets).forEach(([key,p])=>add({id:`preset-${key}`,name:p.name,lat:p.lat,lon:p.lon,type:'Known coast',source:'AnglerSignal coast',match:73}));
+      Object.entries(this.presets).forEach(([key,p])=>add({id:`preset-${key}`,name:p.name,lat:p.lat,lon:p.lon,type:'Known coast',source:'CastVector coast',match:73}));
       return seen.sort((a,b)=>(b.match-a.match)||(a.distance-b.distance)).slice(0,7);
     },
 
@@ -2587,12 +2587,12 @@
 
     openScoutCompare(){const rows=(this.state.scout.compareIds||[]).map(id=>this.state.scout.results.find(r=>r.id===id)).filter(Boolean);if(rows.length<2)return;rows.sort((a,b)=>b.score-a.score);this.state.scout.compareWinnerId=rows[0].id;this.$('compareWinner').innerHTML=`<strong>Scout winner: ${this.escape(rows[0].name)}</strong><span>${rows[0].score}/100 for ${this.escape(this.state.scout.species)} • ${this.escape(this.scoutPeriodLabel())}</span>`;this.$('compareGrid').innerHTML=rows.map((r,i)=>`<article class="compare-card ${i===0?'winner':''}"><div class="compare-card-head"><span>${i===0?'TOP PICK':`OPTION ${i+1}`}</span><strong>${r.score}</strong></div><h3>${this.escape(r.name)}</h3><dl><div><dt>Distance</dt><dd>${this.fmt(r.distance,1)} mi</dd></div><div><dt>Best time</dt><dd>${this.escape(r.bestTime)}</dd></div><div><dt>Wind</dt><dd>${this.fmt(r.wind,0)} mph</dd></div><div><dt>Surf</dt><dd>${this.fmt(r.wave,1)} ft</dd></div><div><dt>Water</dt><dd>${this.fmt(r.water,0)}°F</dd></div><div><dt>Rain</dt><dd>${this.fmt(r.rain,0)}%</dd></div></dl><button class="mini-button compare-use-spot" data-compare-use="${this.escape(r.id)}" type="button">Use this spot</button></article>`).join('');this.$('compareGrid').onclick=(e)=>{const b=e.target.closest('[data-compare-use]');if(!b)return;const r=this.state.scout.results.find(x=>String(x.id)===String(b.dataset.compareUse));if(r){this.closeDialog('compareDialog');this.useScoutSpot(r,false);}};this.$('compareAnalyzeWinnerBtn').disabled=false;this.$('comparePlanWinnerBtn').disabled=false;this.openDialog('compareDialog');},
     useScoutWinner(plan=false){const r=this.state.scout.results.find(x=>String(x.id)===String(this.state.scout.compareWinnerId));if(!r)return;this.closeDialog('compareDialog');this.useScoutSpot(r,plan);},
-    useScoutSpot(r,plan=false){this.state.location={key:'scout',name:r.name,lat:Number(r.lat),lon:Number(r.lon),source:`AnglerSignal Scout • ${r.type}`};this.state.targetSpecies=this.state.scout.species||this.state.targetSpecies;this.onLocationChanged();if(plan)setTimeout(()=>this.openPlanner(),150);else this.navigate('home');this.showToast(`${r.name} selected. Loading exact-location analysis…`);},
+    useScoutSpot(r,plan=false){this.state.location={key:'scout',name:r.name,lat:Number(r.lat),lon:Number(r.lon),source:`CastVector Scout • ${r.type}`};this.state.targetSpecies=this.state.scout.species||this.state.targetSpecies;this.onLocationChanged();if(plan)setTimeout(()=>this.openPlanner(),150);else this.navigate('home');this.showToast(`${r.name} selected. Loading exact-location analysis…`);},
 
     renderGoMode(){
       if(!this.$('goModePanel'))return;const g=this.state.goMode||{},active=!!g.active,c=this.state.data?.current||{},best=this.state.data?this.findBestWindow(this.state.data.hours.filter(h=>h.dateIndex===0).slice(0,24)):{label:'—'};
       this.$('goModeBadge').textContent=active?'LIVE SESSION':'READY';this.$('goModeBadge').classList.toggle('live',active);this.$('goModeTitle').textContent=active?`Fishing ${g.species||this.state.targetSpecies}`:'Turn the forecast into a trip';
-      this.$('goModeSummary').innerHTML=active?`<strong>${this.escape(g.location?.name||this.state.location.name)}</strong> • Started ${new Date(g.startedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})} • Best loaded window ${this.escape(best.label||'—')}`:'Start a live trip at your current fishing destination. AnglerSignal keeps your target, best window, conditions, catches, route shortcuts and checklist in one place.';
+      this.$('goModeSummary').innerHTML=active?`<strong>${this.escape(g.location?.name||this.state.location.name)}</strong> • Started ${new Date(g.startedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})} • Best loaded window ${this.escape(best.label||'—')}`:'Start a live trip at your current fishing destination. CastVector keeps your target, best window, conditions, catches, route shortcuts and checklist in one place.';
       const bp=g.baitPlan||this.baitIntelligence(g.species||this.state.targetSpecies);if(this.$('goBaitPlan'))this.$('goBaitPlan').innerHTML=`<span>BAIT PLAN</span><strong>${this.escape(this.titleCase(bp.primary||''))}</strong><small>${this.escape(bp.rig||'')} • backup ${this.escape(this.titleCase(bp.backup||''))}</small>`;
       this.$('goModeLiveStats').innerHTML=`<div><span>SCORE</span><strong>${this.currentScore()}</strong></div><div><span>WIND</span><strong>${this.fmt(c.windSpeed,0)} mph</strong></div><div><span>SURF</span><strong>${this.fmt(c.waveHeight,1)} ft</strong></div><div><span>WATER</span><strong>${this.fmt(c.waterTemp,0)}°</strong></div>`;
       const sessionCatches=active?this.sessionCatches():[];const mins=active?Math.max(0,Math.floor((Date.now()-new Date(g.startedAt).getTime())/60000)):0;
@@ -2687,7 +2687,7 @@
       const items=this.state.tackleBox||[],low=items.filter(i=>(Number(i.qty)||0)<=(Number(i.minQty)||0));
       if(this.$('tackleCount'))this.$('tackleCount').textContent=String(items.length);
       if(this.$('tackleLowCount'))this.$('tackleLowCount').textContent=String(low.length);
-      box.innerHTML=items.length?items.map(i=>{const s=this.tackleStatus(i);return `<article class="tackle-row"><div class="tackle-main"><span class="tackle-status ${s.toLowerCase()}">${s}</span><div><strong>${this.escape(i.name)}</strong><small>${this.escape(i.category)}${i.notes?` • ${this.escape(i.notes)}`:''}</small></div></div><div class="tackle-qty"><button type="button" data-tackle-dec="${i.id}" aria-label="Decrease ${this.escape(i.name)}">−</button><strong>${Number(i.qty)||0}</strong><button type="button" data-tackle-inc="${i.id}" aria-label="Increase ${this.escape(i.name)}">+</button><button type="button" class="tackle-delete" data-tackle-del="${i.id}" aria-label="Delete ${this.escape(i.name)}">×</button></div></article>`}).join(''):'<div class="empty-state">Your tackle box is empty. Add hooks, rigs, lures, bait, line, weights and other supplies you want AnglerSignal to track.</div>';
+      box.innerHTML=items.length?items.map(i=>{const s=this.tackleStatus(i);return `<article class="tackle-row"><div class="tackle-main"><span class="tackle-status ${s.toLowerCase()}">${s}</span><div><strong>${this.escape(i.name)}</strong><small>${this.escape(i.category)}${i.notes?` • ${this.escape(i.notes)}`:''}</small></div></div><div class="tackle-qty"><button type="button" data-tackle-dec="${i.id}" aria-label="Decrease ${this.escape(i.name)}">−</button><strong>${Number(i.qty)||0}</strong><button type="button" data-tackle-inc="${i.id}" aria-label="Increase ${this.escape(i.name)}">+</button><button type="button" class="tackle-delete" data-tackle-del="${i.id}" aria-label="Delete ${this.escape(i.name)}">×</button></div></article>`}).join(''):'<div class="empty-state">Your tackle box is empty. Add hooks, rigs, lures, bait, line, weights and other supplies you want CastVector to track.</div>';
       const list=this.state.shoppingList||[];
       shop.innerHTML=list.length?list.map((x,idx)=>`<label class="shopping-row ${x.done?'done':''}"><input type="checkbox" data-shopping-check="${idx}" ${x.done?'checked':''}/><div><strong>${this.escape(x.name)}</strong><span>${this.escape(x.reason||'Trip supply')}</span></div><button type="button" data-shopping-del="${idx}" aria-label="Remove ${this.escape(x.name)}">×</button></label>`).join(''):'<div class="empty-state">Generate a shopping list from low-stock tackle and your current bait plan.</div>';
     },
@@ -2762,7 +2762,7 @@
 
       let provider='';
 
-      // Use an official state access layer when AnglerSignal has one registered for the selected coast.
+      // Use an official state access layer when CastVector has one registered for the selected coast.
       try{
         const official=await this.loadOfficialAccessPlaces(radiusMiles);
         official.forEach(addItem);
@@ -2795,7 +2795,7 @@
         const verified=await this.verifiedHoldenMapPlaces();verified.forEach(addItem);if(items.length)provider='verified';
       }
 
-      // Nationwide safety net: AnglerSignal can always analyze the selected coastal coordinate.
+      // Nationwide safety net: CastVector can always analyze the selected coastal coordinate.
       // This is deliberately NOT labeled public access. It keeps forecasting usable while
       // clearly telling the angler to verify legal/public access locally.
       if(!items.length){
@@ -2808,7 +2808,7 @@
       if(this.state.mapPOIs.length){
         this.state.mapPlacesStatus=provider||'live';if(provider!=='anchor')this.writePlaceCache(cacheKey,this.state.mapPOIs);this.renderSpotIntelligence();this.renderMapLayers();
         if(forceToast){
-          const copy=provider==='official'?`Loaded ${this.state.mapPOIs.length} official state coastal access site${this.state.mapPOIs.length===1?'':'s'}.`:provider==='verified'?`Loaded ${this.state.mapPOIs.length} verified local access point${this.state.mapPOIs.length===1?'':'s'}.`:provider==='search'?`Found ${this.state.mapPOIs.length} indexed coastal place${this.state.mapPOIs.length===1?'':'s'} using location search.`:provider==='anchor'?`No verified public access was indexed here, so AnglerSignal loaded your selected ${this.coastRegion()} coordinate for live analysis.`:`Scanned ${this.state.mapPOIs.length} public fishing/access place${this.state.mapPOIs.length===1?'':'s'}.`;
+          const copy=provider==='official'?`Loaded ${this.state.mapPOIs.length} official state coastal access site${this.state.mapPOIs.length===1?'':'s'}.`:provider==='verified'?`Loaded ${this.state.mapPOIs.length} verified local access point${this.state.mapPOIs.length===1?'':'s'}.`:provider==='search'?`Found ${this.state.mapPOIs.length} indexed coastal place${this.state.mapPOIs.length===1?'':'s'} using location search.`:provider==='anchor'?`No verified public access was indexed here, so CastVector loaded your selected ${this.coastRegion()} coordinate for live analysis.`:`Scanned ${this.state.mapPOIs.length} public fishing/access place${this.state.mapPOIs.length===1?'':'s'}.`;
           this.showToast(copy);
         }
         return this.state.mapPOIs;
@@ -2973,7 +2973,7 @@
       const analyze=this.$('topSpotAnalyzeBtn'),save=this.$('topSpotSaveBtn');if(analyze)analyze.disabled=!top;if(save)save.disabled=!top;
       if(this.$('topSpotName'))this.$('topSpotName').textContent=top?top.name:'Scan the area to find public fishing access';
       if(this.$('topSpotScore'))this.$('topSpotScore').textContent=top?top.match:'--';
-      if(this.$('topSpotReason'))this.$('topSpotReason').textContent=top?top.reason:'AnglerSignal will rank named beaches, piers, fishing access, marinas and boat ramps around your selected destination.';
+      if(this.$('topSpotReason'))this.$('topSpotReason').textContent=top?top.reason:'CastVector will rank named beaches, piers, fishing access, marinas and boat ramps around your selected destination.';
       if(this.$('weekendIntel'))this.$('weekendIntel').innerHTML=bestDay?`<strong>Best trip day:</strong> ${this.escape(bestDay.day)} • ${bestDay.score}/100 • ${this.fmt(bestDay.wave,1)} ft surf • ${this.fmt(bestDay.rain,0)}% rain. ${top?`Start by analyzing <strong>${this.escape(top.name)}</strong> at exact coordinates.`:''}`:'Your best forecast day will appear here.';
       this.renderDestinationHub();
       const list=this.$('spotIntelList');if(!list)return;
@@ -3008,9 +3008,9 @@
     recenterMap(){if(!this.state.map)return;const l=this.state.location;this.state.map.setView([l.lat,l.lon],12);setTimeout(()=>this.renderMapLayers(),50);},
 
     resetApp(){
-      if(!confirm('Reset saved AnglerSignal spots, catches, settings and preferences?')) return;
+      if(!confirm('Reset saved CastVector spots, catches, settings and preferences?')) return;
       try{localStorage.removeItem('coastcast-v12-state');localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{['coastcast-v50-state','coastcast-v40-state','coastcast-v31-state','coastcast-v30-state','coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'AnglerSignal Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.watchCenter={running:false,results:[],lastRun:null,species:'Red Drum'};this.state.oceanNetwork={status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null};this.state.experience={mode:'simple'};this.state.membership={tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true,server:null};this.state.backend={installed:false,lastAccessCheck:null,isAdmin:false,familyMembers:[]};this.state.seasonal={selectedSpecies:null,lastViewedMonth:null};this.state.familyCrew={members:[],shareTrips:true,shareFavorites:false};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('AnglerSignal reset.');
+      this.state.live=false;try{['coastcast-v50-state','coastcast-v40-state','coastcast-v31-state','coastcast-v30-state','coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CastVector Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.watchCenter={running:false,results:[],lastRun:null,species:'Red Drum'};this.state.oceanNetwork={status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null};this.state.experience={mode:'simple'};this.state.membership={tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true,server:null};this.state.backend={installed:false,lastAccessCheck:null,isAdmin:false,familyMembers:[]};this.state.seasonal={selectedSpecies:null,lastViewedMonth:null};this.state.familyCrew={members:[],shareTrips:true,shareFavorites:false};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CastVector reset.');
     },
 
 
@@ -3020,7 +3020,7 @@
     },
 
     profileInitials(){
-      const name=(this.state.profile?.name||'AnglerSignal Angler').trim();
+      const name=(this.state.profile?.name||'CastVector Angler').trim();
       const parts=name.split(/\s+/).filter(Boolean);return ((parts[0]?.[0]||'C')+(parts.length>1?(parts[parts.length-1]?.[0]||''):'C')).toUpperCase().slice(0,2);
     },
 
@@ -3028,7 +3028,7 @@
       const p=this.state.profile||{};const initials=this.profileInitials();
       if(this.$('profileInitials'))this.$('profileInitials').textContent=initials;
       if(this.$('profileAvatar'))this.$('profileAvatar').textContent=initials;
-      if(this.$('profileDisplayHeading'))this.$('profileDisplayHeading').textContent=p.name||'AnglerSignal Angler';
+      if(this.$('profileDisplayHeading'))this.$('profileDisplayHeading').textContent=p.name||'CastVector Angler';
       if(this.$('profileHomeSummary'))this.$('profileHomeSummary').textContent=p.homeCoast?`${p.homeCoast} • Favorite target: ${p.favoriteSpecies||this.state.targetSpecies}`:'Set a home coast and favorite target to personalize the app.';
       if(this.$('profileHomeCoast'))this.$('profileHomeCoast').textContent=p.homeCoast||'Not set';
       if(this.$('profileFavoriteSpecies'))this.$('profileFavoriteSpecies').textContent=p.favoriteSpecies||this.state.targetSpecies;
@@ -3049,46 +3049,46 @@
     },
 
     openProfileEditor(){
-      const p=this.state.profile||{};this.$('profileNameInput').value=p.name||'AnglerSignal Angler';this.$('profileHomeInput').value=p.homeCoast||'';this.$('profileSpeciesInput').value=p.favoriteSpecies||this.state.targetSpecies;this.$('profileStyleInput').value=this.state.fishingStyle;this.openDialog('profileDialog');
+      const p=this.state.profile||{};this.$('profileNameInput').value=p.name||'CastVector Angler';this.$('profileHomeInput').value=p.homeCoast||'';this.$('profileSpeciesInput').value=p.favoriteSpecies||this.state.targetSpecies;this.$('profileStyleInput').value=this.state.fishingStyle;this.openDialog('profileDialog');
     },
 
     saveProfile(){
-      const name=(this.$('profileNameInput').value||'').trim().slice(0,40)||'AnglerSignal Angler';const home=(this.$('profileHomeInput').value||'').trim().slice(0,80);const species=this.$('profileSpeciesInput').value;const style=this.$('profileStyleInput').value;
+      const name=(this.$('profileNameInput').value||'').trim().slice(0,40)||'CastVector Angler';const home=(this.$('profileHomeInput').value||'').trim().slice(0,80);const species=this.$('profileSpeciesInput').value;const style=this.$('profileStyleInput').value;
       this.state.profile={name,homeCoast:home,favoriteSpecies:species};this.state.fishingStyle=style;this.save();this.closeDialog('profileDialog');this.recalculateScores();this.renderAll();this.showToast('Profile updated.');
     },
 
     backupPayload(){
-      return {format:'coastcast-backup',version:'5.1.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt}};
+      return {format:'castvector-backup',version:'5.3.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt}};
     },
 
     exportBackup(){
-      try{const payload=this.backupPayload();const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`coastcast-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},300);if(this.$('backupStatus'))this.$('backupStatus').textContent=`Backup exported ${new Date().toLocaleString()}.`;this.showToast('AnglerSignal backup exported.');}catch(_){this.showToast('Could not export backup.');}
+      try{const payload=this.backupPayload();const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`castvector-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},300);if(this.$('backupStatus'))this.$('backupStatus').textContent=`Backup exported ${new Date().toLocaleString()}.`;this.showToast('CastVector backup exported.');}catch(_){this.showToast('Could not export backup.');}
     },
 
     async importBackupFile(event){
       const file=event.target.files?.[0];if(!file)return;
-      try{const text=await file.text();const parsed=JSON.parse(text);const d=parsed?.appState||parsed;if(!d||typeof d!=='object')throw new Error('Invalid');if(!confirm('Restore this AnglerSignal backup? Current local saved data will be replaced.'))return;
+      try{const text=await file.text();const parsed=JSON.parse(text);const d=parsed?.appState||parsed;if(!d||typeof d!=='object')throw new Error('Invalid');if(!confirm('Restore this CastVector backup? Current local saved data will be replaced.'))return;
         if(d.location)this.state.location=d.location;if(typeof d.live==='boolean')this.state.live=d.live;if(d.radius)this.state.radius=Number(d.radius);if(d.tackleRadius)this.state.tackleRadius=Number(d.tackleRadius);if(d.fishingStyle)this.state.fishingStyle=d.fishingStyle;if(d.targetSpecies&&this.species[d.targetSpecies])this.state.targetSpecies=d.targetSpecies;if(Array.isArray(d.waypoints))this.state.waypoints=d.waypoints;if(Array.isArray(d.catches))this.state.catches=d.catches;if(Number.isFinite(d.trips))this.state.trips=d.trips;if(Array.isArray(d.savedTripPlans))this.state.savedTripPlans=d.savedTripPlans;if(Array.isArray(d.alertRules))this.state.alertRules=d.alertRules;if(d.profile)this.state.profile={...this.state.profile,...d.profile};if(d.scout)this.state.scout={...this.state.scout,...d.scout,running:false};if(d.goMode)this.state.goMode={...this.state.goMode,...d.goMode,checks:{...this.state.goMode.checks,...(d.goMode.checks||{})}};if(d.gearPlan)this.state.gearPlan={...this.state.gearPlan,...d.gearPlan,checked:{...(d.gearPlan.checked||{})}};if(d.departure)this.state.departure={...this.state.departure,...d.departure};if(d.regChecks)this.state.regChecks={...d.regChecks};if(Array.isArray(d.tackleBox))this.state.tackleBox=d.tackleBox;if(Array.isArray(d.shoppingList))this.state.shoppingList=d.shoppingList;if(Array.isArray(d.offlinePacks))this.state.offlinePacks=d.offlinePacks;if(d.community&&typeof d.community==='object')this.state.community={...this.state.community,...d.community,reactions:{...(d.community.reactions||{})},publishedLocalIds:Array.isArray(d.community.publishedLocalIds)?d.community.publishedLocalIds:[]};if(d.command&&typeof d.command==='object')this.state.command={...this.state.command,...d.command};if(d.watchCenter&&typeof d.watchCenter==='object')this.state.watchCenter={...this.state.watchCenter,...d.watchCenter,running:false,results:Array.isArray(d.watchCenter.results)?d.watchCenter.results:[]};if(d.oceanNetwork&&typeof d.oceanNetwork==='object')this.state.oceanNetwork={...this.state.oceanNetwork,...d.oceanNetwork,status:'idle'};if(d.experience&&typeof d.experience==='object')this.state.experience={...this.state.experience,...d.experience};if(d.seasonal&&typeof d.seasonal==='object')this.state.seasonal={...this.state.seasonal,...d.seasonal};if(d.familyCrew&&typeof d.familyCrew==='object')this.state.familyCrew={...this.state.familyCrew,...d.familyCrew,members:Array.isArray(d.familyCrew.members)?d.familyCrew.members:[]};if(d.liveUpdatedAt)this.state.liveUpdatedAt=d.liveUpdatedAt;
         this.save();this.state.data=this.buildDemoData();this.recalculateScores();this.renderAll();if(this.$('backupStatus'))this.$('backupStatus').textContent=`Backup restored from ${this.escape(file.name)}.`;this.showToast('Backup restored. Refresh live data for the restored destination.');
-      }catch(_){this.showToast('That file is not a valid AnglerSignal backup.');}finally{event.target.value='';}
+      }catch(_){this.showToast('That file is not a valid CastVector backup.');}finally{event.target.value='';}
     },
 
     openCloudSetup(){
       const c=this.state.cloud||{},cfg=window.COASTCAST_CONFIG||{},managed=!!(cfg.supabaseUrl&&cfg.supabasePublishableKey);
       this.$('cloudUrlInput').value=c.url||cfg.supabaseUrl||'';this.$('cloudKeyInput').value=c.anonKey||cfg.supabasePublishableKey||'';this.$('cloudEmailInput').value=c.email||'';this.$('cloudPasswordInput').value='';this.$('rememberCloudToggle').checked=true;
       if(this.$('cloudTechnicalConfig'))this.$('cloudTechnicalConfig').hidden=managed;
-      this.$('cloudDialogStatus').textContent=this.cloudSignedIn()?'Signed in. Your AnglerSignal access is server verified.':(managed?'Create an account or sign in to AnglerSignal.':'Developer setup is incomplete: add the AnglerSignal Supabase public configuration.');this.openDialog('cloudDialog');
+      this.$('cloudDialogStatus').textContent=this.cloudSignedIn()?'Signed in. Your CastVector access is server verified.':(managed?'Create an account or sign in to CastVector.':'Developer setup is incomplete: add the CastVector Supabase public configuration.');this.openDialog('cloudDialog');
     },
 
     openDeleteAccountDialog(){
-      if(!this.cloudSignedIn()){this.showToast('Sign in to your AnglerSignal account first.');return;}
+      if(!this.cloudSignedIn()){this.showToast('Sign in to your CastVector account first.');return;}
       if(this.state.backend?.isAdmin){this.showToast('Owner/admin accounts must be demoted before deletion.');return;}
       if(this.$('deleteAccountConfirmInput'))this.$('deleteAccountConfirmInput').value='';
       if(this.$('deleteAccountStatus'))this.$('deleteAccountStatus').textContent='This action cannot be undone.';
       this.openDialog('accountDeleteDialog');
     },
 
-    async deleteAnglerSignalAccount(){
+    async deleteCastVectorAccount(){
       if(!this.cloudSignedIn()){this.showToast('Sign in first.');return;}
       if((this.$('deleteAccountConfirmInput')?.value||'').trim()!=='DELETE'){this.$('deleteAccountStatus').textContent='Type DELETE exactly to confirm.';return;}
       const c=this.state.cloud,btn=this.$('confirmDeleteAccountBtn');if(btn)btn.disabled=true;
@@ -3098,7 +3098,7 @@
         let body={};try{body=await r.json();}catch(_){}
         if(!r.ok)throw new Error(body?.error||body?.message||'Account deletion failed');
         try{['coastcast-v50-state','coastcast-v40-state','coastcast-v31-state','coastcast-v30-state','coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state'].forEach(k=>localStorage.removeItem(k));localStorage.removeItem('coastcast-geoapify-key');}catch(_){}
-        this.closeDialog('accountDeleteDialog');this.showToast('AnglerSignal account deleted. Reloading…');setTimeout(()=>location.reload(),900);
+        this.closeDialog('accountDeleteDialog');this.showToast('CastVector account deleted. Reloading…');setTimeout(()=>location.reload(),900);
       }catch(err){this.$('deleteAccountStatus').textContent=err.message||'Could not delete account.';this.showToast(err.message||'Could not delete account.');}
       finally{if(btn)btn.disabled=false;}
     },
@@ -3113,12 +3113,12 @@
     cloudHeaders(token){const c=this.state.cloud;return{'apikey':c.anonKey,'Authorization':`Bearer ${token||c.anonKey}`,'Content-Type':'application/json'};},
 
     async cloudSignIn(){
-      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Signing in…';const r=await fetch(`${cfg.url}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign in failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent='Signed in successfully.';this.renderProfile();this.showToast('AnglerSignal account connected.');setTimeout(()=>this.refreshServerAccess({quiet:true}),120);}
+      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Signing in…';const r=await fetch(`${cfg.url}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign in failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent='Signed in successfully.';this.renderProfile();this.showToast('CastVector account connected.');setTimeout(()=>this.refreshServerAccess({quiet:true}),120);}
       catch(err){this.$('cloudDialogStatus').textContent=err.message||'Could not sign in.';this.showToast(err.message||'Could not sign in.');}
     },
 
     async cloudSignUp(){
-      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Creating account…';const r=await fetch(`${cfg.url}/auth/v1/signup`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign up failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body?.access_token?body:null};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent=body?.access_token?'Account created and signed in.':'Account created. Check your email if confirmation is enabled, then sign in.';this.renderProfile();this.showToast('AnglerSignal account created.');if(body?.access_token)setTimeout(()=>this.refreshServerAccess({quiet:true}),120);}
+      try{const cfg=this.cloudConfigFromForm();this.$('cloudDialogStatus').textContent='Creating account…';const r=await fetch(`${cfg.url}/auth/v1/signup`,{method:'POST',headers:{'apikey':cfg.anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:cfg.email,password:cfg.password})});const body=await r.json();if(!r.ok)throw new Error(body?.msg||body?.error_description||body?.message||'Sign up failed');this.state.cloud={...this.state.cloud,url:cfg.url,anonKey:cfg.anonKey,email:cfg.email,session:body?.access_token?body:null};this.save();this.$('cloudPasswordInput').value='';this.$('cloudDialogStatus').textContent=body?.access_token?'Account created and signed in.':'Account created. Check your email if confirmation is enabled, then sign in.';this.renderProfile();this.showToast('CastVector account created.');if(body?.access_token)setTimeout(()=>this.refreshServerAccess({quiet:true}),120);}
       catch(err){this.$('cloudDialogStatus').textContent=err.message||'Could not create account.';this.showToast(err.message||'Could not create account.');}
     },
 
@@ -3200,7 +3200,7 @@
       if(!this.$('seasonCalendarGrid'))return;const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'],now=this.seasonMonthNow(),species=this.coastRegionSpecies().slice(0,7);this.$('seasonCalendarRegion').textContent=this.coastRegion().toUpperCase();
       let out='<div class="season-cal-cell header">TARGET</div>'+months.map((m,i)=>`<div class="season-cal-cell header ${i===now?'current-month':''}">${m}</div>`).join('');
       for(const sp of species){out+=`<button type="button" class="season-cal-cell species" data-premium="Seasonal Intelligence" data-season-species="${this.escape(sp)}">${this.escape(sp)}</button>`;for(let m=0;m<12;m++){const s=this.seasonalScore(sp,m),cls=s>=88?'peak':s>=74?'strong':s>=58?'shoulder':'off';out+=`<div class="season-cal-cell score ${cls} ${m===now?'current-month':''}" title="${this.escape(sp)} • ${months[m]} • ${s}/100 seasonal planning score">${s}</div>`;}}
-      this.$('seasonCalendarGrid').innerHTML=out;const top=this.seasonalRanking(now)[0];this.$('seasonCalendarCall').innerHTML=top?`Right now, <strong>${this.escape(top.name)}</strong> leads the regional seasonal board at <strong>${top.score}/100</strong>. Tap a species name to make it your active AnglerSignal target.`:'Seasonal calendar unavailable.';
+      this.$('seasonCalendarGrid').innerHTML=out;const top=this.seasonalRanking(now)[0];this.$('seasonCalendarCall').innerHTML=top?`Right now, <strong>${this.escape(top.name)}</strong> leads the regional seasonal board at <strong>${top.score}/100</strong>. Tap a species name to make it your active CastVector target.`:'Seasonal calendar unavailable.';
     },
 
     handleSeasonCalendarClick(e){const b=e.target.closest('[data-season-species]');if(!b)return;const sp=b.dataset.seasonSpecies;if(!this.species[sp])return;this.setSpecies(sp);this.showToast(`${sp} is now your active target.`);},
@@ -3216,7 +3216,7 @@
       if(!this.$('familyCrewList'))return;const f=this.state.familyCrew||{members:[]};
       if(this.cloudSignedIn()&&this.state.backend?.installed){
         const members=this.state.backend?.familyMembers||[];this.$('familyCrewBadge').textContent=members.length?`${members.length} SERVER MEMBER${members.length===1?'':'S'}`:'SERVER READY';
-        this.$('familyCrewSummary').innerHTML=members.length?`<strong>${members.length} Family Crew member${members.length===1?'':'s'} linked on the AnglerSignal server.</strong> Active members receive Family Premium without purchasing another subscription.`:'No Family Crew members linked yet. Invite a family email from your Premium owner account.';
+        this.$('familyCrewSummary').innerHTML=members.length?`<strong>${members.length} Family Crew member${members.length===1?'':'s'} linked on the CastVector server.</strong> Active members receive Family Premium without purchasing another subscription.`:'No Family Crew members linked yet. Invite a family email from your Premium owner account.';
         this.$('familyCrewList').innerHTML=members.map(m=>`<div class="family-member-row"><div><strong>${this.escape(m.email||'Family member')}</strong><small>${this.escape(String(m.status||'invited').toUpperCase())} • server verified</small></div><span class="family-access">${m.status==='active'?'FAMILY PREMIUM':'INVITED'}</span></div>`).join('');
       }else{
         const members=Array.isArray(f.members)?f.members:[];this.$('familyCrewBadge').textContent=members.length?`${members.length} PREVIEW`:'PREVIEW';this.$('familyCrewSummary').innerHTML=members.length?`<strong>${members.length} family member${members.length===1?'':'s'} in this device preview.</strong> Connect the v5 backend to turn these into real server memberships.`:'No family members added to the preview yet. Sign in and install the v5 launch backend for real Family Premium.';
@@ -3310,6 +3310,6 @@
     registerServiceWorker(){if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});}
   };
 
-  window.AnglerSignal=APP;
+  window.CastVector=APP;
   APP.init();
 })();

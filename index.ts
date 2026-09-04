@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
 
     const userClient = createClient(supabaseUrl,publishable,{global:{headers:{Authorization:`Bearer ${token}`}},auth:{persistSession:false}});
     const {data:userData,error:userErr}=await userClient.auth.getUser(token);
-    if(userErr || !userData.user) throw new Error('Invalid AnglerSignal session');
+    if(userErr || !userData.user) throw new Error('Invalid CastVector session');
 
     const {purchaseToken}=await req.json();
     if(!purchaseToken || typeof purchaseToken!=='string') throw new Error('purchaseToken required');
@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
     const entitled=state==='SUBSCRIPTION_STATE_ACTIVE' || state==='SUBSCRIPTION_STATE_IN_GRACE_PERIOD';
     const items=Array.isArray(sub.lineItems)?sub.lineItems:[];
     const matching=items.filter((x:any)=>x.productId===expectedProduct);
-    if(!matching.length) throw new Error('Purchase does not match AnglerSignal Premium product');
+    if(!matching.length) throw new Error('Purchase does not match CastVector Premium product');
     const expiry=matching.map((x:any)=>x.expiryTime).filter(Boolean).sort().at(-1) || null;
     if(expiry && new Date(expiry).getTime() <= Date.now()) throw new Error('Subscription has expired');
 

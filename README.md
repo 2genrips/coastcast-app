@@ -1,12 +1,12 @@
-# AnglerSignal native wrapper scaffold
+# CastVector native wrapper scaffold
 
 This is the store-wrapper starting point for Android and iOS. It is NOT the final store binary yet.
 
-Why a native wrapper: AnglerSignal sells digital Premium functionality, so the store builds need native store subscription flows and platform features such as purchase restoration. The existing PWA remains the shared UI/data engine.
+Why a native wrapper: CastVector sells digital Premium functionality, so the store builds need native store subscription flows and platform features such as purchase restoration. The existing PWA remains the shared UI/data engine.
 
 Working identifiers:
-- App/store title: AnglerSignal Fishing Forecast (subject to final name clearance)
-- Android package / iOS bundle ID: com.anglersignal.fishing
+- App/store title: CastVector Fishing Forecast (subject to final name clearance)
+- Android package / iOS bundle ID: com.castvector.fishing
 - Premium product: coastcast_premium_monthly
 
 Before generating native projects:

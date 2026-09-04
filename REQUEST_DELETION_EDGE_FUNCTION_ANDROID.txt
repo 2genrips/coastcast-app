@@ -14,7 +14,7 @@ Deno.serve(async(req)=>{
   try{
     const body=await req.json().catch(()=>({}));
     const email=String(body?.email||'').trim().toLowerCase();
-    if(!validEmail(email))return json({error:'Enter a valid AnglerSignal account email.'},400);
+    if(!validEmail(email))return json({error:'Enter a valid CastVector account email.'},400);
 
     const url=Deno.env.get('SUPABASE_URL')!;
     const secretJson=Deno.env.get('SUPABASE_SECRET_KEYS');

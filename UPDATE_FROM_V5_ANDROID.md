@@ -1,14 +1,14 @@
-# Updating your existing AnglerSignal v5.0 site from Android
+# Updating your existing app to CastVector v5.3 from Android
 
-IMPORTANT: your live GitHub `coastcast-config.js` already contains the Supabase Project URL and publishable key. This v5.2 package intentionally does NOT include that file, so uploading v5.2 will not overwrite your working connection.
+IMPORTANT: your live GitHub `coastcast-config.js` already contains the Supabase Project URL and publishable key. This v5.3 package intentionally does NOT include that file, so uploading v5.3 will not overwrite your working connection.
 
-1. Extract the v5.2 ZIP.
-2. Open your existing AnglerSignal GitHub repository.
-3. Upload everything inside `coastcast_v5.2_launch_ready`.
+1. Extract the v5.3 ZIP.
+2. Open your existing CastVector GitHub repository.
+3. Upload everything inside `castvector_v5.3_launch_brand`.
 4. Replace matching files when GitHub prompts.
 5. Leave your existing `coastcast-config.js` in the repository.
 6. Commit to main.
-7. Wait for GitHub Pages, fully close AnglerSignal, reopen.
+7. Wait for GitHub Pages, fully close CastVector, reopen.
 
 Then in Supabase:
 1. Run `LAUNCH_COMPLIANCE_SETUP.sql`.

@@ -1,9 +1,9 @@
-# AnglerSignal Premium — v5.0 production architecture
+# CastVector Premium — v5.3 production architecture
 
-Target price: **$4.99/month** for AnglerSignal Premium.
+Target price: **$4.99/month** for CastVector Premium.
 
 ## Effective access types
-- `free` — core AnglerSignal.
+- `free` — core CastVector.
 - `play` — paid Google Play Premium.
 - `family` — Premium inherited from an active Premium family owner; no second subscription.
 - `complimentary` — owner/admin granted Premium, expiring or non-expiring.

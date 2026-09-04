@@ -1,0 +1,8 @@
+Your existing live coastcast-config.js should remain in GitHub because it contains the working Supabase public connection.
+
+You do NOT need to change it just to install v5.3.
+
+Before creating the Google Play / Apple subscription product, update its public billing product value to:
+castvector_premium_monthly
+
+Never place a Supabase secret/service-role key in that file.

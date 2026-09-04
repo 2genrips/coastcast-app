@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.anglersignal.fishing',
-  appName: 'AnglerSignal Fishing Forecast',
+  appId: 'com.castvector.fishing',
+  appName: 'CastVector Fishing Forecast',
   webDir: 'www',
   bundledWebRuntime: false,
   backgroundColor: '#05131F'

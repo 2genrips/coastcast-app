@@ -1,5 +1,5 @@
--- AnglerSignal v5.1 Launch Compliance
--- Run AFTER SUPABASE_SETUP.sql and COASTCAST_LAUNCH_BACKEND.sql.
+-- CastVector v5.1 Launch Compliance
+-- Run AFTER SUPABASE_SETUP.sql and CASTVECTOR_LAUNCH_BACKEND.sql.
 -- Adds a non-destructive public account-deletion request queue.
 
 create table if not exists public.coastcast_deletion_requests (

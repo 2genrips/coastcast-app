@@ -1,4 +1,4 @@
-# AnglerSignal platform launch checklist
+# CastVector platform launch checklist
 
 ## Phase A — already working
 - [x] Hosted PWA on GitHub Pages
@@ -40,7 +40,7 @@
 - [ ] Build native iOS wrapper
 - [ ] Add StoreKit auto-renewable subscription
 - [ ] Add Restore Purchases
-- [ ] Connect App Store entitlement verification to AnglerSignal backend
+- [ ] Connect App Store entitlement verification to CastVector backend
 - [ ] Complete App Privacy
 - [ ] Add privacy/support URLs
 - [ ] TestFlight test

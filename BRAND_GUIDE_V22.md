@@ -1,8 +1,8 @@
-# AnglerSignal 2.2 Brand Guide
+# CastVector 2.2 Brand Guide
 
 ## Primary identity
 - Emblem: compass + fish + wave + location cue.
-- Wordmark: ANGLERSIGNAL / FISHING FORECAST.
+- Wordmark: CASTVECTOR / FISHING FORECAST.
 - Tone: premium marine utility, not cartoon fishing artwork.
 
 ## Core palette

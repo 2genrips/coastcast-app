@@ -1,4 +1,4 @@
-ANGLERSIGNAL v5.1 — PHONE SETUP NEXT
+CASTVECTOR v5.1 — PHONE SETUP NEXT
 
 Your current live coastcast-config.js stays in GitHub. Do not delete or replace it.
 

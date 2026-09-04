@@ -1,4 +1,4 @@
-# AnglerSignal 4.0 Data Sources
+# CastVector 4.0 Data Sources
 
 ## Forecast & marine
 - Open-Meteo weather forecast
@@ -11,7 +11,7 @@
 - NDBC station realtime files: `https://www.ndbc.noaa.gov/data/realtime2/{station}.txt`
 - NDBC station pages: `https://www.ndbc.noaa.gov/station_page.php?station={station}`
 
-NDBC station data can be offshore or exposed differently than the beach. AnglerSignal treats it as a regional reality check for the forecast, not a measurement at the angler's feet.
+NDBC station data can be offshore or exposed differently than the beach. CastVector treats it as a regional reality check for the forecast, not a measurement at the angler's feet.
 
 ## Coast Watch
 Coast Watch uses the weather and marine forecast services to query saved fishing destinations separately. Its comparison score is a planning preview. Open a destination with **Analyze** to load its exact-location NOAA tide and full forecast context before making a trip decision.
@@ -20,21 +20,21 @@ Coast Watch uses the weather and marine forecast services to query saved fishing
 - Official/state public coastal-access datasets where integrated
 - OpenStreetMap / Overpass
 - Nominatim / Photon secondary location discovery
-- AnglerSignal verified regional access catalogs where available
+- CastVector verified regional access catalogs where available
 
 ## Bait & tackle intelligence
-AnglerSignal merges multiple sources:
+CastVector merges multiple sources:
 1. Geoapify Places (optional key) using its fishing/outdoor retail category
 2. OpenStreetMap / Overpass fishing-store tags and fishing-specific metadata
 3. Nominatim / Photon strict text discovery
-4. AnglerSignal verified regional business catalogs
+4. CastVector verified regional business catalogs
 
-Results must pass fishing-business validation or be explicitly verified. AnglerSignal prefers no bait pin over knowingly labeling an unrelated business as tackle.
+Results must pass fishing-business validation or be explicitly verified. CastVector prefers no bait pin over knowingly labeling an unrelated business as tackle.
 
 ## Premium / entitlement architecture
-AnglerSignal 4.0 includes the membership UI/state preview and server-side database schema, but Google Play Billing and secure entitlement validation are **not yet connected**. The beta access selector exists only for UI testing and must not be treated as payment security.
+CastVector 4.0 includes the membership UI/state preview and server-side database schema, but Google Play Billing and secure entitlement validation are **not yet connected**. The beta access selector exists only for UI testing and must not be treated as payment security.
 
 See `PREMIUM_ARCHITECTURE.md` and `ENTITLEMENT_SETUP.sql`.
 
 ## Seasonal Intelligence
-AnglerSignal 4.0 seasonal scores are **broad regional planning heuristics** layered on top of the live species-condition score. They are not regulatory seasons, closures, bag limits, or guarantees of fish presence. The app should continue linking anglers to official state regulations and encourage recent local reports for final trip decisions.
+CastVector 4.0 seasonal scores are **broad regional planning heuristics** layered on top of the live species-condition score. They are not regulatory seasons, closures, bag limits, or guarantees of fish presence. The app should continue linking anglers to official state regulations and encourage recent local reports for final trip decisions.

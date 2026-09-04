@@ -4,33 +4,33 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="AnglerSignal 5.2 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CastVector 5.3 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="AnglerSignal" />
-  <meta property="og:title" content="AnglerSignal Fishing Forecast" />
+  <meta name="apple-mobile-web-app-title" content="CastVector" />
+  <meta property="og:title" content="CastVector Fishing Forecast" />
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="brand-emblem.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=5.2.0" />
-  <title>AnglerSignal 5.2</title>
+  <link rel="stylesheet" href="styles.css?v=5.3.0" />
+  <title>CastVector 5.3</title>
 </head>
 <body>
   <div id="app" class="app-shell">
     <header class="topbar">
-      <div class="brand-lockup brand-lockup-v22" aria-label="AnglerSignal Fishing Forecast">
+      <div class="brand-lockup brand-lockup-v22" aria-label="CastVector Fishing Forecast">
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
-          <div class="brand-name"><span>ANGLER</span><b>SIGNAL</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.2</span></div>
+          <div class="brand-name"><span>CAST</span><b>VECTOR</b></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.3</span></div>
         </div>
       </div>
       <div class="topbar-actions">
         <button id="syncBtn" class="icon-button" type="button" aria-label="Refresh live data" title="Refresh live data"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>
-        <button id="profileBtn" class="profile-button" type="button" aria-label="Open profile" title="Profile"><span id="profileInitials">AS</span></button>
+        <button id="profileBtn" class="profile-button" type="button" aria-label="Open profile" title="Profile"><span id="profileInitials">CV</span></button>
         <button id="settingsBtn" class="icon-button" type="button" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg></button>
       </div>
     </header>
@@ -67,17 +67,17 @@
 
         <section class="panel quick-answer-panel" id="quickAnswerPanel">
           <div class="quick-answer-head">
-            <div><div class="eyebrow">ANGLERSIGNAL QUICK ANSWER</div><h2 id="quickAnswerHeadline">Here’s the fishing move.</h2></div>
+            <div><div class="eyebrow">CASTVECTOR QUICK ANSWER</div><h2 id="quickAnswerHeadline">Here’s the fishing move.</h2></div>
             <span id="quickDecisionBadge" class="quick-decision-badge">ANALYZING</span>
           </div>
-          <p id="quickAnswerSummary" class="quick-answer-summary">AnglerSignal is reducing the forecast into the few things you need before deciding whether to go.</p>
+          <p id="quickAnswerSummary" class="quick-answer-summary">CastVector is reducing the forecast into the few things you need before deciding whether to go.</p>
           <div class="quick-answer-grid">
             <article><span>WHEN</span><strong id="quickWhen">—</strong><small id="quickWhenNote">Best window</small></article>
             <article><span>TARGET</span><strong id="quickTarget">—</strong><small id="quickTargetNote">Best species</small></article>
             <article><span>THROW</span><strong id="quickBait">—</strong><small id="quickBaitNote">Bait / lure</small></article>
             <article><span>CONDITIONS</span><strong id="quickConditions">—</strong><small id="quickConditionsNote">Wind • surf</small></article>
           </div>
-          <div id="quickWhy" class="quick-why">Live data will explain why AnglerSignal made this recommendation.</div>
+          <div id="quickWhy" class="quick-why">Live data will explain why CastVector made this recommendation.</div>
           <div class="quick-answer-actions">
             <button id="quickBuildPlanBtn" class="primary-button" type="button" data-premium="Smart Trip Builder">Build my plan</button>
             <button id="quickDetailsBtn" class="secondary-button" type="button">Show all tools</button>
@@ -96,7 +96,7 @@
           <div class="destination-hero-row">
             <div class="destination-copy">
               <strong id="destinationPrimaryCall">Building destination brief…</strong>
-              <p id="destinationBrief">AnglerSignal is combining live conditions, public access, tackle shops, target species and forecast confidence for this destination.</p>
+              <p id="destinationBrief">CastVector is combining live conditions, public access, tackle shops, target species and forecast confidence for this destination.</p>
             </div>
             <div class="destination-confidence">
               <strong id="destinationConfidence">—</strong><span>%</span><small>DATA<br/>CONF.</small>
@@ -118,7 +118,7 @@
         <section class="panel daily-brief-panel" id="dailyBriefPanel">
           <div class="daily-brief-head">
             <div>
-              <div class="eyebrow">ANGLERSIGNAL DAILY BRIEF</div>
+              <div class="eyebrow">CASTVECTOR DAILY BRIEF</div>
               <h2 id="dailyBriefHeadline">Building today's fishing story…</h2>
             </div>
             <span id="dailyBriefBadge" class="daily-brief-badge">ANALYZING</span>
@@ -144,9 +144,9 @@
             <div><div class="eyebrow">SEASONAL INTELLIGENCE</div><h2>What is running right now?</h2></div>
             <span id="seasonPulseMonth" class="tiny-pill">THIS MONTH</span>
           </div>
-          <p class="section-note">AnglerSignal blends broad regional seasonality with the live conditions already loaded for this coast. It is a planning signal—not a regulation season or guarantee that fish are present.</p>
+          <p class="section-note">CastVector blends broad regional seasonality with the live conditions already loaded for this coast. It is a planning signal—not a regulation season or guarantee that fish are present.</p>
           <div id="seasonPulseList" class="season-pulse-list"></div>
-          <div id="seasonPulseCall" class="season-pulse-call">AnglerSignal is building the seasonal picture.</div>
+          <div id="seasonPulseCall" class="season-pulse-call">CastVector is building the seasonal picture.</div>
           <button id="seasonCalendarShortcutBtn" data-premium="Seasonal Intelligence" class="secondary-button full" type="button">Open 12-month species calendar</button>
         </section>
 
@@ -155,7 +155,7 @@
             <div><div class="eyebrow">OCEAN NETWORK • NOAA OBSERVATIONS</div><h2>Forecast vs. what the ocean is doing</h2></div>
             <span id="oceanNetworkBadge" class="tiny-pill">NOT CHECKED</span>
           </div>
-          <p class="section-note">AnglerSignal looks for a nearby National Data Buoy Center observation and compares measured wind, waves and water temperature with the forecast model. Offshore observations may differ from the beach itself.</p>
+          <p class="section-note">CastVector looks for a nearby National Data Buoy Center observation and compares measured wind, waves and water temperature with the forecast model. Offshore observations may differ from the beach itself.</p>
           <div class="ocean-station-hero">
             <div class="ocean-station-copy">
               <span>NEAREST REPORTING STATION</span>
@@ -187,7 +187,7 @@
         <section class="panel command-center-panel advanced-home premium-surface" id="commandCenterPanel">
           <div class="command-center-top">
             <div>
-              <div class="eyebrow">ANGLERSIGNAL COMMAND CENTER</div>
+              <div class="eyebrow">CASTVECTOR COMMAND CENTER</div>
               <h2>What is the best move?</h2>
             </div>
             <span id="commandBadge" class="command-badge">ANALYZING</span>
@@ -202,7 +202,7 @@
             <div class="command-call-wrap">
               <span class="command-kicker">TODAY'S CALL</span>
               <strong id="commandCall">BUILDING PLAN</strong>
-              <h3 id="commandHeadline">AnglerSignal is combining the coast for you.</h3>
+              <h3 id="commandHeadline">CastVector is combining the coast for you.</h3>
               <p id="commandSummary">Target species, tide movement, wind, surf, weather and forecast confidence are being ranked together.</p>
             </div>
             <div class="command-confidence-ring" aria-label="Forecast confidence">
@@ -226,7 +226,7 @@
 
         <section class="score-hero panel">
           <div class="score-main">
-            <div class="eyebrow">ANGLERSIGNAL FISHING SCORE</div>
+            <div class="eyebrow">CASTVECTOR FISHING SCORE</div>
             <div class="score-number-row">
               <div class="score-number" id="fishingScore">91</div>
               <div class="score-scale">/100</div>
@@ -279,7 +279,7 @@
             <div><div class="eyebrow">BAIT & RIG INTELLIGENCE</div><h2>What should I throw?</h2></div>
             <span id="baitConfidence" class="tiny-pill">SMART PLAN</span>
           </div>
-          <p class="section-note">AnglerSignal combines your target species, fishing style, tide, surf, wind, water temperature and your own catch history into a practical starting plan.</p>
+          <p class="section-note">CastVector combines your target species, fishing style, tide, surf, wind, water temperature and your own catch history into a practical starting plan.</p>
           <div class="bait-hero-grid">
             <article class="bait-primary-card">
               <div class="bait-card-label">TOP PICK</div>
@@ -297,7 +297,7 @@
             <div><span>PRESENTATION</span><strong id="baitPresentationName">—</strong><small id="baitPresentationDetail">—</small></div>
             <div><span>TERMINAL</span><strong id="baitTerminalName">—</strong><small id="baitTerminalDetail">—</small></div>
           </div>
-          <div id="personalBaitNote" class="bait-history-note">Log catches with bait/lure details and AnglerSignal will learn what has worked for you.</div>
+          <div id="personalBaitNote" class="bait-history-note">Log catches with bait/lure details and CastVector will learn what has worked for you.</div>
           <div class="bait-actions">
             <button id="baitUseTripBtn" data-premium="Bait & Rig Intelligence" class="primary-button" type="button">Use this plan</button>
             <button id="baitShopShortcutBtn" class="secondary-button" type="button">Find nearby bait</button>
@@ -311,7 +311,7 @@
           </div>
           <div class="pattern-match-grid">
             <div class="pattern-score-wrap"><strong id="patternMatchScore">--</strong><span>/100 match</span></div>
-            <div class="pattern-match-copy"><h3 id="patternMatchLabel">Build your fishing pattern</h3><p id="patternMatchDetail">Log catches and AnglerSignal will compare today with conditions that have produced fish for you before.</p></div>
+            <div class="pattern-match-copy"><h3 id="patternMatchLabel">Build your fishing pattern</h3><p id="patternMatchDetail">Log catches and CastVector will compare today with conditions that have produced fish for you before.</p></div>
           </div>
           <div class="pattern-mini-grid">
             <div><span>YOUR TOP BAIT</span><strong id="patternTopBait">Not enough data</strong></div>
@@ -338,7 +338,7 @@
           </div>
           <div class="readiness-hero">
             <div class="readiness-score-wrap"><strong id="readinessScore">--</strong><span>/100</span></div>
-            <div class="readiness-copy"><h3 id="readinessHeadline">Checking the loaded forecast</h3><p id="readinessDetail">AnglerSignal is weighing bite quality, surf, wind, rain, source confidence and active NWS hazards.</p></div>
+            <div class="readiness-copy"><h3 id="readinessHeadline">Checking the loaded forecast</h3><p id="readinessDetail">CastVector is weighing bite quality, surf, wind, rain, source confidence and active NWS hazards.</p></div>
           </div>
           <div id="readinessFactors" class="readiness-factors"></div>
           <div class="readiness-callout"><span>PLANNING CALL</span><strong id="readinessCall">WAIT FOR FORECAST</strong><small id="readinessCallDetail">Load live data before making a departure decision.</small></div>
@@ -418,7 +418,7 @@
               <div><span class="eyebrow">BEACH SAFETY GUARD</span><strong id="safetyStatusTitle">Checking conditions…</strong></div>
               <span id="safetyStatusBadge" class="safety-status-badge">CHECKING</span>
             </div>
-            <p id="safetyStatusDetail">AnglerSignal combines NWS point alerts with loaded surf, wind and weather conditions.</p>
+            <p id="safetyStatusDetail">CastVector combines NWS point alerts with loaded surf, wind and weather conditions.</p>
             <div id="safetyAlertList" class="safety-alert-list"></div>
             <div class="safety-actions"><button id="refreshSafetyBtn" class="primary-button small" type="button">Refresh safety</button><button id="openNwsBtn" class="secondary-button small" type="button">NWS safety info</button></div>
           </div>
@@ -443,7 +443,7 @@
               <strong id="regStateCode">Detecting…</strong>
             </div>
           </div>
-          <div id="regulationMessage" class="regulation-message">AnglerSignal links you to the official state source because size, bag, season, gear and closure rules can change during the year.</div>
+          <div id="regulationMessage" class="regulation-message">CastVector links you to the official state source because size, bag, season, gear and closure rules can change during the year.</div>
           <div class="regulation-actions">
             <button id="openRegsBtn" class="primary-button" type="button">Open official regulations</button>
             <button id="openLicenseBtn" class="secondary-button" type="button">License information</button>
@@ -452,7 +452,7 @@
             <div class="reg-guard-status"><span id="regGuardBadge" class="reg-guard-badge">NEEDS CHECK</span><div><strong id="regGuardTitle">Verify before you keep fish</strong><small id="regGuardTime">Not checked today</small></div></div>
             <button id="markRegsCheckedBtn" class="secondary-button small" type="button">Mark checked today</button>
           </div>
-          <p class="micro-note">AnglerSignal never replaces official regulations. Marking this checked only records that you personally reviewed the official source for this species and state today. Federal waters, marine protected areas and emergency closures can have additional rules.</p>
+          <p class="micro-note">CastVector never replaces official regulations. Marking this checked only records that you personally reviewed the official source for this species and state today. Federal waters, marine protected areas and emergency closures can have additional rules.</p>
         </section>
 
         <section class="panel">
@@ -547,7 +547,7 @@
             <div><div class="eyebrow">OCEAN TRUTH LAYER</div><h2>Observed vs forecast</h2></div>
             <span id="forecastTruthBadge" class="tiny-pill">NO STATION</span>
           </div>
-          <div id="forecastTruthSummary" class="forecast-truth-summary">AnglerSignal will compare the current marine model with the nearest available NOAA/NDBC observation.</div>
+          <div id="forecastTruthSummary" class="forecast-truth-summary">CastVector will compare the current marine model with the nearest available NOAA/NDBC observation.</div>
           <div class="truth-compare-grid">
             <article><span>WIND</span><strong id="truthWind">—</strong><small id="truthWindNote">—</small></article>
             <article><span>WAVES</span><strong id="truthWave">—</strong><small id="truthWaveNote">—</small></article>
@@ -558,7 +558,7 @@
             <div class="ocean-history-head"><strong>Recent station wave trend</strong><small id="oceanHistoryNote">No recent station history loaded.</small></div>
             <canvas id="oceanObservationCanvas" width="900" height="250" aria-label="Recent observed wave height trend"></canvas>
           </div>
-          <p class="micro-note">NOAA observations are measured at the reporting station and may be offshore, in an inlet or inside a harbor. AnglerSignal uses them as a reality check for the forecast—not as an exact measurement at your feet.</p>
+          <p class="micro-note">NOAA observations are measured at the reporting station and may be offshore, in an inlet or inside a harbor. CastVector uses them as a reality check for the forecast—not as an exact measurement at your feet.</p>
         </section>
 
         <section class="panel">
@@ -576,7 +576,7 @@
           </div>
           <p class="section-note">A fast scan of the strongest target/day combinations at this destination. Tap any score to load that species and day into Forecast.</p>
           <div id="opportunityMatrix" class="opportunity-matrix"></div>
-          <div id="matrixBestCall" class="matrix-best-call">AnglerSignal is ranking the week.</div>
+          <div id="matrixBestCall" class="matrix-best-call">CastVector is ranking the week.</div>
         </section>
 
 
@@ -585,7 +585,7 @@
             <div><div class="eyebrow">12-MONTH SPECIES CALENDAR</div><h2>Plan farther than the forecast</h2></div>
             <span id="seasonCalendarRegion" class="tiny-pill">REGIONAL</span>
           </div>
-          <p class="section-note">Seasonal scores are broad AnglerSignal planning heuristics for the region. They do not represent legal seasons, bag limits, closures or a promise of fish. Always verify local regulations and recent reports.</p>
+          <p class="section-note">Seasonal scores are broad CastVector planning heuristics for the region. They do not represent legal seasons, bag limits, closures or a promise of fish. Always verify local regulations and recent reports.</p>
           <div class="season-calendar-scroll">
             <div id="seasonCalendarGrid" class="season-calendar-grid"></div>
           </div>
@@ -605,7 +605,7 @@
             <div><div class="eyebrow">CATCH FORECAST TIMELINE</div><h2 id="catchTimelineTitle">Best species windows</h2></div>
             <span id="catchTimelineBadge" class="tiny-pill">SPECIES MODE</span>
           </div>
-          <p id="catchTimelineNote" class="section-note">Hourly AnglerSignal scoring for your selected species. Tap a window to carry it into Smart Departure.</p>
+          <p id="catchTimelineNote" class="section-note">Hourly CastVector scoring for your selected species. Tap a window to carry it into Smart Departure.</p>
           <div id="catchTimeline" class="catch-timeline"></div>
           <div id="topWindowCards" class="top-window-cards"></div>
         </section>
@@ -668,7 +668,7 @@
             <div><div class="eyebrow">7-DAY TIDE PLANNER</div><h2>Highs, lows & movement windows</h2></div>
             <span id="tideWeekSource" class="tiny-pill">NOAA</span>
           </div>
-          <p class="section-note">Times are shown in the fishing destination's local time. AnglerSignal highlights mid-cycle movement windows between NOAA high and low predictions.</p>
+          <p class="section-note">Times are shown in the fishing destination's local time. CastVector highlights mid-cycle movement windows between NOAA high and low predictions.</p>
           <div id="tideWeekGrid" class="tide-week-grid"></div>
         </section>
 
@@ -685,7 +685,7 @@
       <section class="view" data-view="map" id="view-map">
         <div class="page-head map-page-head">
           <div>
-            <div class="eyebrow">ANGLERSIGNAL SCOUT • NATIONWIDE</div>
+            <div class="eyebrow">CASTVECTOR SCOUT • NATIONWIDE</div>
             <h1>Scout the coast</h1>
             <p class="page-subtitle">Rank nearby coastal spots for your target species, compare the strongest options, then analyze the winner live.</p>
           </div>
@@ -695,7 +695,7 @@
 
         <section class="panel scout-command-panel">
           <div class="section-heading scout-heading">
-            <div><div class="eyebrow">ANGLERSIGNAL SCOUT</div><h2>Where should I fish?</h2></div>
+            <div><div class="eyebrow">CASTVECTOR SCOUT</div><h2>Where should I fish?</h2></div>
             <span id="scoutLiveBadge" class="tiny-pill">READY</span>
           </div>
           <p class="section-note">Scout combines nearby public-access discoveries, your private favorites and known coastal destinations, then checks location-specific weather and marine conditions for your target.</p>
@@ -704,7 +704,7 @@
             <label class="field-group compact-field"><span>Search radius</span><select id="scoutRadius" class="select-control"><option value="10">10 miles</option><option value="25" selected>25 miles</option><option value="50">50 miles</option></select></label>
             <label class="field-group compact-field"><span>When</span><select id="scoutPeriod" class="select-control"><option value="today">Today</option><option value="tomorrow">Tomorrow</option><option value="weekend">This weekend</option></select></label>
           </div>
-          <button id="runScoutBtn" data-premium="Scout & Spot Intelligence" class="primary-button full scout-run-button" type="button"><span>◎</span> Run AnglerSignal Scout</button>
+          <button id="runScoutBtn" data-premium="Scout & Spot Intelligence" class="primary-button full scout-run-button" type="button"><span>◎</span> Run CastVector Scout</button>
           <div id="scoutStatus" class="scout-status">Scout is ready. Run it from any U.S. coastal destination.</div>
           <div class="scout-metrics">
             <div><span>CANDIDATES</span><strong id="scoutCandidateCount">0</strong></div>
@@ -737,7 +737,7 @@
           <div class="top-spot-row">
             <div class="top-spot-copy">
               <h2 id="topSpotName">Scan the area to find public fishing access</h2>
-              <p id="topSpotReason">AnglerSignal will rank named beaches, piers, fishing access, marinas and boat ramps around your selected destination.</p>
+              <p id="topSpotReason">CastVector will rank named beaches, piers, fishing access, marinas and boat ramps around your selected destination.</p>
             </div>
             <div class="top-spot-score"><strong id="topSpotScore">--</strong><span>AREA MATCH</span></div>
           </div>
@@ -807,7 +807,7 @@
       <section class="view" data-view="trips" id="view-trips">
         <div class="page-head">
           <div>
-            <div class="eyebrow">MY ANGLERSIGNAL</div>
+            <div class="eyebrow">MY CASTVECTOR</div>
             <h1>Trips</h1>
             <p class="page-subtitle">Keep your best plans, favorite fishing spots and forecast watches together.</p>
           </div>
@@ -822,7 +822,7 @@
 
         <section class="panel launch-panel">
           <div class="launch-panel-top"><div><div class="eyebrow">TRIP COMMAND CENTER</div><h2 id="tripHubHeadline">Ready when the coast lines up</h2></div><span id="tripHubBadge" class="tiny-pill">BETA</span></div>
-          <div id="tripHubRecommendation" class="trip-hub-recommendation">AnglerSignal will combine your live forecast, target species, favorites and alert rules here.</div>
+          <div id="tripHubRecommendation" class="trip-hub-recommendation">CastVector will combine your live forecast, target species, favorites and alert rules here.</div>
           <div class="trip-hub-actions"><button id="tripHubPlanBtn" class="primary-button" type="button">Build best trip</button><button id="tripHubAlertBtn" data-premium="Smart Alerts" class="secondary-button" type="button">Create smart alert</button></div>
         </section>
 
@@ -891,7 +891,7 @@
             <button id="missionLaunchBtn" data-premium="Mission Control" class="primary-button launch-button" type="button">Start Go Fishing Mode</button>
             <button id="missionShareBtn" class="secondary-button" type="button">Share command brief</button>
           </div>
-          <p class="micro-note">Starting Go Fishing Mode does not mean conditions are safe. AnglerSignal blocks its one-tap launch when a high-level Safety Guard condition is loaded.</p>
+          <p class="micro-note">Starting Go Fishing Mode does not mean conditions are safe. CastVector blocks its one-tap launch when a high-level Safety Guard condition is loaded.</p>
         </section>
 
         <section class="panel smart-departure-panel">
@@ -899,7 +899,7 @@
             <div><div class="eyebrow">SMART DEPARTURE</div><h2>When should I leave?</h2></div>
             <span id="departureBadge" class="tiny-pill">AUTO</span>
           </div>
-          <p class="section-note">Tell AnglerSignal roughly how long the drive takes. It works backward from the fishing window and includes setup and an optional bait stop.</p>
+          <p class="section-note">Tell CastVector roughly how long the drive takes. It works backward from the fishing window and includes setup and an optional bait stop.</p>
           <div class="departure-controls">
             <label><span>Drive time</span><div class="input-suffix"><input id="departureDrive" type="number" min="0" max="720" step="5" inputmode="numeric" value="45"/><b>min</b></div></label>
             <label><span>Beach setup</span><div class="input-suffix"><input id="departureSetup" type="number" min="0" max="180" step="5" inputmode="numeric" value="20"/><b>min</b></div></label>
@@ -910,7 +910,7 @@
             <article><span>ARRIVE / SETUP</span><strong id="departureArrive">—</strong><small>Be ready before the bite builds</small></article>
             <article><span>FISH WINDOW</span><strong id="departureFish">—</strong><small id="departureFishScore">Selected species window</small></article>
           </div>
-          <div id="departureBrief" class="departure-brief">Choose a forecast window or let AnglerSignal use today's strongest species window.</div>
+          <div id="departureBrief" class="departure-brief">Choose a forecast window or let CastVector use today's strongest species window.</div>
           <div class="departure-actions"><button id="calculateDepartureBtn" class="primary-button" type="button">Recalculate</button><button id="shareDepartureBtn" class="secondary-button" type="button">Share trip brief</button></div>
         </section>
 
@@ -919,7 +919,7 @@
             <div><div class="eyebrow">DEPARTURE CHECK</div><h2>Go / caution briefing</h2></div>
             <span id="tripSafetyBadge" class="tiny-pill">CHECKING</span>
           </div>
-          <div id="tripSafetySummary" class="trip-safety-summary">AnglerSignal is checking NWS alerts, surf, wind, regulations and your pack list.</div>
+          <div id="tripSafetySummary" class="trip-safety-summary">CastVector is checking NWS alerts, surf, wind, regulations and your pack list.</div>
           <div id="tripSafetyChecklist" class="trip-safety-checklist"></div>
           <button id="tripSafetyRefreshBtn" class="secondary-button full" type="button">Refresh departure check</button>
           <p class="micro-note">This is a planning aid, not a declaration that conditions are safe. Follow lifeguards, posted warnings, NWS alerts and local authorities.</p>
@@ -930,8 +930,8 @@
             <div><div class="eyebrow">GO FISHING MODE</div><h2 id="goModeTitle">Turn the forecast into a trip</h2></div>
             <span id="goModeBadge" class="tiny-pill">READY</span>
           </div>
-          <div id="goModeSummary" class="go-mode-summary">Start a live trip at your current fishing destination. AnglerSignal keeps your target, best window, conditions, route shortcuts and checklist in one place.</div>
-          <div id="goBaitPlan" class="go-bait-plan">AnglerSignal will load your bait and rig recommendation here.</div>
+          <div id="goModeSummary" class="go-mode-summary">Start a live trip at your current fishing destination. CastVector keeps your target, best window, conditions, route shortcuts and checklist in one place.</div>
+          <div id="goBaitPlan" class="go-bait-plan">CastVector will load your bait and rig recommendation here.</div>
           <div id="goModeLiveStats" class="go-mode-live-stats"></div>
           <div id="liveSessionStrip" class="live-session-strip">
             <div><span>SESSION TIME</span><strong id="goSessionTime">Not started</strong></div>
@@ -954,7 +954,7 @@
             <div><div class="eyebrow">SMART GEAR PLANNER</div><h2>Pack for these conditions</h2></div>
             <span id="gearPlanBadge" class="tiny-pill">AUTO</span>
           </div>
-          <div id="gearPlanSummary" class="gear-plan-summary">AnglerSignal builds a pack list from your species, fishing style and loaded conditions.</div>
+          <div id="gearPlanSummary" class="gear-plan-summary">CastVector builds a pack list from your species, fishing style and loaded conditions.</div>
           <div class="gear-plan-progress"><div class="gear-plan-track"><span id="gearPlanProgressBar"></span></div><strong id="gearPlanProgressText">0% packed</strong></div>
           <div id="gearPlanList" class="gear-plan-list"></div>
           <div class="gear-plan-actions">
@@ -1005,7 +1005,7 @@
 
         <section class="panel alert-center-panel">
           <div class="section-heading"><div><div class="eyebrow">SMART ALERTS</div><h2>Forecast watches</h2></div><button id="createAlertBtn" data-premium="Smart Alerts" class="primary-button tiny" type="button">+ Alert</button></div>
-          <div id="alertCenterStatus" class="alert-center-status">Alerts are checked whenever AnglerSignal opens or refreshes live data.</div>
+          <div id="alertCenterStatus" class="alert-center-status">Alerts are checked whenever CastVector opens or refreshes live data.</div>
           <div id="alertRuleList" class="alert-rule-list"><div class="empty-state">No forecast watches yet.</div></div>
         </section>
 
@@ -1054,7 +1054,7 @@
             <div><div class="eyebrow">CATCH INTELLIGENCE</div><h2>What actually works for you</h2></div>
             <span id="catchIntelConfidence" class="tiny-pill">0 catches</span>
           </div>
-          <p class="section-note">AnglerSignal learns from catches you log. The more complete your bait and condition history becomes, the more personal these recommendations get.</p>
+          <p class="section-note">CastVector learns from catches you log. The more complete your bait and condition history becomes, the more personal these recommendations get.</p>
           <div id="catchIntelHero" class="catch-intel-hero"></div>
           <div id="catchIntelMetrics" class="catch-intel-metrics"></div>
           <div id="catchIntelBars" class="catch-intel-bars"></div>
@@ -1080,7 +1080,7 @@
             <div><div class="eyebrow">PHOTO MEMORIES</div><h2>Your catches at a glance</h2></div>
             <span id="photoMemoryBadge" class="tiny-pill">0 recent</span>
           </div>
-          <p class="section-note">Add an optional photo when you log a catch. AnglerSignal compresses it for phone storage and keeps it with your private logbook backup.</p>
+          <p class="section-note">Add an optional photo when you log a catch. CastVector compresses it for phone storage and keeps it with your private logbook backup.</p>
           <div id="photoMemoryGrid" class="photo-memory-grid"><div class="empty-state">Catch photos will appear here.</div></div>
         </section>
 
@@ -1103,9 +1103,9 @@
       <section class="view" data-view="profile" id="view-profile">
         <div class="page-head profile-page-head">
           <div>
-            <div class="eyebrow">MY ANGLERSIGNAL</div>
+            <div class="eyebrow">MY CASTVECTOR</div>
             <h1>Profile</h1>
-            <p class="page-subtitle">Personalize your fishing planner and keep your AnglerSignal data portable.</p>
+            <p class="page-subtitle">Personalize your fishing planner and keep your CastVector data portable.</p>
           </div>
           <span id="profileCloudBadge" class="tiny-pill">LOCAL</span>
         </div>
@@ -1113,7 +1113,7 @@
         <section class="panel profile-identity-panel">
           <div class="profile-identity-top">
             <div id="profileAvatar" class="profile-avatar">AS</div>
-            <div class="profile-identity-copy"><div class="eyebrow">ANGLER PROFILE</div><h2 id="profileDisplayHeading">AnglerSignal Angler</h2><p id="profileHomeSummary">Set a home coast and favorite target to personalize the app.</p></div>
+            <div class="profile-identity-copy"><div class="eyebrow">ANGLER PROFILE</div><h2 id="profileDisplayHeading">CastVector Angler</h2><p id="profileHomeSummary">Set a home coast and favorite target to personalize the app.</p></div>
             <button id="editProfileBtn" class="secondary-button small" type="button">Edit</button>
           </div>
           <div class="profile-stat-grid">
@@ -1125,8 +1125,8 @@
         </section>
 
         <section class="panel account-access-panel" id="accountAccessPanel">
-          <div class="section-heading"><div><div class="eyebrow">ANGLERSIGNAL ACCOUNT</div><h2>Account & secure access</h2></div><span id="serverAccessBadge" class="tiny-pill">SIGN IN REQUIRED</span></div>
-          <div id="serverAccessSummary" class="cloud-account-summary"><strong>No AnglerSignal account connected</strong><span>Sign in to activate server-verified Premium, family and complimentary access.</span></div>
+          <div class="section-heading"><div><div class="eyebrow">CASTVECTOR ACCOUNT</div><h2>Account & secure access</h2></div><span id="serverAccessBadge" class="tiny-pill">SIGN IN REQUIRED</span></div>
+          <div id="serverAccessSummary" class="cloud-account-summary"><strong>No CastVector account connected</strong><span>Sign in to activate server-verified Premium, family and complimentary access.</span></div>
           <div class="account-action-grid">
             <button id="cloudSetupBtn" class="primary-button" type="button">Sign in / create account</button>
             <button id="refreshServerAccessBtn" class="secondary-button" type="button">Refresh server access</button>
@@ -1138,9 +1138,9 @@
         </section>
 
         <section class="panel membership-panel" id="membershipPanel">
-          <div class="section-heading"><div><div class="eyebrow">ANGLERSIGNAL ACCESS</div><h2>Membership</h2></div><span id="membershipBadge" class="membership-badge">BETA FULL ACCESS</span></div>
+          <div class="section-heading"><div><div class="eyebrow">CASTVECTOR ACCESS</div><h2>Membership</h2></div><span id="membershipBadge" class="membership-badge">BETA FULL ACCESS</span></div>
           <div class="membership-hero">
-            <div><strong id="membershipTitle">AnglerSignal Premium Beta</strong><p id="membershipSummary">All premium tools are unlocked while AnglerSignal is in development.</p></div>
+            <div><strong id="membershipTitle">CastVector Premium Beta</strong><p id="membershipSummary">All premium tools are unlocked while CastVector is in development.</p></div>
             <div class="membership-price"><strong>$4.99</strong><span>/month at launch</span></div>
           </div>
           <div class="membership-benefits">
@@ -1186,7 +1186,7 @@
           <div class="section-heading"><div><div class="eyebrow">DATA VAULT</div><h2>Backup & restore</h2></div><span class="tiny-pill">PRIVATE</span></div>
           <p class="section-note">Your catches, saved spots, trips, alert rules and preferences currently live on this device. Export a backup before changing phones or browsers.</p>
           <div class="vault-actions">
-            <button id="exportBackupBtn" class="primary-button" type="button">Export AnglerSignal backup</button>
+            <button id="exportBackupBtn" class="primary-button" type="button">Export CastVector backup</button>
             <button id="importBackupBtn" class="secondary-button" type="button">Import backup</button>
             <input id="importBackupInput" type="file" accept="application/json,.json" hidden />
           </div>
@@ -1194,8 +1194,8 @@
         </section>
 
         <section class="panel cloud-sync-panel">
-          <div class="section-heading"><div><div class="eyebrow">ANGLERSIGNAL ACCOUNT + CLOUD</div><h2>Account & sync across devices</h2></div><span id="cloudConnectionBadge" class="tiny-pill">NOT CONNECTED</span></div>
-          <p class="section-note">Your AnglerSignal account uses Supabase Auth and can also sync your private app data across devices. Your password is never saved by AnglerSignal.</p>
+          <div class="section-heading"><div><div class="eyebrow">CASTVECTOR ACCOUNT + CLOUD</div><h2>Account & sync across devices</h2></div><span id="cloudConnectionBadge" class="tiny-pill">NOT CONNECTED</span></div>
+          <p class="section-note">Your CastVector account uses Supabase Auth and can also sync your private app data across devices. Your password is never saved by CastVector.</p>
           <div id="cloudAccountSummary" class="cloud-account-summary"><strong>Local-only mode</strong><span>Add your own Supabase project when you want cross-device sync.</span></div>
           <div class="cloud-actions">
             <button id="cloudSetupSecondaryBtn" class="secondary-button" type="button">Account setup</button>
@@ -1209,7 +1209,7 @@
         <section class="panel background-alert-panel">
           <div class="section-heading"><div><div class="eyebrow">BACKGROUND ALERTS</div><h2>Launch readiness</h2></div><span class="tiny-pill">NEXT BACKEND STEP</span></div>
           <div class="readiness-list">
-            <div class="ready"><span>✓</span><div><strong>Alert rules</strong><small>Already stored and evaluated in AnglerSignal</small></div></div>
+            <div class="ready"><span>✓</span><div><strong>Alert rules</strong><small>Already stored and evaluated in CastVector</small></div></div>
             <div class="ready"><span>✓</span><div><strong>Notification UI</strong><small>Android notification permission supported when the app is active</small></div></div>
             <div class="ready"><span>✓</span><div><strong>Cloud rule sync</strong><small>Available after optional Supabase connection</small></div></div>
             <div class="pending"><span>→</span><div><strong>24/7 server checks</strong><small>Requires a scheduled backend worker and push-delivery service before public launch</small></div></div>
@@ -1217,7 +1217,7 @@
         </section>
 
         <section class="panel profile-privacy-panel">
-          <div><div class="eyebrow">PRIVACY & SUPPORT</div><h2>Your fishing data stays yours</h2><p>Private catch coordinates and private waypoints are not included in public community posts unless you explicitly choose to share them. Signed-in cloud data is stored in AnglerSignal's account backend.</p></div>
+          <div><div class="eyebrow">PRIVACY & SUPPORT</div><h2>Your fishing data stays yours</h2><p>Private catch coordinates and private waypoints are not included in public community posts unless you explicitly choose to share them. Signed-in cloud data is stored in CastVector's account backend.</p></div>
           <div class="legal-action-row">
             <a class="secondary-button legal-link-button" href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>
             <a class="secondary-button legal-link-button" href="terms.html" target="_blank" rel="noopener">Terms</a>
@@ -1232,9 +1232,9 @@
       <section class="view" data-view="community" id="view-community">
         <div class="page-head">
           <div>
-            <div class="eyebrow">ANGLERSIGNAL COMMUNITY BETA</div>
+            <div class="eyebrow">CASTVECTOR COMMUNITY BETA</div>
             <h1>Catches, cards & challenges</h1>
-            <p class="page-subtitle">Share the catch, not your honey hole. AnglerSignal keeps location precision in your control.</p>
+            <p class="page-subtitle">Share the catch, not your honey hole. CastVector keeps location precision in your control.</p>
           </div>
           <button id="shareCatchBtn" class="primary-button small" type="button">Create catch card</button>
         </div>
@@ -1272,17 +1272,17 @@
 
         <section id="communityChallengesPanel" hidden>
           <section class="panel challenge-hero">
-            <div><div class="eyebrow">WEEKLY PROGRESS</div><h2>Fish more. Learn more.</h2><p>Challenges are based on your own AnglerSignal logbook and trips. No leaderboard pressure required.</p></div>
+            <div><div class="eyebrow">WEEKLY PROGRESS</div><h2>Fish more. Learn more.</h2><p>Challenges are based on your own CastVector logbook and trips. No leaderboard pressure required.</p></div>
             <div id="communityChallengeScore" class="challenge-score"><strong>0</strong><span>XP</span></div>
           </section>
           <div id="communityChallenges" class="challenge-grid"></div>
           <section class="panel">
-            <div class="section-title-row"><div><div class="eyebrow">BADGES</div><h2>Your AnglerSignal milestones</h2></div><span id="communityBadgeCount" class="tiny-pill">0 unlocked</span></div>
+            <div class="section-title-row"><div><div class="eyebrow">BADGES</div><h2>Your CastVector milestones</h2></div><span id="communityBadgeCount" class="tiny-pill">0 unlocked</span></div>
             <div id="communityBadges" class="badge-grid"></div>
           </section>
         </section>
       </section>
-      <footer class="app-trust-footer"><nav class="footer-legal-links" aria-label="Legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a><a href="terms.html" target="_blank" rel="noopener">Terms</a><a href="support.html" target="_blank" rel="noopener">Support</a></nav><svg class="footer-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9 3 4 8.5 4 15.5 4 24.5 16 29 16 29s12-4.5 12-13.5C28 8.5 23 3 16 3Z" fill="none" stroke="#69C9E8" stroke-width="1.8"/><path d="M8.5 15c3-4 7-5 11-2l4-2-1 4 1 4-4-2c-4 3-8 2-11-2Z" fill="#DFF6FF"/><path d="M9 22c4-2 6-2 9 0 3 2 5 2 8 0" fill="none" stroke="#4FDFB5" stroke-width="1.6" stroke-linecap="round"/></svg><div><strong>ANGLERSIGNAL</strong><span>Plan Smarter. Fish Better.</span></div><small>Forecast guidance only. Always check local safety conditions.</small></footer>
+      <footer class="app-trust-footer"><nav class="footer-legal-links" aria-label="Legal"><a href="privacy.html" target="_blank" rel="noopener">Privacy</a><a href="terms.html" target="_blank" rel="noopener">Terms</a><a href="support.html" target="_blank" rel="noopener">Support</a></nav><svg class="footer-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9 3 4 8.5 4 15.5 4 24.5 16 29 16 29s12-4.5 12-13.5C28 8.5 23 3 16 3Z" fill="none" stroke="#69C9E8" stroke-width="1.8"/><path d="M8.5 15c3-4 7-5 11-2l4-2-1 4 1 4-4-2c-4 3-8 2-11-2Z" fill="#DFF6FF"/><path d="M9 22c4-2 6-2 9 0 3 2 5 2 8 0" fill="none" stroke="#4FDFB5" stroke-width="1.6" stroke-linecap="round"/></svg><div><strong>CASTVECTOR</strong><span>Plan Smarter. Fish Better.</span></div><small>Forecast guidance only. Always check local safety conditions.</small></footer>
     </main>
 
     <nav class="bottom-nav" aria-label="Primary navigation">
@@ -1336,7 +1336,7 @@
   <dialog id="shareCatchDialog" class="sheet-dialog">
     <form class="sheet-card share-card-sheet" method="dialog">
       <div class="sheet-head">
-        <div><div class="eyebrow">ANGLERSIGNAL CATCH CARD</div><h2>Share your catch</h2></div>
+        <div><div class="eyebrow">CASTVECTOR CATCH CARD</div><h2>Share your catch</h2></div>
         <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
       </div>
       <label class="field-group"><span>Logged catch</span><select id="shareCatchSelect" class="select-control"></select></label>
@@ -1349,7 +1349,7 @@
       </label>
       <label class="field-group"><span>Caption</span><textarea id="shareCatchCaption" class="text-control textarea" maxlength="220" placeholder="Incoming tide did the work. Released healthy."></textarea></label>
       <div id="shareCatchPreview" class="share-catch-preview">
-        <div class="share-preview-empty">Choose a logged catch to preview your AnglerSignal card.</div>
+        <div class="share-preview-empty">Choose a logged catch to preview your CastVector card.</div>
       </div>
       <div id="shareCatchStatus" class="privacy-note">The generated image never contains hidden coordinates.</div>
       <div class="share-card-actions">
@@ -1384,7 +1384,7 @@
       </div>
       <label class="field-group"><span>Notes</span><textarea id="catchNotes" class="text-control textarea" maxlength="400" placeholder="Structure, retrieve, water clarity, bite details..."></textarea></label>
       <label class="field-group"><span>Location privacy</span><select id="catchPrivacy" class="select-control"><option value="private">Private — exact location stays mine</option><option value="water">Water only — show general area</option><option value="public">Public — share fishing location</option></select></label>
-      <div class="snapshot-card"><strong>Conditions snapshot</strong><span id="catchSnapshot">Current AnglerSignal conditions will be saved with this catch.</span></div>
+      <div class="snapshot-card"><strong>Conditions snapshot</strong><span id="catchSnapshot">Current CastVector conditions will be saved with this catch.</span></div>
       <div class="sheet-actions"><button class="secondary-button" value="cancel" type="submit">Cancel</button><button id="saveCatchBtn" class="primary-button" type="button">Save catch</button></div>
     </form>
   </dialog>
@@ -1436,7 +1436,7 @@
         <label class="field-group"><span>Priority</span><select id="tripPriority" class="select-control"><option value="bite">Best bite</option><option value="calm">Calmest surf</option><option value="dry">Lowest rain</option><option value="dawn">Sunrise session</option></select></label>
       </div>
       <button id="findBestTripBtn" class="primary-button full" type="button">Build smart trip plan</button>
-      <div id="plannerResult" class="planner-result">Choose your preferences and AnglerSignal will rank the week for that species.</div>
+      <div id="plannerResult" class="planner-result">Choose your preferences and CastVector will rank the week for that species.</div>
     </form>
   </dialog>
 
@@ -1448,7 +1448,7 @@
         <div><div class="eyebrow">SMART WATCH</div><h2>Create fishing alert</h2></div>
         <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
       </div>
-      <div class="alert-location-card"><span>Watching</span><strong id="alertLocationName">Current fishing location</strong><small>AnglerSignal checks this rule whenever the app opens or refreshes.</small></div>
+      <div class="alert-location-card"><span>Watching</span><strong id="alertLocationName">Current fishing location</strong><small>CastVector checks this rule whenever the app opens or refreshes.</small></div>
       <label class="field-group"><span>Target species</span><select id="alertSpecies" class="select-control"></select></label>
       <div class="two-col">
         <label class="field-group"><span>Minimum score</span><select id="alertScoreThreshold" class="select-control"><option value="75">75 — Very good</option><option value="80">80</option><option value="85" selected>85 — Excellent watch</option><option value="90">90 — Prime only</option></select></label>
@@ -1457,7 +1457,7 @@
       <label class="field-group"><span>Look ahead</span><select id="alertDays" class="select-control"><option value="3">Next 3 days</option><option value="5">Next 5 days</option><option value="7" selected>Next 7 days</option></select></label>
       <button id="saveAlertBtn" class="primary-button full" type="button">Save forecast watch</button>
       <button id="enableNotificationsBtn" class="secondary-button full" type="button">Enable device notifications</button>
-      <p class="micro-note">Without a server push service, AnglerSignal can alert you when the installed app opens or refreshes live data. True background alerts are a later launch step.</p>
+      <p class="micro-note">Without a server push service, CastVector can alert you when the installed app opens or refreshes live data. True background alerts are a later launch step.</p>
     </form>
   </dialog>
 
@@ -1466,7 +1466,7 @@
   <!-- SCOUT SPOT COMPARISON -->
   <dialog id="compareDialog" class="sheet-dialog compare-dialog">
     <form class="sheet-card compare-sheet" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">ANGLERSIGNAL SCOUT</div><h2>Spot comparison</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="sheet-head"><div><div class="eyebrow">CASTVECTOR SCOUT</div><h2>Spot comparison</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
       <div id="compareWinner" class="compare-winner">Choose two or three Scout results to compare.</div>
       <div id="compareGrid" class="compare-grid"></div>
       <div class="sheet-actions compare-actions"><button id="compareAnalyzeWinnerBtn" class="primary-button" type="button" disabled>Analyze winner</button><button id="comparePlanWinnerBtn" class="secondary-button" type="button" disabled>Plan winner</button></div>
@@ -1477,7 +1477,7 @@
   <dialog id="profileDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
       <div class="sheet-head"><div><div class="eyebrow">ANGLER PROFILE</div><h2>Edit profile</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
-      <label class="field-group"><span>Display name</span><input id="profileNameInput" class="text-control" maxlength="40" placeholder="AnglerSignal Angler" /></label>
+      <label class="field-group"><span>Display name</span><input id="profileNameInput" class="text-control" maxlength="40" placeholder="CastVector Angler" /></label>
       <label class="field-group"><span>Home coast / home water</span><input id="profileHomeInput" class="text-control" maxlength="80" placeholder="Example: Cape Fear Coast, NC" /></label>
       <label class="field-group"><span>Favorite target species</span><select id="profileSpeciesInput" class="select-control"></select></label>
       <label class="field-group"><span>Default fishing style</span><select id="profileStyleInput" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
@@ -1488,8 +1488,8 @@
   <!-- CLOUD SYNC SETUP -->
   <dialog id="cloudDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">ANGLERSIGNAL ACCOUNT + CLOUD</div><h2>Connect Supabase</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
-      <div class="cloud-warning"><strong>Secure AnglerSignal account</strong><span>Your account verifies Premium, Family Crew and complimentary access on the AnglerSignal server. Your password is sent only to the authentication provider and is not saved by AnglerSignal.</span></div>
+      <div class="sheet-head"><div><div class="eyebrow">CASTVECTOR ACCOUNT + CLOUD</div><h2>Connect Supabase</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="cloud-warning"><strong>Secure CastVector account</strong><span>Your account verifies Premium, Family Crew and complimentary access on the CastVector server. Your password is sent only to the authentication provider and is not saved by CastVector.</span></div>
       <div id="cloudTechnicalConfig">
         <label class="field-group"><span>Supabase project URL</span><input id="cloudUrlInput" class="text-control" type="url" placeholder="https://your-project.supabase.co" autocapitalize="off" /></label>
         <label class="field-group"><span>Supabase anon / publishable key</span><textarea id="cloudKeyInput" class="text-control textarea compact-textarea" placeholder="Paste publishable key"></textarea></label>
@@ -1499,7 +1499,7 @@
       <label class="switch-row"><span><strong>Remember project connection</strong><small>Saves URL, anon key and email on this device; never saves your password</small></span><input id="rememberCloudToggle" type="checkbox" checked /></label>
       <div class="cloud-auth-actions"><button id="cloudSignInBtn" class="primary-button" type="button">Sign in</button><button id="cloudSignUpBtn" class="secondary-button" type="button">Create account</button></div>
       <button id="cloudSignOutBtn" class="danger-button full" type="button">Sign out / disconnect session</button>
-      <div id="cloudDialogStatus" class="vault-status">Run SUPABASE_SETUP.sql and ANGLERSIGNAL_LAUNCH_BACKEND.sql in your project to enable launch accounts and entitlements.</div>
+      <div id="cloudDialogStatus" class="vault-status">Run SUPABASE_SETUP.sql and CASTVECTOR_LAUNCH_BACKEND.sql in your project to enable launch accounts and entitlements.</div>
     </form>
   </dialog>
 
@@ -1521,17 +1521,17 @@
   <!-- MEMBERSHIP / ENTITLEMENT PREVIEW -->
   <dialog id="membershipDialog" class="sheet-dialog">
     <form class="sheet-card membership-sheet" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">ANGLERSIGNAL ACCESS</div><h2>Premium built the right way</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="sheet-head"><div><div class="eyebrow">CASTVECTOR ACCESS</div><h2>Premium built the right way</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
       <div class="membership-current-card"><span>CURRENT ACCESS</span><strong id="membershipDialogTitle">Premium Beta</strong><small id="membershipDialogSource">Development full access</small></div>
       <div class="plan-stack">
-        <article class="plan-card"><div><span>FREE</span><strong>AnglerSignal Free</strong></div><p>Quick Answer, basic current conditions, limited forecast, basic map access and a starter logbook.</p></article>
+        <article class="plan-card"><div><span>FREE</span><strong>CastVector Free</strong></div><p>Quick Answer, basic current conditions, limited forecast, basic map access and a starter logbook.</p></article>
         <article class="plan-card featured"><div><span>PREMIUM</span><strong>$4.99 / month</strong></div><p>Full forecast intelligence, Ocean Network, Species & Bait Intelligence, Scout, Coast Watch, Smart Alerts, trip command tools, offline packs, analytics and premium community tools.</p></article>
         <article class="plan-card"><div><span>FAMILY</span><strong>Premium through family</strong></div><p>An invited family member receives the same Premium entitlement without buying another subscription.</p></article>
         <article class="plan-card"><div><span>COMPLIMENTARY</span><strong>Owner-granted Premium</strong></div><p>You can grant selected testers, partners, creators, friends or family Premium with an expiration date or lifetime access—without requiring payment.</p></article>
       </div>
       <div class="beta-entitlement-preview" id="membershipPreviewBlock">
         <strong>Beta entitlement preview</strong>
-        <p>Use this only to test how Free/Premium access will look. Public launch access will be verified by the AnglerSignal backend and store billing—not trusted from this device.</p>
+        <p>Use this only to test how Free/Premium access will look. Public launch access will be verified by the CastVector backend and store billing—not trusted from this device.</p>
         <label class="field-group"><span>Preview access</span><select id="membershipPreviewSetting" class="select-control"><option value="premium">Paid Premium</option><option value="family">Family Premium</option><option value="complimentary">Complimentary Premium</option><option value="lifetime">Lifetime Premium</option><option value="free">Free user</option></select></label>
         <button id="applyMembershipPreviewBtn" class="secondary-button full" type="button">Apply preview</button>
       </div>
@@ -1543,7 +1543,7 @@
   <dialog id="familyServerDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
       <div class="sheet-head"><div><div class="eyebrow">FAMILY PREMIUM</div><h2>Family Crew</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
-      <div class="membership-current-card"><span>SERVER VERIFIED</span><strong>Share Premium with family</strong><small>Family members use Premium without buying another AnglerSignal subscription.</small></div>
+      <div class="membership-current-card"><span>SERVER VERIFIED</span><strong>Share Premium with family</strong><small>Family members use Premium without buying another CastVector subscription.</small></div>
       <label class="field-group"><span>Family member email</span><input id="familyServerEmail" class="text-control" type="email" autocomplete="email" placeholder="family@example.com" /></label>
       <button id="familyServerInviteBtn" class="primary-button full" type="button">Invite / link family member</button>
       <div id="familyServerList" class="family-dialog-list"><div class="empty-state">No server Family Crew members yet.</div></div>
@@ -1554,16 +1554,16 @@
   <!-- OWNER / ADMIN CONSOLE -->
   <dialog id="adminConsoleDialog" class="sheet-dialog">
     <form class="sheet-card admin-sheet" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">ANGLERSIGNAL OWNER</div><h2>Premium Access Console</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="sheet-head"><div><div class="eyebrow">CASTVECTOR OWNER</div><h2>Premium Access Console</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
       <div class="membership-current-card"><span>PRIVATE ADMIN TOOL</span><strong>Grant selected people Premium for free</strong><small>Paid customers, family access and owner-granted access all resolve through the same server entitlement check.</small></div>
-      <label class="field-group"><span>Existing AnglerSignal account email</span><input id="adminEmail" class="text-control" type="email" autocomplete="off" placeholder="person@example.com" /></label>
+      <label class="field-group"><span>Existing CastVector account email</span><input id="adminEmail" class="text-control" type="email" autocomplete="off" placeholder="person@example.com" /></label>
       <div class="two-col">
         <label class="field-group"><span>Grant type</span><select id="adminSource" class="select-control"><option value="complimentary">Complimentary Premium</option><option value="lifetime">Lifetime Premium</option><option value="promo">Promotional Premium</option><option value="beta">Beta / Tester Premium</option></select></label>
         <label class="field-group"><span>Days <small>(0 = no date)</small></span><input id="adminDays" class="text-control" type="number" min="0" max="3650" value="0" /></label>
       </div>
       <label class="field-group"><span>Private admin note</span><input id="adminNote" class="text-control" maxlength="160" placeholder="Tester, partner, family friend…" /></label>
       <div class="admin-action-row"><button id="adminGrantBtn" class="primary-button" type="button">Grant Premium</button><button id="adminRevokeBtn" class="danger-button" type="button">Revoke direct Premium</button><button id="adminRefreshBtn" class="secondary-button" type="button">Refresh list</button></div>
-      <div id="adminAccessList" class="admin-access-list"><div class="empty-state">Refresh to load AnglerSignal accounts.</div></div>
+      <div id="adminAccessList" class="admin-access-list"><div class="empty-state">Refresh to load CastVector accounts.</div></div>
       <p class="micro-note">Admin writes go through database RPCs that verify your signed-in account is listed in <code>coastcast_admins</code>. Secret/service-role keys never belong in this browser app.</p>
     </form>
   </dialog>
@@ -1571,8 +1571,8 @@
   <!-- DELETE ACCOUNT -->
   <dialog id="accountDeleteDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
-      <div class="sheet-head"><div><div class="eyebrow">ACCOUNT & DATA</div><h2>Delete AnglerSignal account</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
-      <div class="danger-confirm-card"><strong>This permanently deletes your signed-in AnglerSignal account and server data.</strong><span>Cloud sync data, community posts, family links, entitlements and push subscriptions tied to this account are removed. Local device data is also cleared after the server confirms deletion. When paid store subscriptions go live, deleting a AnglerSignal account will not by itself cancel Apple/Google billing; users must cancel the store subscription separately.</span></div>
+      <div class="sheet-head"><div><div class="eyebrow">ACCOUNT & DATA</div><h2>Delete CastVector account</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="danger-confirm-card"><strong>This permanently deletes your signed-in CastVector account and server data.</strong><span>Cloud sync data, community posts, family links, entitlements and push subscriptions tied to this account are removed. Local device data is also cleared after the server confirms deletion. When paid store subscriptions go live, deleting a CastVector account will not by itself cancel Apple/Google billing; users must cancel the store subscription separately.</span></div>
       <label class="field-group"><span>Type DELETE to confirm</span><input id="deleteAccountConfirmInput" class="text-control" autocomplete="off" placeholder="DELETE" /></label>
       <button id="confirmDeleteAccountBtn" class="danger-button full" type="button">Permanently delete account</button>
       <div id="deleteAccountStatus" class="vault-status">This action cannot be undone.</div>
@@ -1584,7 +1584,7 @@
   <dialog id="settingsDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
       <div class="sheet-head">
-        <div><div class="eyebrow">ANGLERSIGNAL</div><h2>Settings</h2></div>
+        <div><div class="eyebrow">CASTVECTOR</div><h2>Settings</h2></div>
         <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
       </div>
       <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
@@ -1592,14 +1592,14 @@
       <div class="settings-note"><strong>SIMPLE ON THE SURFACE, POWERFUL UNDERNEATH</strong><br/>Simple mode keeps the key answer up front. Forecast, Scout, Trips, Logbook and advanced intelligence stay available whenever you want them.</div>
       <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
       <label class="field-group"><span>Fishing-area scan radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <div class="settings-note"><strong>BAIT & TACKLE ACCURACY</strong><br/>AnglerSignal now merges multiple shop sources and keeps public fishing-access pins separate from tackle-store pins.</div>
+      <div class="settings-note"><strong>BAIT & TACKLE ACCURACY</strong><br/>CastVector now merges multiple shop sources and keeps public fishing-access pins separate from tackle-store pins.</div>
       <label class="field-group"><span>Tackle-shop search radius</span><select id="tackleRadiusSetting" class="select-control"><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option><option value="50">50 miles</option></select></label>
       <label class="field-group"><span>Geoapify Places key <small>(optional — nationwide accuracy)</small></span><input id="geoapifyKeySetting" class="text-control" type="password" autocomplete="off" placeholder="Paste free Geoapify API key" /></label>
-      <div id="placesProviderStatus" class="settings-note">Open-data mode. AnglerSignal is using OpenStreetMap plus verified local catalogs.</div>
+      <div id="placesProviderStatus" class="settings-note">Open-data mode. CastVector is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
-      <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or AnglerSignal backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">AnglerSignal v5.2 is a launch-readiness build. No business database can guarantee 100% completeness, so AnglerSignal shows source provenance and prefers verified fishing-store categories over guesswork.</div>
-      <button id="resetAppBtn" class="danger-button full" type="button">Reset saved AnglerSignal data</button>
+      <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CastVector backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
+      <div class="settings-note">CastVector v5.3 is a launch-readiness build. No business database can guarantee 100% completeness, so CastVector shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CastVector data</button>
     </form>
   </dialog>
 
@@ -1610,7 +1610,7 @@
         <div><div class="eyebrow">HOW IT WORKS</div><h2>Species-adjusted score</h2></div>
         <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
       </div>
-      <p class="info-copy">AnglerSignal starts with weather, wind, waves, tide movement and daylight. Species Mode then shifts the weighting to better match how you want to fish. Your logged catches now add a personal pattern signal when AnglerSignal finds similar conditions.</p>
+      <p class="info-copy">CastVector starts with weather, wind, waves, tide movement and daylight. Species Mode then shifts the weighting to better match how you want to fish. Your logged catches now add a personal pattern signal when CastVector finds similar conditions.</p>
       <div class="info-grid">
         <div><strong>Tides</strong><span>Movement and timing relative to high/low water</span></div>
         <div><strong>Wind</strong><span>Speed and casting direction for the selected fishing style</span></div>
@@ -1625,7 +1625,7 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="coastcast-config.js?v=5.2.0"></script>
-  <script src="app.js?v=5.2.0"></script>
+  <script src="coastcast-config.js?v=5.3.0"></script>
+  <script src="app.js?v=5.3.0"></script>
 </body>
 </html>

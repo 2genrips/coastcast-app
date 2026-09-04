@@ -1,6 +1,6 @@
 {
-  "name": "AnglerSignal Fishing Forecast",
-  "short_name": "AnglerSignal",
+  "name": "CastVector Fishing Forecast",
+  "short_name": "CastVector",
   "description": "Nationwide coastal fishing intelligence with live forecasts, observed ocean data, seasonal species planning, Scout, trips, family-ready Premium access, catch analytics and offline tools.",
   "id": "./",
   "start_url": "./index.html",
@@ -11,13 +11,13 @@
   "theme_color": "#06182A",
   "icons": [
     {
-      "src": "icon-192-v52.png",
+      "src": "icon-192-v53.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512-v52.png",
+      "src": "icon-512-v53.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -30,18 +30,18 @@
       "url": "./index.html#forecast",
       "icons": [
         {
-          "src": "icon-192-v52.png",
+          "src": "icon-192-v53.png",
           "sizes": "192x192"
         }
       ]
     },
     {
-      "name": "AnglerSignal Scout",
+      "name": "CastVector Scout",
       "short_name": "Scout",
       "url": "./index.html#map",
       "icons": [
         {
-          "src": "icon-192-v52.png",
+          "src": "icon-192-v53.png",
           "sizes": "192x192"
         }
       ]
@@ -52,7 +52,7 @@
       "url": "./index.html#trips",
       "icons": [
         {
-          "src": "icon-192-v52.png",
+          "src": "icon-192-v53.png",
           "sizes": "192x192"
         }
       ]
@@ -63,18 +63,18 @@
       "url": "./index.html#logbook",
       "icons": [
         {
-          "src": "icon-192-v52.png",
+          "src": "icon-192-v53.png",
           "sizes": "192x192"
         }
       ]
     },
     {
-      "name": "AnglerSignal Community",
+      "name": "CastVector Community",
       "short_name": "Community",
       "url": "./index.html#community",
       "icons": [
         {
-          "src": "icon-192-v52.png",
+          "src": "icon-192-v53.png",
           "sizes": "192x192"
         }
       ]

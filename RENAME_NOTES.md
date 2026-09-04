@@ -1,18 +1,15 @@
-# AnglerSignal v5.2 — Brand Rename
+# CastVector public brand migration
 
-## New public brand
-**ANGLERSIGNAL — FISHING FORECAST**
+CastVector is the public product name beginning with v5.3.
 
-Tagline stays: **Plan Smarter. Fish Better.**
+## Preserved intentionally
+The existing Supabase database objects, RPC names, local-storage migration keys, and `window.COASTCAST_CONFIG` configuration object retain their historical `coastcast_*` identifiers. These are private implementation details and are intentionally preserved so existing accounts, Owner access, Complimentary Premium, Family data, catches, trips, and cloud backups keep working.
 
-The compass/fish/wave emblem, navy/aqua palette, UX, Premium model, accounts, Supabase data, catches, trips, family/complimentary access and fishing tools are preserved.
+## Public identity
+- App: **CastVector Fishing Forecast**
+- Brand: **CASTVECTOR**
+- Tagline: **Plan Smarter. Fish Better.**
+- Future Android/iOS package ID: `com.castvector.fishing`
+- Future Premium product ID: `castvector_premium_monthly`
 
-## Important legacy technical names
-To avoid breaking the already-working Supabase installation and the user's configured GitHub file, some internal identifiers intentionally remain `coastcast_*`, `COASTCAST_CONFIG`, `COASTCAST_LAUNCH_BACKEND.sql`, and the existing `coastcast-config.js` filename. These are implementation details and are not the public product name.
-
-The native store wrapper now uses `com.anglersignal.fishing` because store records have not been created yet.
-
-## Store title
-**AnglerSignal Fishing Forecast**
-
-A preliminary web search on 2026-09-04 did not surface an obvious same-name fishing app. This is not a trademark clearance or legal opinion; do a formal trademark/store/domain clearance before filing or spending heavily on the name.
+Do not rename the existing Supabase tables/functions unless a later database migration explicitly does so.

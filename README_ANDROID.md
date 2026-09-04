@@ -1,16 +1,16 @@
-# AnglerSignal 5.0 — Android / GitHub Pages update
+# CastVector 5.0 — Android / GitHub Pages update
 
-AnglerSignal 5.0 keeps the nationwide fishing app working as a GitHub Pages PWA and adds the launch-security foundation for real accounts and Premium access.
+CastVector 5.0 keeps the nationwide fishing app working as a GitHub Pages PWA and adds the launch-security foundation for real accounts and Premium access.
 
 ## Update the app from Android
-1. Extract the AnglerSignal v5.0 ZIP.
-2. Open your existing AnglerSignal GitHub repository.
+1. Extract the CastVector v5.3 ZIP.
+2. Open your existing CastVector GitHub repository.
 3. Choose **Add file → Upload files**.
-4. Upload everything from inside the `coastcast_v5.0` folder, including the new SQL/docs and `supabase` folder.
+4. Upload everything from inside the `coastcast_v5.3` folder, including the new SQL/docs and `supabase` folder.
 5. Replace the matching app files and commit to `main`.
-6. Wait for GitHub Pages to redeploy, then fully close/reopen AnglerSignal.
+6. Wait for GitHub Pages to redeploy, then fully close/reopen CastVector.
 
-Your previous AnglerSignal local data migrates forward from v4.0.
+Your previous CastVector local data migrates forward from v4.0.
 
 ## What works without a backend
 All normal fishing features continue working. Premium UI remains available in development preview mode so you can keep testing.
@@ -19,13 +19,13 @@ All normal fishing features continue working. Premium UI remains available in de
 When ready:
 1. Create/use your Supabase project.
 2. Run `SUPABASE_SETUP.sql`.
-3. Run `ANGLERSIGNAL_LAUNCH_BACKEND.sql`.
+3. Run `CASTVECTOR_LAUNCH_BACKEND.sql`.
 4. Put the public Supabase URL and publishable key into `coastcast-config.js` (or use the in-app Account setup during development).
-5. Create your AnglerSignal account in **Profile → AnglerSignal Account**.
-6. Follow `ADMIN_SETUP.md` once to make your account the AnglerSignal owner/admin.
+5. Create your CastVector account in **Profile → CastVector Account**.
+6. Follow `ADMIN_SETUP.md` once to make your account the CastVector owner/admin.
 7. Tap **Refresh server access** in the app.
 
-After the launch backend is detected, the local Premium simulator is disabled for the signed-in account and AnglerSignal uses server-verified access.
+After the launch backend is detected, the local Premium simulator is disabled for the signed-in account and CastVector uses server-verified access.
 
 ## Important
 Never put these in GitHub Pages:

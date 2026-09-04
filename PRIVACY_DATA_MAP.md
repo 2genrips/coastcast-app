@@ -1,8 +1,8 @@
-# AnglerSignal production privacy/data map
+# CastVector production privacy/data map
 
 Use this when completing Google Play Data Safety and Apple App Privacy. Re-check against the final native build and any SDKs added later.
 
-| Data | Why AnglerSignal uses it | Linked to account? | Public by default? |
+| Data | Why CastVector uses it | Linked to account? | Public by default? |
 |---|---|---|---|
 | Email/account ID | sign-in, entitlement, family access | Yes | No |
 | Current/destination location | forecast, tides, nearby places | Can be | No |
@@ -13,4 +13,4 @@ Use this when completing Google Play Data Safety and Apple App Privacy. Re-check
 | Push subscription/device endpoint | background alerts | Yes | No |
 | Fishing preferences/app settings | personalization | Yes if cloud synced | No |
 
-Third-party/public data services can receive request context such as coordinates when AnglerSignal asks for location-specific conditions or places. Final privacy disclosures must include every production SDK/provider.
+Third-party/public data services can receive request context such as coordinates when CastVector asks for location-specific conditions or places. Final privacy disclosures must include every production SDK/provider.

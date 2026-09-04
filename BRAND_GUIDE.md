@@ -1,7 +1,7 @@
-# AnglerSignal 2.1 Brand Guide
+# CastVector 2.1 Brand Guide
 
 ## Identity
-AnglerSignal combines a compass, coastal fish, wave, and location motif. The emblem is the primary app mark.
+CastVector combines a compass, coastal fish, wave, and location motif. The emblem is the primary app mark.
 
 ## Core colors
 - Deep Navy: #06182A
@@ -20,6 +20,6 @@ AnglerSignal combines a compass, coastal fish, wave, and location motif. The emb
 - Do not stretch, rotate, recolor, outline, or add decorative effects to the primary mark.
 
 ## Voice
-Clear, confident, coastal, practical. AnglerSignal should feel like a serious fishing utility rather than a novelty app.
+Clear, confident, coastal, practical. CastVector should feel like a serious fishing utility rather than a novelty app.
 
 Tagline: **Plan smarter. Fish better.**

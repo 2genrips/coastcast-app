@@ -21,7 +21,7 @@ Deno.serve(async(req)=>{
 
     const userClient=createClient(url,publishable,{global:{headers:{Authorization:`Bearer ${token}`}},auth:{persistSession:false}});
     const {data:userData,error:userErr}=await userClient.auth.getUser(token);
-    if(userErr||!userData.user)return json({error:'Invalid AnglerSignal session'},401);
+    if(userErr||!userData.user)return json({error:'Invalid CastVector session'},401);
 
     const admin=createClient(url,secret,{auth:{persistSession:false}});
     const uid=userData.user.id;

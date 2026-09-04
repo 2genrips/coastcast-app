@@ -1,4 +1,4 @@
--- AnglerSignal v1.8 Cloud Sync + Community Beta
+-- CastVector v1.8 Cloud Sync + Community Beta
 -- Run in Supabase Dashboard > SQL Editor for YOUR project.
 -- Re-running is safe; policies are replaced where needed.
 
@@ -22,13 +22,13 @@ drop policy if exists "coastcast_update_own" on public.coastcast_user_data;
 create policy "coastcast_update_own" on public.coastcast_user_data
 for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
--- Public AnglerSignal Community catch posts.
--- IMPORTANT: AnglerSignal only writes the location precision selected by the angler.
+-- Public CastVector Community catch posts.
+-- IMPORTANT: CastVector only writes the location precision selected by the angler.
 create table if not exists public.community_catches (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   source_catch_id text not null,
-  display_name text not null default 'AnglerSignal Angler',
+  display_name text not null default 'CastVector Angler',
   species text not null,
   catch_date timestamptz,
   length_in numeric,
