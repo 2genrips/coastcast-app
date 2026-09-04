@@ -1,2 +1,2 @@
-CoastCast v1.5.0
-Ocean IQ + Safety Guard + 7-Day Tide Planner
+CoastCast v1.6.0
+Beach Readiness + Catch Forecast Timeline + Smart Departure

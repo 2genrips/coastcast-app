@@ -44,3 +44,7 @@ Bait, rig and gear suggestions are CoastCast planning heuristics built from load
 When Live Data is enabled, CoastCast requests the NWS active-alert endpoint for the selected point. An empty successful response means no active NWS point alerts were returned at that moment; it does **not** prove a beach is hazard-free. CoastCast also applies local planning thresholds to loaded surf, gust and thunderstorm conditions.
 
 NOAA tide prediction requests now load approximately seven days of high/low predictions for the Tide Planner.
+
+
+## v1.6 derived intelligence
+Beach Readiness, Catch Forecast Timeline, and Smart Departure are CoastCast-derived planning outputs calculated locally from the already loaded Weather, Marine, NOAA tide, NWS alert, species, and user-preference data. They do not add a new external data provider and should not be treated as a safety guarantee.

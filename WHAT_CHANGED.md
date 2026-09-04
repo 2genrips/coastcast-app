@@ -1,26 +1,20 @@
-# CoastCast v1.5.0 — Ocean IQ + Safety Guard
+# CoastCast v1.6 — What Changed
 
-## Ocean IQ
-- New Home intelligence panel combines tide stage, next NOAA turn, tide-movement strength and the next three strongest movement windows.
-- New Moon & Light context shows moon phase, approximate illumination, sunrise and sunset.
-- Moon data is deliberately treated as secondary context rather than a guaranteed bite predictor.
+## Beach Readiness
+- New 0–100 planning-readiness score that weighs the fishing window, wind, surf, weather, live-source confidence, and NWS hazard status.
+- Explicit planning call: Strong Trip Window, Go With a Conditions Check, Wait/Recheck, or Hold & Review Official Warnings.
+- This is intentionally a trip-planning score, not a safety guarantee.
 
-## NWS Safety Guard
-- CoastCast now requests active National Weather Service alerts for the exact fishing point when Live Data refreshes.
-- The Safety Guard combines NWS alerts with loaded wave height, wind gusts and thunderstorm conditions.
-- Statuses are **LOWER RISK**, **CAUTION**, **HIGH RISK**, or **VERIFY**. None should be read as a declaration that a beach is safe.
-- NWS alert health appears in the source-status chips.
+## Catch Forecast Timeline
+- New species-specific hourly timeline on Forecast.
+- Ranks the three strongest 3-hour windows for the currently selected species.
+- Tap any top window to carry it directly into Smart Departure.
 
-## 7-Day Tide Planner
-- NOAA high/low prediction request expanded from roughly 2 days to 7 days.
-- Forecast now groups high/low events into a horizontally scrollable week view.
-- Mid-cycle water-movement windows are calculated between adjacent high/low predictions.
+## Smart Departure
+- Enter approximate drive time, setup time, and optional bait-stop time.
+- CoastCast works backward from the selected fishing window to calculate Leave By and Arrive/Setup times in destination-local time.
+- One-tap Android share of a compact CoastCast Trip Brief, with text-file fallback.
 
-## Nationwide destination-local time fix
-- Open-Meteo destination timezone and UTC offset are retained in CoastCast.
-- Hourly weather labels, sunrise/sunset, NOAA tide labels and Tide Intelligence are handled as fishing-destination local time instead of blindly converting them to the phone's timezone.
-- This is especially important when planning trips across U.S. time zones.
-
-## Departure Check
-- Trips now has a pre-departure briefing combining NWS hazards, regulation-review status, Smart Gear progress and live forecast-source health.
-- This remains a planning aid; local authorities, lifeguards, posted warnings and official alerts control.
+## Data portability
+- Smart Departure preferences are included in local state, backups, and cloud payloads.
+- Existing v1.5 data migrates forward automatically.
