@@ -3,239 +3,539 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#071b2a" />
-  <meta name="description" content="CoastCast - Android-first fishing trip planner prototype with tide, wind, weather, swell, fishing score, spots, bait shops, logbook and community features." />
+  <meta name="theme-color" content="#061722" />
+  <meta name="description" content="CoastCast is a fishing-first coastal trip planner with live weather, marine conditions, tides, fishing scores, species mode, maps, bait shops and a personal catch logbook." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
-  <title>CoastCast Fishing</title>
+  <title>CoastCast</title>
 </head>
 <body>
   <div id="app" class="app-shell">
     <header class="topbar">
-      <div class="brand-wrap">
+      <div class="brand-lockup" aria-label="CoastCast">
         <img src="icon.svg" alt="" class="brand-icon" />
         <div>
-          <div class="brand">COASTCAST</div>
-          <div class="brand-sub">FISHING FORECAST</div>
+          <div class="brand-name">COASTCAST</div>
+          <div class="brand-kicker">FISH SMARTER</div>
         </div>
       </div>
-      <button id="settingsBtn" class="icon-btn" aria-label="Open settings">⚙</button>
+      <div class="topbar-actions">
+        <button id="syncBtn" class="icon-button" type="button" aria-label="Refresh live data" title="Refresh live data">↻</button>
+        <button id="settingsBtn" class="icon-button" type="button" aria-label="Open settings" title="Settings">⚙</button>
+      </div>
     </header>
 
     <main id="mainContent" class="main-content">
-      <section id="view-home" class="view active" data-view="home">
-        <div class="location-card card">
-          <div class="eyebrow">FISHING LOCATION</div>
-          <div class="location-row">
-            <div>
-              <h1 id="locationName">Wrightsville Beach, NC</h1>
-              <div class="muted" id="locationCoords">34.2085, -77.7964</div>
+      <!-- HOME -->
+      <section class="view active" data-view="home" id="view-home">
+        <section class="location-hero panel">
+          <div class="location-topline">
+            <div class="location-copy">
+              <span class="eyebrow">FISHING LOCATION</span>
+              <button id="locationTitleBtn" class="location-title-button" type="button">
+                <span id="locationName">Wrightsville Beach, NC</span>
+                <span aria-hidden="true">⌄</span>
+              </button>
+              <div class="location-meta">
+                <span id="locationCoords">34.2085, -77.7964</span>
+                <span>•</span>
+                <span id="locationSource">Saved coast</span>
+              </div>
             </div>
-            <button id="favoriteSpotBtn" class="icon-btn" aria-label="Save this fishing spot">☆</button>
+            <button id="favoriteSpotBtn" class="favorite-button" type="button" aria-label="Save current fishing spot">☆</button>
           </div>
-          <div class="location-actions">
-            <button id="chooseLocationBtn" class="btn btn-primary">Choose location</button>
-            <button id="useMyLocationBtn" class="btn btn-secondary">Use my location</button>
-          </div>
-          <div class="mode-row">
-            <span class="status-dot" id="modeDot"></span>
-            <span id="modeText">Demo Mode — sample data</span>
-            <button id="liveModeBtn" class="text-btn">Try Live Data</button>
-          </div>
-        </div>
 
-        <section class="hero-score card">
-          <div>
-            <div class="eyebrow">FISHING SCORE</div>
-            <div class="score-wrap"><span id="fishingScore">91</span><small>/100</small></div>
-            <div id="scoreLabel" class="score-label excellent">EXCELLENT</div>
-            <p id="scoreReason" class="hero-copy">Incoming tide, light offshore wind and sunrise line up for a strong morning bite.</p>
+          <div class="status-row">
+            <span id="modeBadge" class="status-pill demo"><span class="status-dot"></span><span id="modeText">Demo data</span></span>
+            <button id="liveModeBtn" class="link-button" type="button">Use live data</button>
+            <span class="status-divider">•</span>
+            <span id="lastUpdated" class="muted-xs">Updated now</span>
           </div>
-          <div class="score-ring" aria-hidden="true"><div class="score-fish">🐟</div></div>
         </section>
 
-        <section class="metric-grid">
-          <article class="metric card"><span>🌡️</span><div><div class="metric-label">AIR TEMP</div><div id="airTemp" class="metric-value">72°F</div><div id="feelsLike" class="metric-sub">Feels 72°F</div></div></article>
-          <article class="metric card"><span>⛅</span><div><div class="metric-label">WEATHER</div><div id="weatherText" class="metric-value small">Partly Cloudy</div><div id="precipNow" class="metric-sub">Rain 10%</div></div></article>
-          <article class="metric card"><span>🧭</span><div><div class="metric-label">WIND</div><div id="windNow" class="metric-value small">NE 7 mph</div><div id="gustNow" class="metric-sub">Gusts 10 mph</div></div></article>
-          <article class="metric card"><span>🌊</span><div><div class="metric-label">SURF</div><div id="surfNow" class="metric-value small">2.0 ft</div><div id="periodNow" class="metric-sub">9 sec period</div></div></article>
-          <article class="metric card"><span>🌡</span><div><div class="metric-label">WATER TEMP</div><div id="waterTemp" class="metric-value small">75°F</div><div class="metric-sub">Nearshore</div></div></article>
-          <article class="metric card"><span>📈</span><div><div class="metric-label">PRESSURE</div><div id="pressureNow" class="metric-value small">30.08 in</div><div id="pressureTrend" class="metric-sub">Rising ↑</div></div></article>
+        <section class="score-hero panel">
+          <div class="score-main">
+            <div class="eyebrow">COASTCAST FISHING SCORE</div>
+            <div class="score-number-row">
+              <div class="score-number" id="fishingScore">91</div>
+              <div class="score-scale">/100</div>
+            </div>
+            <div id="scoreLabel" class="grade-badge excellent">EXCELLENT</div>
+            <p id="scoreReason" class="score-reason">Incoming tide, light wind and first light create a strong surf-fishing window.</p>
+          </div>
+          <div class="score-dial-wrap" aria-hidden="true">
+            <svg class="score-dial" viewBox="0 0 120 120">
+              <circle class="score-track" cx="60" cy="60" r="50"></circle>
+              <circle id="scoreArc" class="score-arc" cx="60" cy="60" r="50"></circle>
+              <text x="60" y="56" text-anchor="middle" class="dial-icon">🎣</text>
+              <text id="dialGrade" x="60" y="79" text-anchor="middle" class="dial-label">PRIME</text>
+            </svg>
+          </div>
         </section>
 
-        <section class="card best-window">
-          <div class="eyebrow">BEST FISHING WINDOW</div>
-          <div id="bestWindow" class="best-time">5:45 AM – 8:20 AM</div>
-          <div id="bestWindowReason" class="muted">Incoming tide • Sunrise • Light offshore wind</div>
+        <section class="species-mode panel">
+          <div class="section-heading compact-heading">
+            <div>
+              <div class="eyebrow">SPECIES MODE</div>
+              <h2>What are you targeting?</h2>
+            </div>
+            <button id="speciesInfoBtn" class="link-button" type="button">Why it matters</button>
+          </div>
+          <div id="speciesChips" class="chip-scroll" role="group" aria-label="Target species"></div>
+          <div id="speciesInsight" class="insight-strip"></div>
         </section>
 
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">TODAY'S TIDES</div><h2 id="tideStationLabel">Nearest tide station</h2></div><button id="tideDetailsBtn" class="text-btn">Details</button></div>
-          <div class="tide-events" id="tideEvents"></div>
-          <div class="chart-wrap"><canvas id="tideCanvas" width="900" height="280" aria-label="Tide chart"></canvas></div>
+        <section class="best-window panel accent-panel">
+          <div class="best-window-icon" aria-hidden="true">⏱</div>
+          <div class="best-window-copy">
+            <div class="eyebrow">BEST WINDOW TODAY</div>
+            <div id="bestWindow" class="best-window-time">5:45 AM – 8:20 AM</div>
+            <div id="bestWindowReason" class="best-window-reason">Incoming tide • Sunrise • Light offshore wind</div>
+          </div>
+          <button class="arrow-button" data-nav="forecast" type="button" aria-label="Open full forecast">›</button>
         </section>
 
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">TRIP WEATHER</div><h2>Next 12 hours</h2></div><button class="text-btn" data-nav="forecast">Full forecast</button></div>
+        <section class="condition-grid" aria-label="Current fishing conditions">
+          <article class="condition-card panel">
+            <div class="condition-icon">🌡️</div>
+            <div class="condition-label">AIR</div>
+            <div id="airTemp" class="condition-value">72°F</div>
+            <div id="feelsLike" class="condition-sub">Feels 72°F</div>
+          </article>
+          <article class="condition-card panel">
+            <div id="weatherIcon" class="condition-icon">🌤️</div>
+            <div class="condition-label">WEATHER</div>
+            <div id="weatherText" class="condition-value small">Partly cloudy</div>
+            <div id="precipNow" class="condition-sub">Rain 10%</div>
+          </article>
+          <article class="condition-card panel">
+            <div class="condition-icon">🧭</div>
+            <div class="condition-label">WIND</div>
+            <div id="windNow" class="condition-value small">NE 7 mph</div>
+            <div id="gustNow" class="condition-sub">Gusts 10 mph</div>
+          </article>
+          <article class="condition-card panel">
+            <div class="condition-icon">🌊</div>
+            <div class="condition-label">SURF</div>
+            <div id="surfNow" class="condition-value small">2.0 ft</div>
+            <div id="periodNow" class="condition-sub">9 sec period</div>
+          </article>
+          <article class="condition-card panel">
+            <div class="condition-icon">💧</div>
+            <div class="condition-label">WATER</div>
+            <div id="waterTemp" class="condition-value small">75°F</div>
+            <div id="swellNow" class="condition-sub">Swell 1.7 ft</div>
+          </article>
+          <article class="condition-card panel">
+            <div class="condition-icon">📈</div>
+            <div class="condition-label">PRESSURE</div>
+            <div id="pressureNow" class="condition-value small">30.08 in</div>
+            <div id="pressureTrend" class="condition-sub">Stable</div>
+          </article>
+        </section>
+
+        <section class="panel intel-panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">FISHING INTELLIGENCE</div>
+              <h2>Why the score looks good</h2>
+            </div>
+            <span id="intelConfidence" class="tiny-pill">High confidence</span>
+          </div>
+          <div id="scoreFactors" class="factor-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">TIDES</div>
+              <h2 id="tideStationLabel">Nearest tide station</h2>
+            </div>
+            <button class="link-button" data-nav="forecast" type="button">Details</button>
+          </div>
+          <div id="tideEvents" class="tide-events"></div>
+          <div class="chart-shell">
+            <canvas id="tideCanvas" width="900" height="280" aria-label="Tide curve"></canvas>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">NEXT 12 HOURS</div>
+              <h2>Fishing conditions by hour</h2>
+            </div>
+            <button class="link-button" data-nav="forecast" type="button">Full forecast</button>
+          </div>
           <div id="hourlyStrip" class="hourly-strip"></div>
         </section>
 
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">7-DAY OUTLOOK</div><h2>Best day to go</h2></div><span id="bestDayBadge" class="pill good">SAT • 95</span></div>
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">TRIP OUTLOOK</div>
+              <h2>Best day this week</h2>
+            </div>
+            <button id="quickPlanBtn" class="link-button" type="button">Plan trip</button>
+          </div>
+          <div id="bestDaySummary" class="best-day-summary"></div>
           <div id="dayScores" class="day-score-grid"></div>
         </section>
 
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">NEAR YOUR FISHING SPOT</div><h2>Bait & tackle</h2></div><button class="text-btn" data-nav="map">See map</button></div>
+        <section class="panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">BAIT & TACKLE</div>
+              <h2>Closest to your fishing spot</h2>
+            </div>
+            <button class="link-button" data-nav="map" type="button">Map</button>
+          </div>
           <div id="baitShopList" class="list-stack"></div>
         </section>
       </section>
 
-      <section id="view-forecast" class="view" data-view="forecast">
-        <div class="page-title-row"><div><div class="eyebrow">TRIP PLANNER</div><h1>Forecast</h1></div><button id="plannerBtn" class="btn btn-primary compact">Plan trip</button></div>
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">DAILY</div><h2 id="forecastLocation">Wrightsville Beach, NC</h2></div><span class="pill">7 days</span></div>
+      <!-- FORECAST -->
+      <section class="view" data-view="forecast" id="view-forecast">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">TRIP PLANNER</div>
+            <h1>Forecast</h1>
+            <p id="forecastLocation" class="page-subtitle">Wrightsville Beach, NC</p>
+          </div>
+          <button id="plannerBtn" class="primary-button small" type="button">Plan trip</button>
+        </div>
+
+        <section class="panel forecast-summary">
+          <div class="forecast-summary-main">
+            <div id="forecastSummaryIcon" class="forecast-big-icon">🌤️</div>
+            <div>
+              <div id="forecastSummaryTemp" class="forecast-big-temp">72°F</div>
+              <div id="forecastSummaryText" class="forecast-summary-text">Partly cloudy</div>
+            </div>
+          </div>
+          <div class="forecast-summary-grid">
+            <div><span>Feels</span><strong id="summaryFeels">72°F</strong></div>
+            <div><span>Wind</span><strong id="summaryWind">NE 7</strong></div>
+            <div><span>Rain</span><strong id="summaryRain">10%</strong></div>
+            <div><span>Surf</span><strong id="summarySurf">2.0 ft</strong></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">7-DAY</div><h2>Choose a day</h2></div>
+            <span class="tiny-pill">Tap for hourly</span>
+          </div>
           <div id="forecastDays" class="forecast-days"></div>
         </section>
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">HOURLY BREAKDOWN</div><h2 id="selectedForecastDay">Today</h2></div></div>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">HOURLY</div><h2 id="selectedForecastDay">Today</h2></div>
+            <span id="selectedDayScore" class="grade-badge good">91 / 100</span>
+          </div>
           <div class="table-scroll">
             <table class="forecast-table">
-              <thead><tr><th>Time</th><th>Weather</th><th>Temp</th><th>Wind</th><th>Rain</th><th>Tide</th><th>Score</th></tr></thead>
+              <thead>
+                <tr><th>Time</th><th>Wx</th><th>Temp</th><th>Wind</th><th>Rain</th><th>Wave</th><th>Tide</th><th>Fish</th></tr>
+              </thead>
               <tbody id="hourlyTable"></tbody>
             </table>
           </div>
         </section>
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">PACK SMART</div><h2>Trip checklist</h2></div><button id="refreshChecklistBtn" class="text-btn">Refresh</button></div>
+
+        <section class="metric-section-grid">
+          <article class="panel marine-detail-card">
+            <div class="eyebrow">MARINE</div>
+            <h2>Surf & swell</h2>
+            <div class="detail-list">
+              <div><span>Wave height</span><strong id="detailWave">2.0 ft</strong></div>
+              <div><span>Wave period</span><strong id="detailPeriod">9 sec</strong></div>
+              <div><span>Wave direction</span><strong id="detailWaveDir">ESE</strong></div>
+              <div><span>Swell height</span><strong id="detailSwell">1.7 ft</strong></div>
+              <div><span>Water temp</span><strong id="detailWater">75°F</strong></div>
+            </div>
+          </article>
+          <article class="panel marine-detail-card">
+            <div class="eyebrow">SUN & SKY</div>
+            <h2>Trip daylight</h2>
+            <div class="detail-list">
+              <div><span>Sunrise</span><strong id="detailSunrise">6:39 AM</strong></div>
+              <div><span>Sunset</span><strong id="detailSunset">7:28 PM</strong></div>
+              <div><span>Max rain chance</span><strong id="detailRain">20%</strong></div>
+              <div><span>Pressure</span><strong id="detailPressure">30.08 in</strong></div>
+              <div><span>Moon phase</span><strong id="detailMoon">Waxing gibbous</strong></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">TIDE TIMING</div><h2 id="forecastTideStation">Nearest NOAA station</h2></div>
+          </div>
+          <div id="forecastTideEvents" class="tide-events"></div>
+          <div class="chart-shell large"><canvas id="forecastTideCanvas" width="900" height="320" aria-label="Detailed tide curve"></canvas></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">PACK SMART</div><h2>Recommended trip checklist</h2></div>
+            <button id="refreshChecklistBtn" class="link-button" type="button">Refresh</button>
+          </div>
           <div id="tripChecklist" class="checklist"></div>
         </section>
       </section>
 
-      <section id="view-map" class="view" data-view="map">
-        <div class="page-title-row"><div><div class="eyebrow">SPOTS & SERVICES</div><h1>Fishing map</h1></div><button id="addWaypointBtn" class="btn btn-primary compact">+ Waypoint</button></div>
-        <section class="card map-card">
-          <div class="map-toolbar">
-            <button class="chip active" data-map-filter="all">All</button>
-            <button class="chip" data-map-filter="spots">Spots</button>
-            <button class="chip" data-map-filter="catches">Catches</button>
-            <button class="chip" data-map-filter="shops">Bait shops</button>
+      <!-- MAP -->
+      <section class="view" data-view="map" id="view-map">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">EXPLORE</div>
+            <h1>Fishing map</h1>
+            <p class="page-subtitle">Spots, catches and bait stores around your destination.</p>
           </div>
-          <div id="mapMock" class="map-mock" role="img" aria-label="Schematic fishing map centered on selected location">
-            <div class="water-label">ATLANTIC OCEAN</div>
-            <div class="shore-line"></div>
-            <button class="map-pin main-pin" style="left:62%;top:46%" data-pin-type="spots" data-pin-name="Selected fishing spot">🎣</button>
-            <button class="map-pin catch-pin" style="left:70%;top:28%" data-pin-type="catches" data-pin-name="Recent catch: Red Drum">🐟</button>
-            <button class="map-pin catch-pin" style="left:54%;top:63%" data-pin-type="catches" data-pin-name="Recent catch: Speckled Trout">🐟</button>
-            <button class="map-pin shop-pin" style="left:28%;top:38%" data-pin-type="shops" data-pin-name="Nearby bait shop">📍</button>
-            <div class="map-note">Prototype map • live version can use a real mapping provider</div>
+          <button id="addWaypointBtn" class="primary-button small" type="button">+ Spot</button>
+        </div>
+
+        <section class="panel map-panel">
+          <div class="map-search-row">
+            <button id="mapSearchBtn" class="map-search-button" type="button">⌕ Search fishing location</button>
+            <button id="mapRecenterBtn" class="icon-button inline" type="button" aria-label="Recenter map">◎</button>
           </div>
-          <div id="mapSelection" class="map-selection">Tap a pin to see details.</div>
+          <div class="map-filter-row" role="group" aria-label="Map filters">
+            <button class="filter-chip active" data-map-filter="all" type="button">All</button>
+            <button class="filter-chip" data-map-filter="spots" type="button">Saved spots</button>
+            <button class="filter-chip" data-map-filter="catches" type="button">My catches</button>
+            <button class="filter-chip" data-map-filter="shops" type="button">Bait shops</button>
+          </div>
+          <div id="leafletMap" class="real-map" aria-label="Interactive fishing map"></div>
+          <div id="mapFallback" class="map-fallback hidden">
+            <div class="map-fallback-icon">🗺️</div>
+            <strong>Map unavailable</strong>
+            <span>The rest of CoastCast still works. Reconnect and refresh to load the interactive map.</span>
+          </div>
+          <div id="mapSelection" class="map-selection">Fishing spot is centered on <strong>Wrightsville Beach, NC</strong>.</div>
         </section>
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">SAVED WAYPOINTS</div><h2>Your spots</h2></div><span id="waypointCount" class="pill">0</span></div>
-          <div id="waypointList" class="list-stack empty-state">No saved waypoints yet.</div>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">WAYPOINTS</div><h2>Saved fishing spots</h2></div>
+            <span id="waypointCount" class="tiny-pill">0 saved</span>
+          </div>
+          <div id="waypointList" class="list-stack empty-state">No saved fishing spots yet.</div>
         </section>
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">CLOSEST FROM FISHING SPOT</div><h2>Bait & tackle stores</h2></div><button id="refreshShopsBtn" class="text-btn">Find live</button></div>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">NEARBY SERVICES</div><h2>Bait & tackle</h2></div>
+            <button id="refreshShopsBtn" class="link-button" type="button">Find live</button>
+          </div>
           <div id="mapShopList" class="list-stack"></div>
         </section>
       </section>
 
-      <section id="view-logbook" class="view" data-view="logbook">
-        <div class="page-title-row"><div><div class="eyebrow">YOUR HISTORY</div><h1>Logbook</h1></div><button id="logCatchBtn" class="btn btn-primary compact">+ Log catch</button></div>
+      <!-- LOGBOOK -->
+      <section class="view" data-view="logbook" id="view-logbook">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">MY FISHING</div>
+            <h1>Logbook</h1>
+            <p class="page-subtitle">Build your own history of what works, where and under which conditions.</p>
+          </div>
+          <button id="logCatchBtn" class="primary-button small" type="button">+ Catch</button>
+        </div>
+
         <section class="stats-grid">
-          <div class="card stat"><span id="catchCount">0</span><small>Catches</small></div>
-          <div class="card stat"><span id="speciesCount">0</span><small>Species</small></div>
-          <div class="card stat"><span id="pbCount">0</span><small>Personal bests</small></div>
+          <article class="panel stat-card"><span id="catchCount">0</span><small>Catches</small></article>
+          <article class="panel stat-card"><span id="speciesCount">0</span><small>Species</small></article>
+          <article class="panel stat-card"><span id="pbCount">0</span><small>PBs</small></article>
+          <article class="panel stat-card"><span id="tripCount">0</span><small>Trips</small></article>
         </section>
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">TARGET SPECIES</div><h2>What are you fishing for?</h2></div></div>
-          <select id="targetSpecies" class="field">
-            <option>Red Drum</option><option>Speckled Trout</option><option>Flounder</option><option>Bluefish</option><option>Spanish Mackerel</option><option>Black Drum</option><option>Sheepshead</option><option>Striped Bass</option><option>Other</option>
-          </select>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">TARGET MODE</div><h2 id="logbookTargetTitle">Red Drum</h2></div>
+            <select id="targetSpecies" class="select-control compact-select" aria-label="Target species"></select>
+          </div>
           <div id="speciesTip" class="species-tip"></div>
         </section>
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">CATCHES</div><h2>Recent log</h2></div><select id="logPrivacyFilter" class="mini-select"><option value="all">All</option><option value="private">Private</option><option value="water">Water only</option><option value="public">Public</option></select></div>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">YOUR PATTERNS</div><h2>Fishing insights</h2></div>
+            <span class="tiny-pill">Learns from catches</span>
+          </div>
+          <div id="personalInsights" class="personal-insights"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <div><div class="eyebrow">CATCH HISTORY</div><h2>Recent catches</h2></div>
+            <select id="logPrivacyFilter" class="select-control compact-select" aria-label="Catch privacy filter">
+              <option value="all">All</option>
+              <option value="private">Private</option>
+              <option value="water">Water only</option>
+              <option value="public">Public</option>
+            </select>
+          </div>
           <div id="catchList" class="list-stack empty-state">Your catches will appear here.</div>
         </section>
       </section>
 
-      <section id="view-community" class="view" data-view="community">
-        <div class="page-title-row"><div><div class="eyebrow">LOCAL ANGLERS</div><h1>Community</h1></div><button id="shareCatchBtn" class="btn btn-primary compact">Share catch</button></div>
-        <section class="card">
-          <div class="section-head"><div><div class="eyebrow">NEARBY ACTIVITY</div><h2>What's biting</h2></div><select id="communitySpeciesFilter" class="mini-select"><option value="all">All species</option><option>Red Drum</option><option>Speckled Trout</option><option>Flounder</option><option>Bluefish</option></select></div>
-          <div id="communityFeed" class="feed"></div>
+      <!-- COMMUNITY -->
+      <section class="view" data-view="community" id="view-community">
+        <div class="page-head">
+          <div>
+            <div class="eyebrow">DISCOVER</div>
+            <h1>Local catches</h1>
+            <p class="page-subtitle">A privacy-aware community feed around the water you care about.</p>
+          </div>
+          <button id="shareCatchBtn" class="primary-button small" type="button">Share catch</button>
+        </div>
+
+        <section class="panel community-controls">
+          <div class="community-filter-row">
+            <select id="communitySpeciesFilter" class="select-control" aria-label="Filter community by species">
+              <option value="all">All species</option>
+            </select>
+            <select id="communityRadiusFilter" class="select-control" aria-label="Community radius">
+              <option value="10">Within 10 mi</option>
+              <option value="25">Within 25 mi</option>
+              <option value="50">Within 50 mi</option>
+            </select>
+          </div>
+          <div class="privacy-note">📍 Exact catch coordinates stay hidden unless the angler chooses to share them.</div>
         </section>
+
+        <div id="communityFeed" class="community-feed"></div>
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Main navigation">
-      <button class="nav-btn active" data-view-target="home"><span>⌂</span><small>Home</small></button>
-      <button class="nav-btn" data-view-target="forecast"><span>☁</span><small>Forecast</small></button>
-      <button class="nav-btn" data-view-target="map"><span>⌖</span><small>Map</small></button>
-      <button class="nav-btn" data-view-target="logbook"><span>▣</span><small>Logbook</small></button>
-      <button class="nav-btn" data-view-target="community"><span>👥</span><small>Community</small></button>
+    <nav class="bottom-nav" aria-label="Primary navigation">
+      <button class="nav-button active" type="button" data-view-target="home"><span>⌂</span><small>Home</small></button>
+      <button class="nav-button" type="button" data-view-target="forecast"><span>≋</span><small>Forecast</small></button>
+      <button class="nav-button" type="button" data-view-target="map"><span>⌖</span><small>Map</small></button>
+      <button class="nav-button" type="button" data-view-target="logbook"><span>◫</span><small>Logbook</small></button>
+      <button class="nav-button" type="button" data-view-target="community"><span>♧</span><small>Community</small></button>
     </nav>
   </div>
 
-  <dialog id="locationDialog" class="modal">
-    <form method="dialog" id="locationForm" class="modal-card">
-      <div class="modal-head"><div><div class="eyebrow">LOCATION OF INTEREST</div><h2>Choose fishing location</h2></div><button value="cancel" class="icon-btn" aria-label="Close">✕</button></div>
-      <label>Preset beach<select id="presetLocation" class="field"><option value="wrightsville">Wrightsville Beach, NC</option><option value="carolina">Carolina Beach, NC</option><option value="topsail">Topsail Beach, NC</option><option value="surfCity">Surf City, NC</option><option value="nagsHead">Nags Head, NC</option><option value="myrtle">Myrtle Beach, SC</option></select></label>
-      <div class="divider"><span>or enter coordinates</span></div>
-      <div class="two-col"><label>Latitude<input id="latInput" class="field" inputmode="decimal" value="34.2085" /></label><label>Longitude<input id="lonInput" class="field" inputmode="decimal" value="-77.7964" /></label></div>
-      <label>Location name<input id="customLocationName" class="field" value="Wrightsville Beach, NC" /></label>
-      <div class="modal-actions"><button value="cancel" class="btn btn-secondary">Cancel</button><button id="saveLocationBtn" value="default" class="btn btn-primary">Use location</button></div>
+  <!-- LOCATION DIALOG -->
+  <dialog id="locationDialog" class="sheet-dialog">
+    <form id="locationForm" class="sheet-card" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">DESTINATION</div><h2>Choose fishing location</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <label class="field-group">
+        <span>Search beach, pier, inlet or town</span>
+        <div class="search-inline">
+          <input id="locationSearchInput" class="text-control" type="search" placeholder="Example: Carolina Beach, NC" autocomplete="off" />
+          <button id="locationSearchGoBtn" class="primary-button" type="button">Search</button>
+        </div>
+      </label>
+      <button id="useMyLocationSheetBtn" class="secondary-button full" type="button">◎ Use my phone location</button>
+      <div class="divider"><span>POPULAR COASTS</span></div>
+      <div id="presetLocations" class="preset-list"></div>
+      <div id="locationSearchResults" class="search-results"></div>
     </form>
   </dialog>
 
-  <dialog id="settingsDialog" class="modal">
-    <form method="dialog" class="modal-card">
-      <div class="modal-head"><div><div class="eyebrow">APP SETTINGS</div><h2>CoastCast</h2></div><button value="cancel" class="icon-btn" aria-label="Close">✕</button></div>
-      <label class="switch-row"><span><strong>Live data mode</strong><small>Uses internet APIs when available.</small></span><input id="liveModeToggle" type="checkbox" /></label>
-      <label>Default search radius<select id="radiusSetting" class="field"><option value="5">5 miles</option><option value="10" selected>10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
-      <label>Fishing style<select id="fishingStyleSetting" class="field"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Kayak / inshore</option></select></label>
-      <p class="muted small-copy">Demo Mode works completely offline after the app files load. Live data requires a web connection and may need the app to be served from localhost/HTTPS rather than opened directly as a file.</p>
-      <div class="modal-actions"><button value="cancel" class="btn btn-primary">Done</button></div>
+  <!-- WAYPOINT DIALOG -->
+  <dialog id="waypointDialog" class="sheet-dialog">
+    <form id="waypointForm" class="sheet-card" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">SAVE SPOT</div><h2>Add fishing waypoint</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <label class="field-group"><span>Name</span><input id="waypointName" class="text-control" maxlength="60" placeholder="North end trough" /></label>
+      <label class="field-group"><span>Notes</span><textarea id="waypointNotes" class="text-control textarea" maxlength="240" placeholder="Access, structure, parking, bait, etc."></textarea></label>
+      <label class="field-group"><span>Privacy</span><select id="waypointPrivacy" class="select-control"><option value="private">Private</option><option value="water">Water name only</option><option value="public">Public</option></select></label>
+      <div class="sheet-actions"><button class="secondary-button" value="cancel" type="submit">Cancel</button><button id="saveWaypointBtn" class="primary-button" type="button">Save spot</button></div>
     </form>
   </dialog>
 
-  <dialog id="catchDialog" class="modal">
-    <form method="dialog" id="catchForm" class="modal-card">
-      <div class="modal-head"><div><div class="eyebrow">LOGBOOK</div><h2>Log a catch</h2></div><button value="cancel" class="icon-btn" aria-label="Close">✕</button></div>
-      <label>Species<select id="catchSpecies" class="field"><option>Red Drum</option><option>Speckled Trout</option><option>Flounder</option><option>Bluefish</option><option>Spanish Mackerel</option><option>Black Drum</option><option>Sheepshead</option><option>Striped Bass</option><option>Other</option></select></label>
-      <div class="two-col"><label>Length (in)<input id="catchLength" class="field" type="number" min="0" step="0.1" /></label><label>Weight (lb)<input id="catchWeight" class="field" type="number" min="0" step="0.1" /></label></div>
-      <label>Bait / lure<input id="catchBait" class="field" placeholder="e.g. cut mullet, shrimp, spoon" /></label>
-      <label>Privacy<select id="catchPrivacy" class="field"><option value="private">Private — only me</option><option value="water">Share water name only</option><option value="public">Public exact spot</option></select></label>
-      <label>Notes<textarea id="catchNotes" class="field textarea" placeholder="Current, structure, presentation, hook size, etc."></textarea></label>
-      <div class="modal-actions"><button value="cancel" class="btn btn-secondary">Cancel</button><button id="saveCatchBtn" value="default" class="btn btn-primary">Save catch</button></div>
+  <!-- CATCH DIALOG -->
+  <dialog id="catchDialog" class="sheet-dialog">
+    <form id="catchForm" class="sheet-card" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">LOGBOOK</div><h2>Log a catch</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <div class="two-col">
+        <label class="field-group"><span>Species</span><select id="catchSpecies" class="select-control"></select></label>
+        <label class="field-group"><span>Date / time</span><input id="catchDateTime" class="text-control" type="datetime-local" /></label>
+      </div>
+      <div class="two-col">
+        <label class="field-group"><span>Length (in)</span><input id="catchLength" class="text-control" type="number" min="0" max="200" step="0.25" inputmode="decimal" /></label>
+        <label class="field-group"><span>Weight (lb)</span><input id="catchWeight" class="text-control" type="number" min="0" max="500" step="0.1" inputmode="decimal" /></label>
+      </div>
+      <label class="field-group"><span>Bait / lure</span><input id="catchBait" class="text-control" maxlength="80" placeholder="Cut mullet, shrimp, paddletail..." /></label>
+      <label class="field-group"><span>Notes</span><textarea id="catchNotes" class="text-control textarea" maxlength="400" placeholder="Structure, retrieve, water clarity, bite details..."></textarea></label>
+      <label class="field-group"><span>Location privacy</span><select id="catchPrivacy" class="select-control"><option value="private">Private — exact location stays mine</option><option value="water">Water only — show general area</option><option value="public">Public — share fishing location</option></select></label>
+      <div class="snapshot-card"><strong>Conditions snapshot</strong><span id="catchSnapshot">Current CoastCast conditions will be saved with this catch.</span></div>
+      <div class="sheet-actions"><button class="secondary-button" value="cancel" type="submit">Cancel</button><button id="saveCatchBtn" class="primary-button" type="button">Save catch</button></div>
     </form>
   </dialog>
 
-  <dialog id="waypointDialog" class="modal">
-    <form method="dialog" id="waypointForm" class="modal-card">
-      <div class="modal-head"><div><div class="eyebrow">WAYPOINT</div><h2>Save fishing spot</h2></div><button value="cancel" class="icon-btn" aria-label="Close">✕</button></div>
-      <label>Name<input id="waypointName" class="field" placeholder="North end trough" /></label>
-      <label>Notes<textarea id="waypointNotes" class="field textarea" placeholder="Structure, tide, access notes, parking, etc."></textarea></label>
-      <div class="modal-actions"><button value="cancel" class="btn btn-secondary">Cancel</button><button id="saveWaypointBtn" value="default" class="btn btn-primary">Save waypoint</button></div>
+  <!-- TRIP PLANNER DIALOG -->
+  <dialog id="plannerDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">SMART TRIP</div><h2>Find my best fishing trip</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <div class="two-col">
+        <label class="field-group"><span>Target species</span><select id="tripSpecies" class="select-control"></select></label>
+        <label class="field-group"><span>Preferred session</span><select id="tripSession" class="select-control"><option>Any time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></label>
+      </div>
+      <label class="field-group"><span>Maximum wind you want to fish</span><select id="tripMaxWind" class="select-control"><option value="10">10 mph</option><option value="15" selected>15 mph</option><option value="20">20 mph</option></select></label>
+      <button id="findBestTripBtn" class="primary-button full" type="button">Find best day</button>
+      <div id="plannerResult" class="planner-result">Choose your preferences and CoastCast will rank the week.</div>
     </form>
   </dialog>
 
-  <dialog id="plannerDialog" class="modal">
-    <form method="dialog" id="plannerForm" class="modal-card">
-      <div class="modal-head"><div><div class="eyebrow">TRIP PLANNER</div><h2>Pick the best day</h2></div><button value="cancel" class="icon-btn" aria-label="Close">✕</button></div>
-      <label>Earliest date<input id="tripStartDate" class="field" type="date" /></label>
-      <label>Preferred session<select id="tripSession" class="field"><option>Any time</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></label>
-      <label>Target species<select id="tripSpecies" class="field"><option>Red Drum</option><option>Speckled Trout</option><option>Flounder</option><option>Bluefish</option><option>Spanish Mackerel</option><option>Anything biting</option></select></label>
-      <div id="plannerResult" class="planner-result">Tap “Find best trip” to rank the available forecast days.</div>
-      <div class="modal-actions"><button value="cancel" class="btn btn-secondary">Close</button><button id="findBestTripBtn" type="button" class="btn btn-primary">Find best trip</button></div>
+  <!-- SETTINGS DIALOG -->
+  <dialog id="settingsDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">COASTCAST</div><h2>Settings</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <label class="switch-row"><span><strong>Live data</strong><small>Weather, marine, NOAA tides and nearby shops</small></span><input id="liveModeToggle" type="checkbox" /></label>
+      <label class="field-group"><span>Fishing style</span><select id="fishingStyleSetting" class="select-control"><option>Surf fishing</option><option>Pier fishing</option><option>Inlet / jetty</option><option>Nearshore boat</option></select></label>
+      <label class="field-group"><span>Nearby shop radius</span><select id="radiusSetting" class="select-control"><option value="5">5 miles</option><option value="10">10 miles</option><option value="20">20 miles</option><option value="30">30 miles</option></select></label>
+      <div class="settings-note">CoastCast v0.3 is an early prototype. Fishing scores are planning guidance, not a guarantee of fish activity or marine safety.</div>
+      <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CoastCast data</button>
+    </form>
+  </dialog>
+
+  <!-- INFO DIALOG -->
+  <dialog id="infoDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head">
+        <div><div class="eyebrow">HOW IT WORKS</div><h2>Species-adjusted score</h2></div>
+        <button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button>
+      </div>
+      <p class="info-copy">CoastCast starts with weather, wind, waves, tide movement and daylight. Species Mode then shifts the weighting to better match how you want to fish. Your own logged catches can eventually add a personal-history signal.</p>
+      <div class="info-grid">
+        <div><strong>Tides</strong><span>Movement and timing relative to high/low water</span></div>
+        <div><strong>Wind</strong><span>Speed and casting direction for the selected fishing style</span></div>
+        <div><strong>Marine</strong><span>Wave height, period, swell and water temperature</span></div>
+        <div><strong>Weather</strong><span>Rain risk, pressure and temperature</span></div>
+        <div><strong>Daylight</strong><span>Dawn and dusk windows receive extra weight</span></div>
+        <div><strong>Your history</strong><span>Future versions can learn patterns from your catches</span></div>
+      </div>
     </form>
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="app.js"></script>
 </body>
 </html>

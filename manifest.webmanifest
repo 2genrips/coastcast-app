@@ -1,25 +1,16 @@
 {
-  "name": "CoastCast Fishing Forecast",
+  "name": "CoastCast Fishing Planner",
   "short_name": "CoastCast",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#061522",
-  "theme_color": "#071b2a",
-  "description": "Fishing trip planner with weather, tides, wind, surf, spots, bait shops, logbook and community prototype.",
-  "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
+  "description": "Fishing-first coastal trip planner with weather, tides, wind, surf, species scoring, maps, bait shops, logbook and community tools.",
   "id": "./",
-  "scope": "./"
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#06131d",
+  "theme_color": "#061722",
+  "icons": [
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
 }
