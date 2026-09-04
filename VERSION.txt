@@ -1,1 +1,1 @@
-CoastCast v0.5.0 — Professional Brand + Live Forecast Engine
+0.5.1

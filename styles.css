@@ -92,3 +92,18 @@ h1{font-size:32px;letter-spacing:.01em;font-weight:700}.section-heading h2{font-
 .app-trust-footer{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;margin:26px 8px 8px;padding:14px 4px 4px;border-top:1px solid rgba(123,184,255,.08);color:#708D9E}.app-trust-footer img{width:28px;height:28px}.app-trust-footer strong{font-family:"Barlow Condensed",Inter,sans-serif;display:block;color:#9DB9C8;font-size:15px;letter-spacing:.11em}.app-trust-footer span{font-size:9px}.app-trust-footer small{grid-column:1/-1;font-size:9px;line-height:1.45;color:#648193}
 .primary-button{background:linear-gradient(135deg,#119DB2,#6FC8F7);color:#041A24;box-shadow:0 8px 22px rgba(17,157,178,.13)}.secondary-button{border-color:rgba(123,184,255,.14)}.select-control,.text-control{background:#081D2D;border-color:rgba(123,184,255,.13)}
 @media(max-width:390px){.location-title-button{font-size:24px}.score-number{font-size:60px}.score-dial-wrap{width:104px;height:104px}.brand-name{font-size:19px!important}.best-window-time{font-size:26px}.source-health{margin-top:8px}}
+
+
+/* CoastCast v0.5.1 mobile asset + icon hotfix */
+.brand-mark-svg{display:block;flex:0 0 auto;overflow:visible}
+.icon-button{color:#D7EDF8;-webkit-appearance:none;appearance:none}
+.icon-button svg,.best-window-icon svg{fill:none!important;stroke:currentColor!important}
+.icon-button svg path,.icon-button svg circle,.best-window-icon svg path,.best-window-icon svg circle{vector-effect:non-scaling-stroke}
+.best-window-icon{color:#A9D9F1}
+.score-breakdown-link{-webkit-appearance:none!important;appearance:none!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#75CFE4!important;padding:8px 0 0!important;min-height:0!important;width:auto!important}
+.location-title-button{width:100%;min-width:0}
+.location-title-button span:first-child{display:block!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:100%!important;word-break:normal;overflow-wrap:anywhere}
+.location-title-button span:last-child{flex:0 0 auto;margin-top:1px}
+.footer-mark{width:28px;height:28px;display:block}
+.dial-brand{pointer-events:none}
+@media(max-width:390px){.brand-mark-svg{width:36px!important;height:36px!important}.brand-lockup{gap:9px}.brand-name{letter-spacing:.1em!important}.location-title-button{font-size:23px}.score-breakdown-link{font-size:11px!important}}
