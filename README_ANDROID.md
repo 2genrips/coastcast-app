@@ -1,36 +1,23 @@
-# CastVector 5.0 — Android / GitHub Pages update
+# CastVector v5.4 — Android update
 
-CastVector 5.0 keeps the nationwide fishing app working as a GitHub Pages PWA and adds the launch-security foundation for real accounts and Premium access.
+## What this build adds
+Community Live: realtime fishing chat, online angler count, channels, replies, reports, blocks and moderation hooks.
 
-## Update the app from Android
-1. Extract the CastVector v5.3 ZIP.
-2. Open your existing CastVector GitHub repository.
-3. Choose **Add file → Upload files**.
-4. Upload everything from inside the `coastcast_v5.3` folder, including the new SQL/docs and `supabase` folder.
-5. Replace the matching app files and commit to `main`.
-6. Wait for GitHub Pages to redeploy, then fully close/reopen CastVector.
+## Update from v5.3
+1. Download and extract the v5.4 ZIP.
+2. Upload everything inside the `castvector_v5.4_community_live` folder to the root of your existing GitHub repository.
+3. Replace matching files and commit to `main`.
+4. **Do not delete your existing `coastcast-config.js`.** This ZIP intentionally does not contain it.
+5. In Supabase run `CASTVECTOR_COMMUNITY_LIVE_SETUP_ANDROID.txt` using SQL Editor.
+6. Wait for GitHub Pages, fully close CastVector, and reopen it.
 
-Your previous CastVector local data migrates forward from v4.0.
+## First test
+- Confirm your Owner account still shows Lifetime Premium.
+- Open Community Live.
+- Save a public chat nickname.
+- Send a General message.
+- On a second signed-in account, open Community Live and confirm the message appears without refreshing.
+- Confirm the online angler count increases.
+- Test Reply, Report and Block.
 
-## What works without a backend
-All normal fishing features continue working. Premium UI remains available in development preview mode so you can keep testing.
-
-## Turn on real accounts + entitlements
-When ready:
-1. Create/use your Supabase project.
-2. Run `SUPABASE_SETUP.sql`.
-3. Run `CASTVECTOR_LAUNCH_BACKEND.sql`.
-4. Put the public Supabase URL and publishable key into `coastcast-config.js` (or use the in-app Account setup during development).
-5. Create your CastVector account in **Profile → CastVector Account**.
-6. Follow `ADMIN_SETUP.md` once to make your account the CastVector owner/admin.
-7. Tap **Refresh server access** in the app.
-
-After the launch backend is detected, the local Premium simulator is disabled for the signed-in account and CastVector uses server-verified access.
-
-## Important
-Never put these in GitHub Pages:
-- Supabase secret/service-role key
-- Google Play service-account JSON/private key
-- VAPID private key
-
-Public Supabase publishable keys are designed for browser use when Row Level Security is correctly configured.
+Community chat is open to signed-in Free and Premium users. Premium fishing intelligence remains the paid value proposition.
