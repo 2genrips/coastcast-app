@@ -10,5 +10,6 @@ window.COASTCAST_CONFIG = Object.freeze({
   supportEmail: '',
   legalEntity: '',
   storeDisplayName: 'CastVector Fishing Forecast',
-  appPackageId: 'com.castvector.fishing'
+  appPackageId: 'com.castvector.fishing',
+  appVersion: '5.6.1'
 });

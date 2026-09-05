@@ -26,7 +26,7 @@
 - [ ] Create Full Distribution developer account
 - [ ] Verify developer identity/device as requested
 - [ ] Create app record and reserve package ID
-- [ ] Create subscription product coastcast_premium_monthly
+- [ ] Create subscription product castvector_premium_monthly
 - [ ] Integrate native Play Billing purchase flow
 - [ ] Connect purchase token to existing verify-play-subscription backend
 - [ ] Complete Data Safety and account-deletion URL

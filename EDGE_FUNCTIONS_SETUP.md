@@ -9,7 +9,7 @@ It authenticates the CastVector user, verifies a Google Play subscription token 
 
 ### Required Edge Function secrets
 - `GOOGLE_PLAY_PACKAGE_NAME`
-- `COASTCAST_PREMIUM_PRODUCT_ID` (recommended: `coastcast_premium_monthly`)
+- `CASTVECTOR_PREMIUM_PRODUCT_ID` (recommended: `castvector_premium_monthly`)
 - `GOOGLE_SERVICE_ACCOUNT_JSON` (the entire service account JSON as a secret)
 
 Supabase provides its own URL and publishable/secret keys to Edge Functions. Never place the Google service-account JSON or Supabase secret key in GitHub Pages.

@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class BillingManager implements PurchasesUpdatedListener {
-    // Server verification performs required subscription acknowledgement before paid access is finalized.
+    // Secure server verification grants entitlement and acknowledges new subscription purchase tokens.
     private final Activity activity;
     private final WebView webView;
     private BillingClient billingClient;

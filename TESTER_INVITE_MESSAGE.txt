@@ -1,0 +1,7 @@
+I’m testing CastVector, a coastal fishing forecast and trip-planning app, before its Google Play launch.
+
+I need closed-test users to stay opted in for the full 14-day test period. If you can help, I’ll send you the Google Play test link. Please install it, open it a few times during the test, and send me any bugs or confusing parts you notice.
+
+Things worth testing: forecast, tides, map/Scout, trip planning, logbook, and Community Live.
+
+Thanks for helping me get CastVector ready for launch.

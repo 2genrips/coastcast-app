@@ -1,13 +1,13 @@
-# Native billing web hook
+# CastVector Android source v5.6.1
 
-Do not wire the $4.99 purchase button until the Play Console subscription product exists.
+Safe source package for the `CASTVECTOR_ANDROID_SOURCE_BASE64` GitHub Actions secret.
 
-When ready:
-1. Upload `native-billing-hook.js` to the CastVector website.
-2. Add `<script src="native-billing-hook.js"></script>` after `app.js`.
-3. The Premium button should call `CastVectorPlay.buyPremium()`.
-4. Listen for `castvector:premium-verification-needed`.
-5. Send the purchase token to the protected Supabase `verify-play-subscription` Edge Function.
-6. Refresh server access only after the backend confirms the entitlement.
+Contains no signing key, passwords, Supabase secret keys, Google service-account JSON, or user data.
 
-The browser must never grant itself Premium.
+Package: com.castvector.fishing
+Version: 5.6.1
+Target SDK: 36
+Play Billing: 8.3.0
+
+Version code: 56101
+Premium product: castvector_premium_monthly

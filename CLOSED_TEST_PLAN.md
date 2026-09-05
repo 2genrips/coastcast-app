@@ -1,34 +1,30 @@
-# Closed-test plan
+# Google Play closed-test plan — CastVector
 
-## Tester target
-Recruit 15 people so there is a buffer above Google's minimum if your Play developer account is a personal account created after November 13, 2023.
+## Current Google requirement
+For a personal Google Play developer account created after November 13, 2023, production access requires a closed test with at least 12 testers continuously opted in for at least 14 days before applying for production access.
 
-Keep at least 12 testers opted in continuously for 14 days before applying for production access.
+## Recommended CastVector test group
+Recruit 15–20 people so the test is not jeopardized if a few testers leave.
 
-## Recommended tester mix
-- 5 family/friends who fish
-- 4 people who use Android regularly but are not technical
-- 3 anglers from different coastal regions
-- 2 people who will test Community Live
-- 1 person who rarely fishes, to test ease of use
+Ask testers to use the app on at least 3 separate days during the 14-day window and test:
+1. Account creation/sign-in
+2. Location search or current location
+3. Home Quick Answer
+4. Forecast and NOAA tides
+5. Map / Scout
+6. Trips
+7. Community Live
+8. Free vs Premium gating where applicable
+9. Logbook / catch entry
+10. Privacy, support and delete-account flows
 
-## What each tester should do
-Day 1:
-- install from the Play test link
-- open Home
-- allow or deny location once
-- choose a fishing coast
-- open Forecast, Map, Trips, Logbook and Community
-- create an account if comfortable
+## What to record
+Keep a simple list of:
+- tester email
+- device model
+- Android version
+- date joined
+- major bugs found
+- fix/status
 
-During the test:
-- use CastVector naturally several times
-- report confusing screens, broken buttons or incorrect data
-- test at least one saved trip
-- test Community Live if signed in
-
-Before production:
-- verify there are no crash reports blocking launch
-- verify policy declarations match the final build
-- verify Privacy, Terms, Support and Delete Account URLs are public
-- verify the app-access review account works
+Google may ask what you learned during testing when you apply for production access. Use TEST_FEEDBACK_TEMPLATE.md to keep the answers organized.
