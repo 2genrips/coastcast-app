@@ -9,9 +9,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.view.ViewGroup;
+import android.view.WindowInsets;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
@@ -21,10 +24,10 @@ import android.webkit.SafeBrowsingResponse;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.net.URI;
@@ -42,17 +45,41 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final int appBackground = Color.rgb(6, 17, 29);
+        getWindow().setStatusBarColor(appBackground);
+        getWindow().setNavigationBarColor(appBackground);
+
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(appBackground);
+
         webView = new WebView(this);
-        webView.setBackgroundColor(Color.rgb(6, 17, 29));
-        webView.setOnApplyWindowInsetsListener((view, insets) -> {
-            int statusBarInset = Math.max(0, insets.getSystemWindowInsetTop());
-            if (view.getPaddingTop() != statusBarInset) {
-                view.setPadding(0, statusBarInset, 0, 0);
+        webView.setBackgroundColor(appBackground);
+        FrameLayout.LayoutParams webParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+        root.addView(webView, webParams);
+
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            int topInset;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                topInset = insets.getInsetsIgnoringVisibility(
+                        WindowInsets.Type.statusBars() | WindowInsets.Type.displayCutout()
+                ).top;
+            } else {
+                topInset = Math.max(0, insets.getStableInsetTop());
+            }
+
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) webView.getLayoutParams();
+            if (lp.topMargin != topInset) {
+                lp.topMargin = topInset;
+                webView.setLayoutParams(lp);
             }
             return insets;
         });
-        setContentView(webView);
-        webView.requestApplyInsets();
+
+        setContentView(root);
+        root.requestApplyInsets();
 
         configureWebView();
         billingManager = new BillingManager(this, webView);
