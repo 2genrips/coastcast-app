@@ -44,7 +44,15 @@ public class MainActivity extends Activity {
 
         webView = new WebView(this);
         webView.setBackgroundColor(Color.rgb(6, 17, 29));
+        webView.setOnApplyWindowInsetsListener((view, insets) -> {
+            int statusBarInset = Math.max(0, insets.getSystemWindowInsetTop());
+            if (view.getPaddingTop() != statusBarInset) {
+                view.setPadding(0, statusBarInset, 0, 0);
+            }
+            return insets;
+        });
         setContentView(webView);
+        webView.requestApplyInsets();
 
         configureWebView();
         billingManager = new BillingManager(this, webView);
