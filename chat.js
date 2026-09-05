@@ -158,7 +158,7 @@
     const badge = $('communityUnreadBadge');
     if (badge) {
       badge.hidden = total < 1;
-      badge.textContent = total > 99 ? '99+ new' : `${total} new`;
+      badge.textContent = total > 99 ? '99+' : String(total);
     }
   }
 
