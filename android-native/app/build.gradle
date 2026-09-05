@@ -1,0 +1,74 @@
+import java.util.Properties
+
+plugins {
+    id 'com.android.application'
+}
+
+def localProps = new Properties()
+def localPropsFile = rootProject.file("keystore.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+
+def cvWebUrl = providers.gradleProperty("CASTVECTOR_WEB_URL").orElse("https://2genrips.github.io/cc/").get()
+def premiumProductId = providers.gradleProperty("CASTVECTOR_PREMIUM_PRODUCT_ID").orElse("castvector_premium_monthly").get()
+
+android {
+    namespace 'com.castvector.fishing'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.castvector.fishing'
+        minSdk 26
+        targetSdk 36
+        versionCode 56101
+        versionName '5.6.1'
+
+        buildConfigField "String", "CASTVECTOR_WEB_URL", "\"${cvWebUrl}\""
+        buildConfigField "String", "PREMIUM_PRODUCT_ID", "\"${premiumProductId}\""
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        if (localPropsFile.exists()) {
+            release {
+                storeFile rootProject.file(localProps['storeFile'])
+                storePassword localProps['storePassword']
+                keyAlias localProps['keyAlias']
+                keyPassword localProps['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+        release {
+            minifyEnabled false
+            shrinkResources false
+            if (localPropsFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources {
+            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE*', 'META-INF/NOTICE*']
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.android.billingclient:billing:8.3.0'
+}
