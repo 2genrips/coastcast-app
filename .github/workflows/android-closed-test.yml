@@ -57,6 +57,16 @@ jobs:
           path: android-native/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
+      - name: Build unsigned Google Play AAB
+        run: gradle -p android-native :app:bundleRelease --no-daemon --stacktrace
+
+      - name: Upload unsigned release AAB for private signing
+        uses: actions/upload-artifact@v4
+        with:
+          name: CastVector-5.6.1-unsigned-aab
+          path: android-native/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
       - name: Restore private upload key
         if: env.ANDROID_KEYSTORE_BASE64 != ''
         working-directory: android-native
