@@ -1,0 +1,41 @@
+APP NAME (27/30)
+CastVector Fishing Forecast
+
+SHORT DESCRIPTION (75/80)
+Fishing forecast, tides, species, trips, chat and smarter coastal planning.
+
+FULL DESCRIPTION (2231/4000)
+CastVector helps coastal anglers decide when to go, what to target, what to throw and how to plan the trip.
+
+Start with a simple fishing answer, then go deeper when you need it. CastVector combines coastal weather, marine conditions, NOAA tide information, observed-ocean context, species intelligence and trip tools in one fishing-focused experience.
+
+KEY TOOLS
+• Quick Answer fishing recommendation
+• Weather, wind, surf and marine forecast
+• NOAA tide planning
+• Ocean Network observed-condition context
+• Species and seasonal intelligence
+• Scout and fishing-spot comparison tools
+• Coast Watch and trip planning
+• Bait, rig and gear guidance
+• Smart alerts and saved trips
+• Private fishing logbook and catch analytics
+• Tackle and shopping tools
+• Community Live fishing chat
+• Family Premium access
+• Offline trip tools where supported
+
+SIMPLE WHEN YOU WANT IT
+CastVector is designed to be easy to understand. The Home screen gives you the fishing move first: whether conditions look promising, the strongest time window, a target species and a bait or lure direction. Advanced tools remain available when you want more detail.
+
+COMMUNITY LIVE
+Signed-in anglers can ask fishing questions, discuss rigs and conditions, and get help using CastVector. Community tools include reporting, blocking and owner moderation. Exact private fishing spots are not automatically attached to chat messages.
+
+CASTVECTOR PREMIUM
+CastVector Free keeps the core experience useful. CastVector Premium unlocks the full set of advanced forecasting, Scout, Coast Watch, species, bait, trip, offline and analytics tools. Premium is planned at $4.99 per month in the United States. Google Play displays the final price, billing period and renewal terms before purchase.
+
+Family members may receive Premium through a CastVector Family Crew entitlement without purchasing a separate subscription. CastVector may also grant complimentary, promotional, beta or lifetime Premium access to selected accounts.
+
+IMPORTANT
+CastVector is a planning tool, not a guarantee of fishing success or safety. Weather, marine conditions, access rules and fishing regulations can change. Check official warnings, local conditions and current regulations before acting.
+

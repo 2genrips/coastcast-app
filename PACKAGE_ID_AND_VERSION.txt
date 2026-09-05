@@ -1,0 +1,10 @@
+CastVector Android
+Package ID: com.castvector.fishing
+Version name: 5.6.0
+Version code: 56000
+Target SDK: 36
+Compile SDK: 36
+Minimum SDK: 26
+Premium subscription product ID: castvector_premium_monthly
+Play Billing Library: 8.3.0
+Web URL: https://2genrips.github.io/cc/

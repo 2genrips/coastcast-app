@@ -1,0 +1,19 @@
+Fill these in before Play submission.
+
+LIVE APP URL
+https://2genrips.github.io/cc/
+
+PRIVACY POLICY URL
+https://2genrips.github.io/cc/privacy.html
+
+TERMS URL
+https://2genrips.github.io/cc/terms.html
+
+SUPPORT URL
+https://2genrips.github.io/cc/support.html
+
+ACCOUNT DELETION URL
+https://2genrips.github.io/cc/delete-account.html
+
+Confirm every URL opens publicly while signed out.
+If your actual GitHub Pages path is not `/cc/`, replace these before submission.

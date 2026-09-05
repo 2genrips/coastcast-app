@@ -1,19 +1,13 @@
-# CastVector native wrapper scaffold
+# Native billing web hook
 
-This is the store-wrapper starting point for Android and iOS. It is NOT the final store binary yet.
+Do not wire the $4.99 purchase button until the Play Console subscription product exists.
 
-Why a native wrapper: CastVector sells digital Premium functionality, so the store builds need native store subscription flows and platform features such as purchase restoration. The existing PWA remains the shared UI/data engine.
+When ready:
+1. Upload `native-billing-hook.js` to the CastVector website.
+2. Add `<script src="native-billing-hook.js"></script>` after `app.js`.
+3. The Premium button should call `CastVectorPlay.buyPremium()`.
+4. Listen for `castvector:premium-verification-needed`.
+5. Send the purchase token to the protected Supabase `verify-play-subscription` Edge Function.
+6. Refresh server access only after the backend confirms the entitlement.
 
-Working identifiers:
-- App/store title: CastVector Fishing Forecast (subject to final name clearance)
-- Android package / iOS bundle ID: com.castvector.fishing
-- Premium product: coastcast_premium_monthly
-
-Before generating native projects:
-1. Lock the final store name and bundle/package ID.
-2. Copy production web assets into native/www, including your existing configured coastcast-config.js.
-3. Install Capacitor dependencies.
-4. Add Android/iOS platforms.
-5. Integrate Google Play Billing and StoreKit. Do not submit a web wrapper that bypasses the platform's required subscription flow.
-
-Android can be built on Windows/Linux/macOS or CI. Final iOS signing/submission requires Apple's toolchain/signing environment (typically macOS/Xcode or a compatible cloud build service).
+The browser must never grant itself Premium.

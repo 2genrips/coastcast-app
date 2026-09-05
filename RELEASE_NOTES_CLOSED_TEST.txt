@@ -1,0 +1,12 @@
+CastVector 5.6 closed-test build
+
+• Nationwide coastal fishing forecasts and NOAA tide planning
+• Ocean Network observed-condition context
+• Species, bait and seasonal intelligence
+• Scout, Coast Watch, Trips and private Logbook
+• Community Live with online count, reporting and owner moderation
+• Server-verified accounts and Premium entitlements
+• Google Play Premium purchase + restore foundation
+• Family, Complimentary and Lifetime Premium entitlement support
+
+Closed-test focus: sign-in, location, live data, Community Live, Premium purchase/restore, family access, trip planning and stability.
