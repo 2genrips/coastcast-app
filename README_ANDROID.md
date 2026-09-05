@@ -1,23 +1,18 @@
-# CastVector v5.4 — Android update
+# CastVector v5.5 — Community Pro + Launch Moderation
 
-## What this build adds
-Community Live: realtime fishing chat, online angler count, channels, replies, reports, blocks and moderation hooks.
+CastVector v5.5 upgrades the working Community Live system without changing your existing Supabase project, Owner account, Lifetime Premium, complimentary users, fishing data, or `coastcast-config.js`.
 
-## Update from v5.3
-1. Download and extract the v5.4 ZIP.
-2. Upload everything inside the `castvector_v5.4_community_live` folder to the root of your existing GitHub repository.
-3. Replace matching files and commit to `main`.
-4. **Do not delete your existing `coastcast-config.js`.** This ZIP intentionally does not contain it.
-5. In Supabase run `CASTVECTOR_COMMUNITY_LIVE_SETUP_ANDROID.txt` using SQL Editor.
-6. Wait for GitHub Pages, fully close CastVector, and reopen it.
+## Existing v5.4 users
+1. Run `CASTVECTOR_COMMUNITY_V5.5_UPGRADE_ANDROID.txt` in Supabase -> SQL Editor.
+2. Upload everything inside this folder to the same GitHub Pages repository and replace matching files.
+3. Keep the existing `coastcast-config.js`; this package intentionally does not include it.
+4. Commit to `main`, wait for Pages, fully close CastVector, and reopen it.
 
-## First test
-- Confirm your Owner account still shows Lifetime Premium.
-- Open Community Live.
-- Save a public chat nickname.
-- Send a General message.
-- On a second signed-in account, open Community Live and confirm the message appears without refreshing.
-- Confirm the online angler count increases.
-- Test Reply, Report and Block.
+## Test
+- Trips should show the Community Live online count.
+- Community should show channel unread badges, typing status, pinned staff messages, Rules, and Safety.
+- Profile -> Owner Console should show Community Moderation for the Owner account.
+- Use two phones/accounts to verify realtime chat, typing, online count, reports, and a temporary mute.
 
-Community chat is open to signed-in Free and Premium users. Premium fishing intelligence remains the paid value proposition.
+## Fresh Community install
+For a Supabase project that never had Community Live installed, run the combined `CASTVECTOR_COMMUNITY_LIVE_SETUP_ANDROID.txt` instead of the smaller upgrade file.

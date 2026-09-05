@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CastVector 5.4.1 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CastVector 5.5 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -16,8 +16,8 @@
   <meta property="og:image" content="brand-emblem.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="styles.css?v=5.4.0" />
-  <link rel="stylesheet" href="chat.css?v=5.4.0" />
-  <title>CastVector 5.4.1</title>
+  <link rel="stylesheet" href="chat.css?v=5.5.0" />
+  <title>CastVector 5.5</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -26,7 +26,7 @@
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>CAST</span><b>VECTOR</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.4.1</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.5</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -1010,8 +1010,10 @@
           <div id="alertRuleList" class="alert-rule-list"><div class="empty-state">No forecast watches yet.</div></div>
         </section>
 
-        <section class="panel community-launch-card">
-          <div><div class="eyebrow">COMMUNITY LIVE</div><h2>Fishing chat, catches & help</h2><p>Ask anglers for tips, talk rigs and conditions, get app help, and see how many anglers are online.</p></div>
+        <section class="panel community-launch-card cv-community-launch-pro">
+          <div><div class="eyebrow">COMMUNITY LIVE</div><h2>Fishing chat, catches & help</h2><p>Ask anglers for tips, talk rigs and conditions, get app help, and see how many anglers are online.</p>
+            <div class="cv-community-mini-row"><span class="cv-mini-live"><i></i><strong id="communityMiniOnlineCount">—</strong> anglers online</span><span id="communityUnreadBadge" class="cv-unread-badge" hidden>0 new</span></div>
+          </div>
           <button id="openCommunityBtn" class="secondary-button" type="button">Open community</button>
         </section>
       </section>
@@ -1266,6 +1268,7 @@
             <div class="cv-chat-profile-row">
               <label class="field-group cv-chat-name-field"><span>Public chat name</span><input id="chatDisplayName" class="text-control" maxlength="32" autocomplete="off" placeholder="Example: SurfCasterNC" /></label>
               <button id="chatSaveNameBtn" class="secondary-button small" type="button">Save name</button>
+              <button id="chatRulesBtn" class="ghost-button small" type="button">Rules</button>
               <button id="chatSafetyBtn" class="ghost-button small" type="button">Safety</button>
             </div>
 
@@ -1277,6 +1280,8 @@
             </div>
 
             <div class="cv-channel-meta"><strong id="chatChannelTitle">General</strong><span id="chatChannelOnline">— online in this channel</span></div>
+            <div id="chatPinned" class="cv-chat-pinned" hidden></div>
+            <div id="chatTypingIndicator" class="cv-typing-indicator" aria-live="polite"></div>
             <div id="chatMessages" class="cv-chat-messages" role="log" aria-live="polite" aria-relevant="additions"></div>
             <button id="chatLoadOlderBtn" class="ghost-button full cv-load-older" type="button">Load older messages</button>
 
@@ -1618,6 +1623,14 @@
       <label class="field-group"><span>Private admin note</span><input id="adminNote" class="text-control" maxlength="160" placeholder="Tester, partner, family friend…" /></label>
       <div class="admin-action-row"><button id="adminGrantBtn" class="primary-button" type="button">Grant Premium</button><button id="adminRevokeBtn" class="danger-button" type="button">Revoke direct Premium</button><button id="adminRefreshBtn" class="secondary-button" type="button">Refresh list</button></div>
       <div id="adminAccessList" class="admin-access-list"><div class="empty-state">Refresh to load CastVector accounts.</div></div>
+      <section id="chatModerationSection" class="cv-moderation-section" hidden>
+        <div class="cv-moderation-head"><div><div class="eyebrow">COMMUNITY MODERATION</div><h3>Reports & chat mutes</h3></div><button id="chatModerationRefreshBtn" class="secondary-button small" type="button">Refresh</button></div>
+        <div class="cv-moderation-stats"><div><strong id="chatOpenReportCount">0</strong><span>OPEN REPORTS</span></div><div><strong id="chatActiveMuteCount">0</strong><span>ACTIVE MUTES</span></div></div>
+        <div class="cv-moderation-subhead">Report queue</div>
+        <div id="chatReportQueue" class="cv-report-queue"><div class="empty-state">No open reports.</div></div>
+        <div class="cv-moderation-subhead">Muted anglers</div>
+        <div id="chatMuteList" class="cv-mute-list"><div class="empty-state">No active chat mutes.</div></div>
+      </section>
       <p class="micro-note">Admin writes go through database RPCs that verify your signed-in account is listed in <code>coastcast_admins</code>. Secret/service-role keys never belong in this browser app.</p>
     </form>
   </dialog>
@@ -1644,6 +1657,23 @@
     </form>
   </dialog>
 
+
+  <!-- COMMUNITY LIVE RULES -->
+  <dialog id="chatRulesDialog" class="sheet-dialog">
+    <form class="sheet-card" method="dialog">
+      <div class="sheet-head"><div><div class="eyebrow">COMMUNITY LIVE</div><h2>Community rules</h2></div><button class="icon-button" value="cancel" aria-label="Close" type="submit">×</button></div>
+      <div class="cv-rules-list">
+        <div><strong>Be useful</strong><span>Fishing tips, rigs, bait, conditions and CastVector help belong here.</span></div>
+        <div><strong>Protect locations</strong><span>Do not post someone else’s private address, exact honey hole or identifying location without permission.</span></div>
+        <div><strong>Keep it respectful</strong><span>No harassment, threats, hate, spam or targeted abuse.</span></div>
+        <div><strong>Keep it legal & safe</strong><span>No instructions for illegal activity or knowingly dangerous fishing advice.</span></div>
+        <div><strong>Moderation applies</strong><span>Messages can be reported, removed, pinned by staff, or lead to temporary/permanent chat restrictions.</span></div>
+      </div>
+      <button id="chatAcceptRulesBtn" class="primary-button full" type="button">I understand — join chat</button>
+      <p class="micro-note">You can read these rules again anytime from Community Live.</p>
+    </form>
+  </dialog>
+
   <!-- SETTINGS DIALOG -->
   <dialog id="settingsDialog" class="sheet-dialog">
     <form class="sheet-card" method="dialog">
@@ -1662,7 +1692,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. CastVector is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CastVector backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">CastVector v5.4.1 is a launch-readiness build. No business database can guarantee 100% completeness, so CastVector shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">CastVector v5.5 is a launch-readiness build. No business database can guarantee 100% completeness, so CastVector shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CastVector data</button>
     </form>
   </dialog>
@@ -1690,8 +1720,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="coastcast-config.js?v=5.4.0"></script>
-  <script src="app.js?v=5.4.0"></script>
-  <script src="chat.js?v=5.4.1"></script>
+  <script src="coastcast-config.js?v=5.5.0"></script>
+  <script src="app.js?v=5.5.0"></script>
+  <script src="chat.js?v=5.5.0"></script>
 </body>
 </html>

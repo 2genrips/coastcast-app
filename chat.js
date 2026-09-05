@@ -1,4 +1,4 @@
-/* CastVector v5.4 — Community Live
+/* CastVector v5.5 — Community Pro
    Real-time text chat + online presence using the user's existing Supabase project.
    Does not store service-role/secret keys in the browser. */
 (() => {
@@ -23,12 +23,20 @@
     blocked: new Set(),
     presenceChannel: null,
     messageChannel: null,
+    notificationChannel: null,
     isAdmin: false,
     backendReady: false,
     loading: false,
     oldest: null,
     hasOlder: true,
     reply: null,
+    pinned: null,
+    unread: { general: 0, tips: 0, conditions: 0, help: 0 },
+    typingUsers: new Map(),
+    typingTimer: null,
+    typingStopTimer: null,
+    rulesAccepted: false,
+    lastSeenWrite: 0,
     initialized: false,
     toastTimer: null
   };
@@ -113,6 +121,72 @@
     return value.length > max ? `${value.slice(0, max - 1)}…` : value;
   }
 
+
+  function communityIsActive() {
+    return !!$('view-community')?.classList.contains('active');
+  }
+
+  function rulesKey() {
+    return `castvector-chat-rules-v1:${state.user?.id || 'guest'}`;
+  }
+
+  function updateRulesState() {
+    try { state.rulesAccepted = localStorage.getItem(rulesKey()) === 'accepted'; }
+    catch (_) { state.rulesAccepted = false; }
+  }
+
+  function totalUnread() {
+    return Object.values(state.unread).reduce((sum, value) => sum + Number(value || 0), 0);
+  }
+
+  function renderUnreadBadges() {
+    document.querySelectorAll('[data-chat-channel]').forEach(btn => {
+      const channel = btn.dataset.chatChannel;
+      let badge = btn.querySelector('.cv-channel-unread');
+      const count = Number(state.unread[channel] || 0);
+      if (!badge && count > 0) {
+        badge = document.createElement('span');
+        badge.className = 'cv-channel-unread';
+        btn.appendChild(badge);
+      }
+      if (badge) {
+        badge.textContent = count > 99 ? '99+' : String(count);
+        badge.hidden = count < 1;
+      }
+    });
+    const total = totalUnread();
+    const badge = $('communityUnreadBadge');
+    if (badge) {
+      badge.hidden = total < 1;
+      badge.textContent = total > 99 ? '99+ new' : `${total} new`;
+    }
+  }
+
+  function markChannelRead(channel = state.channel) {
+    if (!CHANNELS[channel]) return;
+    state.unread[channel] = 0;
+    renderUnreadBadges();
+  }
+
+  function addUnread(channel) {
+    if (!CHANNELS[channel]) return;
+    state.unread[channel] = Math.min(999, Number(state.unread[channel] || 0) + 1);
+    renderUnreadBadges();
+  }
+
+  function relativeUntil(iso) {
+    if (!iso) return 'Permanent';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return 'Active';
+    const ms = d.getTime() - Date.now();
+    if (ms <= 0) return 'Expired';
+    const minutes = Math.ceil(ms / 60000);
+    if (minutes < 60) return `${minutes}m remaining`;
+    const hours = Math.ceil(minutes / 60);
+    if (hours < 48) return `${hours}h remaining`;
+    return `${Math.ceil(hours / 24)}d remaining`;
+  }
+
   async function makeClient() {
     const config = cfg();
     if (!config.supabaseUrl || !config.supabasePublishableKey) {
@@ -145,6 +219,7 @@
       if (error || !data?.session?.user) throw error || new Error('No session');
       state.session = data.session;
       state.user = data.session.user;
+      updateRulesState();
       setAuthUI(true);
       return true;
     } catch (error) {
@@ -176,7 +251,7 @@
     if (!state.backendReady) return;
     const { data, error } = await state.client
       .from('castvector_chat_profiles')
-      .select('user_id, display_name, created_at, updated_at')
+      .select('user_id, display_name, created_at, updated_at, last_seen_at')
       .eq('user_id', state.user.id)
       .maybeSingle();
     if (error) console.warn('[Community Live] profile', error);
@@ -225,8 +300,10 @@
 
   async function checkAdmin() {
     if (!state.client) return;
-    const { data, error } = await state.client.rpc('coastcast_is_admin');
-    state.isAdmin = !error && data === true;
+    let result = await state.client.rpc('castvector_chat_is_admin');
+    if (result.error) result = await state.client.rpc('coastcast_is_admin');
+    state.isAdmin = !result.error && result.data === true;
+    if ($('chatModerationSection')) $('chatModerationSection').hidden = !state.isAdmin;
   }
 
   function renderBlockedList(rows) {
@@ -297,6 +374,7 @@
   }
 
   function renderMessages({ preserveBottom = false } = {}) {
+    renderPinned();
     const list = $('chatMessages');
     if (!list) return;
     const previousHeight = list.scrollHeight;
@@ -320,6 +398,44 @@
     visible.forEach(msg => list.appendChild(buildMessageNode(msg)));
     if (preserveBottom) list.scrollTop = previousTop + (list.scrollHeight - previousHeight);
     else list.scrollTop = list.scrollHeight;
+  }
+
+  function renderPinned() {
+    const box = $('chatPinned');
+    if (!box) return;
+    const pin = state.pinned || state.messages.find(m => m.is_pinned && !m.is_removed) || null;
+    state.pinned = pin;
+    box.replaceChildren();
+    box.hidden = !pin;
+    if (!pin) return;
+    const top = document.createElement('div');
+    top.className = 'pin-top';
+    const label = document.createElement('span');
+    label.className = 'pin-label';
+    label.textContent = '📌 PINNED BY CASTVECTOR';
+    const author = document.createElement('strong');
+    author.textContent = pin.display_name || 'CastVector Staff';
+    top.append(label, author);
+    if (state.isAdmin) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = 'Unpin';
+      btn.addEventListener('click', () => adminPinMessage(pin, false));
+      top.appendChild(btn);
+    }
+    const body = document.createElement('p');
+    body.textContent = pin.body;
+    box.append(top, body);
+  }
+
+  async function loadPinned() {
+    if (!state.backendReady) return;
+    const { data, error } = await state.client.from('castvector_chat_messages')
+      .select('id,user_id,display_name,author_badge,channel,body,reply_to,is_pinned,created_at')
+      .eq('channel', state.channel).eq('is_removed', false).eq('is_pinned', true)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle();
+    if (!error) state.pinned = data || null;
+    renderPinned();
   }
 
   function buildMessageNode(msg) {
@@ -389,10 +505,20 @@
       blockBtn.addEventListener('click', () => blockUser(msg));
       actions.append(reportBtn, blockBtn);
       if (state.isAdmin) {
+        const pinBtn = document.createElement('button');
+        const currentlyPinned = state.pinned?.id === msg.id || msg.is_pinned === true;
+        pinBtn.type = 'button'; pinBtn.textContent = currentlyPinned ? 'Unpin' : 'Pin';
+        pinBtn.className = 'cv-pin-action';
+        pinBtn.addEventListener('click', () => adminPinMessage(msg, !currentlyPinned));
+        const muteBtn = document.createElement('button');
+        muteBtn.type = 'button'; muteBtn.textContent = 'Mute';
+        muteBtn.className = 'cv-danger-action';
+        muteBtn.addEventListener('click', () => adminMuteUser(msg));
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button'; removeBtn.textContent = 'Remove';
+        removeBtn.className = 'cv-danger-action';
         removeBtn.addEventListener('click', () => adminRemoveMessage(msg));
-        actions.appendChild(removeBtn);
+        actions.append(pinBtn, muteBtn, removeBtn);
       }
     }
 
@@ -417,6 +543,7 @@
   async function sendMessage(event) {
     event?.preventDefault?.();
     if (!state.backendReady || !state.user) return;
+    if (!state.rulesAccepted) { $('chatRulesDialog')?.showModal(); return; }
     const input = $('chatMessageInput');
     const body = String(input?.value || '').trim();
     if (!body) return;
@@ -443,7 +570,7 @@
     if (error) {
       console.warn('[Community Live] send', error);
       const text = String(error.message || '').toLowerCase();
-      showToast(text.includes('slow down') ? 'Slow down a little before sending again.' : 'Message could not be sent.');
+      showToast(text.includes('slow down') ? 'Slow down a little before sending again.' : text.includes('restricted') ? 'Your Community Live posting access is currently restricted.' : 'Message could not be sent.');
       return;
     }
     input.value = '';
@@ -515,6 +642,127 @@
     showToast('Message removed.');
   }
 
+  async function adminPinMessage(msg, shouldPin = true) {
+    if (!state.isAdmin) return;
+    const { error } = await state.client.rpc('castvector_chat_pin_message', { p_message_id: msg.id, p_pin: !!shouldPin });
+    if (error) return showToast('Could not update pinned message. Run the v5.5 Community upgrade SQL first.');
+    state.messages = state.messages.map(m => ({ ...m, is_pinned: m.channel === msg.channel ? (m.id === msg.id ? !!shouldPin : false) : m.is_pinned }));
+    state.pinned = shouldPin ? { ...msg, is_pinned: true } : null;
+    renderMessages({ preserveBottom: true });
+    showToast(shouldPin ? 'Message pinned for this channel.' : 'Pinned message removed.');
+  }
+
+  async function adminMuteUser(msg, presetMinutes = null) {
+    if (!state.isAdmin || !msg?.user_id) return;
+    let minutes = presetMinutes;
+    if (minutes === null) {
+      const raw = window.prompt(`Mute ${msg.display_name} from posting for how many minutes?\n60 = 1 hour • 1440 = 1 day • 10080 = 7 days • 0 = permanent`, '1440');
+      if (raw === null) return;
+      minutes = Math.max(0, Math.min(525600, Number.parseInt(raw, 10) || 0));
+    }
+    const reason = window.prompt('Reason for chat restriction', 'Community rule violation');
+    if (reason === null) return;
+    const { error } = await state.client.rpc('castvector_chat_ban_user', { p_user_id: msg.user_id, p_minutes: minutes, p_reason: String(reason || '').slice(0, 200) });
+    if (error) return showToast('Could not restrict this angler.');
+    showToast(minutes > 0 ? `${msg.display_name} muted from posting.` : `${msg.display_name} permanently muted.`);
+    await loadModeration();
+  }
+
+  async function loadModeration() {
+    if (!state.isAdmin || !state.client) return;
+    if ($('chatModerationSection')) $('chatModerationSection').hidden = false;
+    const [reportsResult, bansResult] = await Promise.all([
+      state.client.rpc('castvector_chat_admin_reports'),
+      state.client.rpc('castvector_chat_admin_bans')
+    ]);
+    if (reportsResult.error || bansResult.error) {
+      renderModerationUpgradeNeeded();
+      return;
+    }
+    const reports = Array.isArray(reportsResult.data) ? reportsResult.data : [];
+    const bans = Array.isArray(bansResult.data) ? bansResult.data : [];
+    if ($('chatOpenReportCount')) $('chatOpenReportCount').textContent = String(reports.filter(r => r.status === 'open').length);
+    if ($('chatActiveMuteCount')) $('chatActiveMuteCount').textContent = String(bans.length);
+    renderReportQueue(reports);
+    renderMuteList(bans);
+  }
+
+  function renderModerationUpgradeNeeded() {
+    const text = 'Run CASTVECTOR_COMMUNITY_V5.5_UPGRADE_ANDROID.txt in Supabase to activate the moderation dashboard.';
+    if ($('chatReportQueue')) $('chatReportQueue').innerHTML = `<div class="empty-state">${text}</div>`;
+    if ($('chatMuteList')) $('chatMuteList').innerHTML = '<div class="empty-state">Community v5.5 upgrade required.</div>';
+  }
+
+  function renderReportQueue(rows) {
+    const box = $('chatReportQueue');
+    if (!box) return;
+    box.replaceChildren();
+    const openRows = rows.filter(row => row.status === 'open' || row.status === 'reviewed');
+    if (!openRows.length) {
+      const empty = document.createElement('div'); empty.className = 'empty-state'; empty.textContent = 'No open reports.'; box.appendChild(empty); return;
+    }
+    openRows.forEach(row => {
+      const card = document.createElement('div'); card.className = 'cv-report-card';
+      const title = document.createElement('strong'); title.textContent = row.reported_display_name || 'Reported angler';
+      const body = document.createElement('p'); body.textContent = row.message_body ? `“${safeSnippet(row.message_body, 180)}”` : 'Reported message is unavailable.';
+      const meta = document.createElement('small'); meta.textContent = `${CHANNELS[row.channel] || row.channel || 'Chat'} • ${timeLabel(row.created_at)} • ${row.details || 'No details provided'}`;
+      const actions = document.createElement('div'); actions.className = 'cv-mod-actions';
+      const remove = document.createElement('button'); remove.type='button'; remove.className='danger-button'; remove.textContent='Remove message'; remove.addEventListener('click', async () => {
+        if (row.message_id) await state.client.rpc('castvector_chat_remove_message', { p_message_id: row.message_id, p_reason: 'Removed from report queue' });
+        await resolveReport(row.id, 'actioned');
+      });
+      const mute = document.createElement('button'); mute.type='button'; mute.className='secondary-button'; mute.textContent='Mute 24h'; mute.addEventListener('click', async () => {
+        const fake = { user_id: row.reported_user_id, display_name: row.reported_display_name || 'Angler' };
+        const { error } = await state.client.rpc('castvector_chat_ban_user', { p_user_id: fake.user_id, p_minutes: 1440, p_reason: '24h mute from report queue' });
+        if (error) return showToast('Could not mute angler.');
+        await resolveReport(row.id, 'actioned');
+      });
+      const dismiss = document.createElement('button'); dismiss.type='button'; dismiss.className='ghost-button'; dismiss.textContent='Dismiss'; dismiss.addEventListener('click', () => resolveReport(row.id, 'dismissed'));
+      actions.append(remove, mute, dismiss); card.append(title, body, meta, actions); box.appendChild(card);
+    });
+  }
+
+  function renderMuteList(rows) {
+    const box = $('chatMuteList');
+    if (!box) return;
+    box.replaceChildren();
+    if (!rows.length) {
+      const empty = document.createElement('div'); empty.className='empty-state'; empty.textContent='No active chat mutes.'; box.appendChild(empty); return;
+    }
+    rows.forEach(row => {
+      const card = document.createElement('div'); card.className='cv-mute-card';
+      const title = document.createElement('strong'); title.textContent = row.display_name || 'Restricted angler';
+      const detail = document.createElement('p'); detail.textContent = row.reason || 'Chat restriction';
+      const meta = document.createElement('small'); meta.textContent = relativeUntil(row.banned_until);
+      const actions = document.createElement('div'); actions.className='cv-mod-actions';
+      const unmute = document.createElement('button'); unmute.type='button'; unmute.className='secondary-button'; unmute.textContent='Unmute'; unmute.addEventListener('click', async () => {
+        const { error } = await state.client.rpc('castvector_chat_unban_user', { p_user_id: row.user_id });
+        if (error) return showToast('Could not remove chat restriction.');
+        showToast('Chat restriction removed.'); await loadModeration();
+      });
+      actions.appendChild(unmute); card.append(title, detail, meta, actions); box.appendChild(card);
+    });
+  }
+
+  async function resolveReport(reportId, status) {
+    const { error } = await state.client.rpc('castvector_chat_resolve_report', { p_report_id: reportId, p_status: status });
+    if (error) return showToast('Could not update report.');
+    showToast(status === 'dismissed' ? 'Report dismissed.' : 'Report action recorded.');
+    await loadModeration();
+  }
+
+  async function subscribeNotifications() {
+    if (!state.client || !state.backendReady || state.notificationChannel) return;
+    state.notificationChannel = state.client.channel(`castvector-chat-notify-${Math.random().toString(36).slice(2,7)}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'castvector_chat_messages' }, payload => {
+        const msg = payload.new;
+        if (!msg?.id || msg.user_id === state.user?.id || msg.is_removed) return;
+        const activeHere = communityIsActive() && msg.channel === state.channel && document.visibilityState === 'visible';
+        if (!activeHere) addUnread(msg.channel);
+      })
+      .subscribe();
+  }
+
   async function subscribeMessages() {
     if (!state.client || !state.backendReady) return;
     if (state.messageChannel) {
@@ -529,12 +777,16 @@
           const msg = payload.new;
           if (!msg?.id || msg.is_removed || state.messages.some(m => m.id === msg.id)) return;
           state.messages.push(msg);
+          if (msg.is_pinned) state.pinned = msg;
           if (state.messages.length > 160) state.messages = state.messages.slice(-160);
           renderMessages();
         } else if (payload.eventType === 'UPDATE') {
           const msg = payload.new;
-          if (msg?.is_removed) state.messages = state.messages.filter(m => m.id !== msg.id);
-          else state.messages = state.messages.map(m => m.id === msg.id ? msg : m);
+          if (msg?.is_removed) { state.messages = state.messages.filter(m => m.id !== msg.id); if (state.pinned?.id === msg.id) state.pinned = null; }
+          else {
+            state.messages = state.messages.map(m => m.id === msg.id ? msg : m);
+            if (msg.is_pinned) state.pinned = msg; else if (state.pinned?.id === msg.id) state.pinned = null;
+          }
           renderMessages({ preserveBottom: true });
         } else if (payload.eventType === 'DELETE') {
           state.messages = state.messages.filter(m => m.id !== payload.old?.id);
@@ -559,6 +811,7 @@
       .on('presence', { event: 'sync' }, updatePresenceCounts)
       .on('presence', { event: 'join' }, updatePresenceCounts)
       .on('presence', { event: 'leave' }, updatePresenceCounts)
+      .on('broadcast', { event: 'typing' }, ({ payload }) => handleTypingBroadcast(payload))
       .subscribe(async status => {
         if (status === 'SUBSCRIBED') await trackPresence();
       });
@@ -573,6 +826,39 @@
       online_at: new Date().toISOString()
     };
     try { await state.presenceChannel.track(payload); } catch (_) {}
+    if (state.backendReady && Date.now() - state.lastSeenWrite > 60000) {
+      state.lastSeenWrite = Date.now();
+      state.client.from('castvector_chat_profiles').update({ last_seen_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq('user_id', state.user.id).then(() => {}).catch(() => {});
+    }
+  }
+
+  function handleTypingBroadcast(payload) {
+    if (!payload || payload.user_id === state.user?.id) return;
+    if (payload.channel !== state.channel) return;
+    if (payload.typing) state.typingUsers.set(payload.user_id, { name: cleanName(payload.display_name) || 'An angler', expires: Date.now() + 3500 });
+    else state.typingUsers.delete(payload.user_id);
+    renderTypingIndicator();
+  }
+
+  function renderTypingIndicator() {
+    const el = $('chatTypingIndicator');
+    if (!el) return;
+    const now = Date.now();
+    for (const [id, item] of state.typingUsers.entries()) if (item.expires <= now) state.typingUsers.delete(id);
+    const names = [...state.typingUsers.values()].map(item => item.name);
+    el.textContent = names.length === 1 ? `${names[0]} is typing…` : names.length === 2 ? `${names[0]} and ${names[1]} are typing…` : names.length > 2 ? `${names.length} anglers are typing…` : '';
+  }
+
+  function emitTyping() {
+    if (!state.presenceChannel || !state.user) return;
+    clearTimeout(state.typingTimer);
+    clearTimeout(state.typingStopTimer);
+    const payload = { user_id: state.user.id, display_name: cleanName(state.profile?.display_name || $('chatDisplayName')?.value || generatedName()), channel: state.channel, typing: true };
+    state.presenceChannel.send({ type: 'broadcast', event: 'typing', payload }).catch(() => {});
+    state.typingStopTimer = setTimeout(() => {
+      state.presenceChannel?.send({ type: 'broadcast', event: 'typing', payload: { ...payload, typing: false } }).catch(() => {});
+    }, 1800);
+    state.typingTimer = setTimeout(renderTypingIndicator, 3600);
   }
 
   function updatePresenceCounts() {
@@ -583,7 +869,9 @@
       const metas = Array.isArray(presence[id]) ? presence[id] : [];
       if (metas.some(meta => meta.channel === state.channel)) inChannel += 1;
     });
-    if ($('chatOnlineCount')) $('chatOnlineCount').textContent = String(userIds.length || 1);
+    const total = userIds.length || (state.user ? 1 : 0);
+    if ($('chatOnlineCount')) $('chatOnlineCount').textContent = String(total);
+    if ($('communityMiniOnlineCount')) $('communityMiniOnlineCount').textContent = String(total);
     if ($('chatChannelOnline')) $('chatChannelOnline').textContent = `${inChannel || (state.user ? 1 : 0)} online in this channel`;
   }
 
@@ -594,12 +882,15 @@
     state.oldest = null;
     state.hasOlder = true;
     cancelReply();
+    state.typingUsers.clear();
+    renderTypingIndicator();
+    markChannelRead(channel);
     document.querySelectorAll('[data-chat-channel]').forEach(btn => btn.classList.toggle('active', btn.dataset.chatChannel === channel));
     if ($('chatChannelTitle')) $('chatChannelTitle').textContent = CHANNELS[channel];
     if ($('chatMessages')) $('chatMessages').innerHTML = '<div class="cv-chat-empty"><div><strong>Loading live chat…</strong><span>One moment.</span></div></div>';
     await trackPresence();
     updatePresenceCounts();
-    await loadMessages();
+    await Promise.all([loadMessages(), loadPinned()]);
     await subscribeMessages();
   }
 
@@ -617,9 +908,12 @@
     }
     if (!await checkBackend()) return;
     await Promise.all([loadProfile(), loadBlocks(), checkAdmin()]);
-    await loadMessages();
+    await Promise.all([loadMessages(), loadPinned()]);
     await subscribeMessages();
+    await subscribeNotifications();
     if (!state.presenceChannel) await subscribePresence(); else await trackPresence();
+    if (state.isAdmin) await loadModeration();
+    if (communityIsActive()) markChannelRead();
     updatePresenceCounts();
   }
 
@@ -627,20 +921,30 @@
     $('chatOpenProfileBtn')?.addEventListener('click', () => $('profileBtn')?.click());
     $('chatSaveNameBtn')?.addEventListener('click', () => saveProfile(false));
     $('chatSafetyBtn')?.addEventListener('click', () => $('chatSafetyDialog')?.showModal());
+    $('chatRulesBtn')?.addEventListener('click', () => $('chatRulesDialog')?.showModal());
+    $('chatAcceptRulesBtn')?.addEventListener('click', () => {
+      try { localStorage.setItem(rulesKey(), 'accepted'); } catch (_) {}
+      state.rulesAccepted = true;
+      $('chatRulesDialog')?.close();
+      showToast('Community rules accepted.');
+    });
     $('chatComposer')?.addEventListener('submit', sendMessage);
-    $('chatMessageInput')?.addEventListener('input', updateCharCount);
+    $('chatMessageInput')?.addEventListener('input', () => { updateCharCount(); emitTyping(); });
     $('chatCancelReplyBtn')?.addEventListener('click', cancelReply);
     $('chatLoadOlderBtn')?.addEventListener('click', () => loadMessages({ older: true }));
     document.querySelectorAll('[data-chat-channel]').forEach(btn => btn.addEventListener('click', () => switchChannel(btn.dataset.chatChannel)));
     $('communityRefreshBtn')?.addEventListener('click', () => setTimeout(refreshAll, 0));
+    $('chatModerationRefreshBtn')?.addEventListener('click', loadModeration);
+    $('openAdminConsoleBtn')?.addEventListener('click', () => setTimeout(loadModeration, 250));
+    $('adminRefreshBtn')?.addEventListener('click', () => setTimeout(loadModeration, 150));
 
     // When the user returns from Profile after signing in/out, refresh the chat state.
-    $('openCommunityBtn')?.addEventListener('click', () => setTimeout(refreshAll, 250));
+    $('openCommunityBtn')?.addEventListener('click', () => { markChannelRead(); setTimeout(refreshAll, 250); });
     window.addEventListener('focus', () => {
-      if (document.visibilityState === 'visible') setTimeout(refreshAll, 250);
+      if (document.visibilityState === 'visible') { if (communityIsActive()) markChannelRead(); setTimeout(refreshAll, 250); }
     });
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') setTimeout(refreshAll, 250);
+      if (document.visibilityState === 'visible') { if (communityIsActive()) markChannelRead(); setTimeout(refreshAll, 250); }
     });
   }
 
@@ -653,9 +957,12 @@
     if (!ok) return;
     if (!await checkBackend()) return;
     await Promise.all([loadProfile(), loadBlocks(), checkAdmin()]);
-    await loadMessages();
+    await Promise.all([loadMessages(), loadPinned()]);
     await subscribeMessages();
+    await subscribeNotifications();
     await subscribePresence();
+    if (state.isAdmin) await loadModeration();
+    renderUnreadBadges();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
