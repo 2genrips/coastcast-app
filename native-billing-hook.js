@@ -18,6 +18,22 @@
     }
   };
 
+  function syncAccountButtonLabel() {
+    const button = document.getElementById('cloudSetupBtn');
+    if (!button) return;
+    const cv = app();
+    const signedIn = !!cv?.cloudSignedIn?.();
+    button.textContent = signedIn ? 'Manage account' : 'Sign in / create account';
+  }
+
+  function watchAccountState() {
+    syncAccountButtonLabel();
+    const target = document.getElementById('serverAccessSummary') || document.getElementById('serverAccessBadge');
+    if (!target || typeof MutationObserver === 'undefined') return;
+    const observer = new MutationObserver(syncAccountButtonLabel);
+    observer.observe(target, {subtree:true, childList:true, characterData:true, attributes:true});
+  }
+
   async function verifyPurchase(detail) {
     const cv = app();
     if (!cv || !detail?.purchaseToken) return;
@@ -53,6 +69,7 @@
 
       await cv.refreshServerAccess?.({quiet:true});
       cv.updateStoreBillingUI?.({status:'ready'});
+      syncAccountButtonLabel();
       cv.showToast?.(body.premium ? 'CastVector Premium is active.' : 'Purchase verified, but Premium is not active yet.');
     } catch (err) {
       cv.showToast?.(err?.message || 'Could not verify Google Play purchase.');
@@ -71,7 +88,18 @@
 
   window.addEventListener('castvector:native-ready', () => {
     app()?.updateStoreBillingUI?.({status:'connecting'});
+    syncAccountButtonLabel();
   });
 
-  setTimeout(() => app()?.updateStoreBillingUI?.({status: window.CastVectorPlay.available() ? 'connecting' : 'web'}), 250);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', watchAccountState, {once:true});
+  } else {
+    watchAccountState();
+  }
+
+  setTimeout(() => {
+    app()?.updateStoreBillingUI?.({status: window.CastVectorPlay.available() ? 'connecting' : 'web'});
+    syncAccountButtonLabel();
+  }, 250);
+  setTimeout(syncAccountButtonLabel, 1200);
 })();
