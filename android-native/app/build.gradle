@@ -10,7 +10,7 @@ if (localPropsFile.exists()) {
     localPropsFile.withInputStream { localProps.load(it) }
 }
 
-def cvWebUrl = providers.gradleProperty("CASTVECTOR_WEB_URL").orElse("https://2genrips.github.io/cc/").get()
+def cvWebUrl = providers.gradleProperty("CASTVECTOR_WEB_URL").orElse("https://2genrips.github.io/coastcast-app/").get()
 def premiumProductId = providers.gradleProperty("CASTVECTOR_PREMIUM_PRODUCT_ID").orElse("castvector_premium_monthly").get()
 
 android {
