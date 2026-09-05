@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
     const {purchaseToken}=await req.json();
     if(!purchaseToken || typeof purchaseToken!=='string') throw new Error('purchaseToken required');
     const packageName=Deno.env.get('GOOGLE_PLAY_PACKAGE_NAME')!;
-    const expectedProduct=Deno.env.get('COASTCAST_PREMIUM_PRODUCT_ID') || 'coastcast_premium_monthly';
+    const expectedProduct=Deno.env.get('CASTVECTOR_PREMIUM_PRODUCT_ID') || Deno.env.get('COASTCAST_PREMIUM_PRODUCT_ID') || 'castvector_premium_monthly';
     const sa=JSON.parse(Deno.env.get('GOOGLE_SERVICE_ACCOUNT_JSON') || '{}');
     if(!packageName || !sa.client_email || !sa.private_key) throw new Error('Google Play backend secrets are not configured');
 
@@ -97,6 +97,15 @@ Deno.serve(async (req) => {
       });
       if(error) throw error;
       await admin.from('coastcast_entitlement_audit').insert({user_id:userData.user.id,action:'play_verify',access_level:'premium',source:'play',expires_at:expiry,note:state});
+      if(String(sub.acknowledgementState||'')==='ACKNOWLEDGEMENT_STATE_PENDING'){
+        const ackUrl=`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(packageName)}/purchases/subscriptions/${encodeURIComponent(expectedProduct)}/tokens/${encodeURIComponent(purchaseToken)}:acknowledge`;
+        const ackRes=await fetch(ackUrl,{method:'POST',headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json'},body:'{}'});
+        if(!ackRes.ok){
+          let ackBody:any={};try{ackBody=await ackRes.json();}catch(_){}
+          throw new Error(ackBody?.error?.message || 'Google Play acknowledgement failed');
+        }
+      }
+
     } else {
       await admin.from('coastcast_entitlements').update({status:'expired',updated_at:new Date().toISOString(),note:`Google Play: ${state}`}).eq('user_id',userData.user.id).eq('source','play');
     }

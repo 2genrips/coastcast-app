@@ -1,5 +1,5 @@
-const CACHE='castvector-v5.3.0';
-const CORE=['./','./index.html','./styles.css?v=5.3.0','./app.js?v=5.3.0','./manifest.webmanifest','./coastcast-config.js?v=5.3.0','./icon-192.png','./icon-512.png','./icon-192-v53.png','./icon-512-v53.png','./apple-touch-icon.png','./favicon-32.png','./brand-emblem.png','./brand-watermark.png','./privacy.html','./terms.html','./support.html','./delete-account.html'];
+const CACHE='castvector-v5.6.0';
+const CORE=['./','./index.html','./styles.css?v=5.6.0','./app.js?v=5.6.0','./chat.css?v=5.6.0','./chat.js?v=5.6.0','./native-billing-hook.js?v=5.6.0','./manifest.webmanifest','./coastcast-config.js?v=5.6.0','./icon-192.png','./icon-512.png','./icon-192-v56.png','./icon-512-v56.png','./apple-touch-icon.png','./favicon-32.png','./brand-emblem.png','./brand-watermark.png','./privacy.html','./terms.html','./support.html','./delete-account.html'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
 });
@@ -20,7 +20,7 @@ self.addEventListener('fetch',event=>{
 self.addEventListener('push',event=>{
   let payload={title:'CastVector fishing alert',body:'A saved fishing watch has an update.',url:'./index.html#trips'};
   try{const incoming=event.data?.json();if(incoming)payload={...payload,...incoming};}catch(_){try{payload.body=event.data?.text()||payload.body;}catch(__){}}
-  event.waitUntil(self.registration.showNotification(payload.title,{body:payload.body,icon:'./icon-192-v53.png',badge:'./favicon-32.png',data:{url:payload.url||'./index.html#trips'},tag:payload.tag||'castvector-alert'}));
+  event.waitUntil(self.registration.showNotification(payload.title,{body:payload.body,icon:'./icon-192-v56.png',badge:'./favicon-32.png',data:{url:payload.url||'./index.html#trips'},tag:payload.tag||'castvector-alert'}));
 });
 self.addEventListener('notificationclick',event=>{
   event.notification.close();const target=event.notification?.data?.url||'./index.html#trips';

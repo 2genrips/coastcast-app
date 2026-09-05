@@ -361,6 +361,8 @@
       this.$('quickDetailsBtn')?.addEventListener('click',()=>this.setExperienceMode('full',true));
       this.$('quickSimpleBtn')?.addEventListener('click',()=>this.setExperienceMode(this.state.experience?.mode==='simple'?'full':'simple',true));
       this.$('manageMembershipBtn')?.addEventListener('click',()=>this.openMembershipDialog());
+      this.$('buyPremiumBtn')?.addEventListener('click',()=>this.startPremiumPurchase());
+      this.$('restorePremiumBtn')?.addEventListener('click',()=>this.restorePremiumPurchase());
       this.$('applyMembershipPreviewBtn')?.addEventListener('click',()=>this.applyMembershipPreview());
       this.$('seasonCalendarShortcutBtn')?.addEventListener('click',()=>{this.navigate('forecast');setTimeout(()=>this.$('seasonCalendarPanel')?.scrollIntoView({behavior:'smooth',block:'start'}),120);});
       this.$('seasonCalendarGrid')?.addEventListener('click',e=>this.handleSeasonCalendarClick(e));
@@ -1440,6 +1442,42 @@
       return map[preview]||map.premium;
     },
 
+    nativeBillingAvailable(){return !!(window.CastVectorPlay&&typeof window.CastVectorPlay.available==='function'&&window.CastVectorPlay.available());},
+
+    updateStoreBillingUI(status={}){
+      const cfg=window.COASTCAST_CONFIG||{},btn=this.$('buyPremiumBtn'),restore=this.$('restorePremiumBtn'),copy=this.$('storePurchaseStatus');
+      const price=status.price||cfg.premiumMonthlyPrice||'$4.99';
+      if(btn)btn.textContent=`Start Premium — ${price}/month`;
+      if(this.hasPremium()){
+        if(btn){btn.disabled=true;btn.textContent='Premium active';}
+        if(copy)copy.textContent='This account already has server-verified Premium access.';
+        if(restore)restore.disabled=false;
+        return;
+      }
+      if(this.nativeBillingAvailable()){
+        if(btn)btn.disabled=false;
+        if(restore)restore.disabled=false;
+        if(copy)copy.textContent=status.status==='ready'?'Google Play Billing is ready. Purchase access is verified by the CastVector server.':'Google Play Billing is connecting…';
+      }else{
+        if(btn)btn.disabled=false;
+        if(restore)restore.disabled=false;
+        if(copy)copy.textContent='Premium checkout is available inside the CastVector Google Play / App Store build. Your web/PWA account can still receive Family, Complimentary or Lifetime Premium.';
+      }
+    },
+
+    startPremiumPurchase(){
+      if(this.hasPremium()){this.showToast('Premium is already active on this account.');return;}
+      if(!this.cloudSignedIn()){this.showToast('Sign in to your CastVector account before purchasing Premium.');this.openCloudSetup();return;}
+      if(this.nativeBillingAvailable()){try{window.CastVectorPlay.buyPremium();this.showToast('Opening Google Play checkout…');}catch(err){this.showToast(err?.message||'Could not start store checkout.');}}
+      else this.showToast('Premium checkout will be available in the CastVector store app.');
+    },
+
+    restorePremiumPurchase(){
+      if(!this.cloudSignedIn()){this.showToast('Sign in to your CastVector account before restoring a purchase.');this.openCloudSetup();return;}
+      if(this.nativeBillingAvailable()){try{window.CastVectorPlay.restore();this.showToast('Checking Google Play purchases…');}catch(err){this.showToast(err?.message||'Could not restore purchases.');}}
+      else this.showToast('Purchase restore is available in the CastVector store app.');
+    },
+
     hasPremium(){return !!this.membershipSnapshot().premium;},
 
     openMembershipDialog(){
@@ -1475,6 +1513,7 @@
         this.$('serverAccessSummary').innerHTML=this.cloudSignedIn()?`<strong>${this.escape(email||'Signed in')}</strong><span>${this.state.backend?.installed?`${this.escape(snap.source)} • ${snap.premium?'Premium active':'Free access'}`:'Account connected. Install the v5 launch backend to turn on server-verified access.'}</span>`:`<strong>No CastVector account connected</strong><span>Sign in to activate server-verified Premium, family and complimentary access.</span>`;
       }
       if(this.$('openAdminConsoleBtn'))this.$('openAdminConsoleBtn').hidden=!this.state.backend?.isAdmin;
+      this.updateStoreBillingUI();
     },
 
     async refreshSessionIfNeeded(){
@@ -3058,7 +3097,7 @@
     },
 
     backupPayload(){
-      return {format:'castvector-backup',version:'5.3.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt}};
+      return {format:'castvector-backup',version:'5.6.0',exportedAt:new Date().toISOString(),appState:{location:this.state.location,live:this.state.live,radius:this.state.radius,tackleRadius:this.state.tackleRadius,fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,waypoints:this.state.waypoints,catches:this.state.catches,trips:this.state.trips,savedTripPlans:this.state.savedTripPlans,alertRules:this.state.alertRules,profile:this.state.profile,scout:this.state.scout,goMode:this.state.goMode,gearPlan:this.state.gearPlan,departure:this.state.departure,regChecks:this.state.regChecks,tackleBox:this.state.tackleBox,shoppingList:this.state.shoppingList,offlinePacks:this.state.offlinePacks,community:this.state.community,command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt}};
     },
 
     exportBackup(){

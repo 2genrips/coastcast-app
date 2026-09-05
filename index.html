@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CastVector 5.5.1 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CastVector 5.6 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -15,9 +15,9 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="brand-emblem.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=5.4.0" />
-  <link rel="stylesheet" href="chat.css?v=5.5.1" />
-  <title>CastVector 5.5.1</title>
+  <link rel="stylesheet" href="styles.css?v=5.6.0" />
+  <link rel="stylesheet" href="chat.css?v=5.6.0" />
+  <title>CastVector 5.6</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -26,7 +26,7 @@
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>CAST</span><b>VECTOR</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.5.1</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.6</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -1587,6 +1587,19 @@
         <article class="plan-card"><div><span>FAMILY</span><strong>Premium through family</strong></div><p>An invited family member receives the same Premium entitlement without buying another subscription.</p></article>
         <article class="plan-card"><div><span>COMPLIMENTARY</span><strong>Owner-granted Premium</strong></div><p>You can grant selected testers, partners, creators, friends or family Premium with an expiration date or lifetime access—without requiring payment.</p></article>
       </div>
+
+      <div id="storePurchaseBlock" class="store-purchase-block">
+        <div class="store-purchase-copy">
+          <span class="eyebrow">STORE BILLING</span>
+          <strong id="storePurchaseTitle">CastVector Premium</strong>
+          <p id="storePurchaseStatus">In the Google Play build, Premium purchases and restores are verified by the CastVector server before access is granted.</p>
+        </div>
+        <div class="store-purchase-actions">
+          <button id="buyPremiumBtn" class="primary-button" type="button">Start Premium — $4.99/month</button>
+          <button id="restorePremiumBtn" class="secondary-button" type="button">Restore purchase</button>
+        </div>
+      </div>
+
       <div class="beta-entitlement-preview" id="membershipPreviewBlock">
         <strong>Beta entitlement preview</strong>
         <p>Use this only to test how Free/Premium access will look. Public launch access will be verified by the CastVector backend and store billing—not trusted from this device.</p>
@@ -1691,7 +1704,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. CastVector is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CastVector backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">CastVector v5.5 is a launch-readiness build. No business database can guarantee 100% completeness, so CastVector shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">CastVector v5.6 is the first store-launch candidate. No business database can guarantee 100% completeness, so CastVector shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CastVector data</button>
     </form>
   </dialog>
@@ -1719,8 +1732,9 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="coastcast-config.js?v=5.5.1"></script>
-  <script src="app.js?v=5.5.1"></script>
-  <script src="chat.js?v=5.5.1"></script>
+  <script src="coastcast-config.js?v=5.6.0"></script>
+  <script src="app.js?v=5.6.0"></script>
+  <script src="chat.js?v=5.6.0"></script>
+  <script src="native-billing-hook.js?v=5.6.0"></script>
 </body>
 </html>

@@ -505,3 +505,10 @@ body::before{background-image:url("brand-watermark.png");background-size:min(76v
 /* CastVector v5.3 public rename */
 .brand-name{font-size:18px!important;letter-spacing:.075em!important;white-space:nowrap}
 @media(max-width:390px){.brand-name{font-size:16px!important;letter-spacing:.055em!important}.brand-kicker{letter-spacing:.24em!important}}
+
+
+/* v5.6 store launch candidate */
+.store-purchase-block{margin:14px 0;padding:14px;border:1px solid rgba(79,223,181,.28);border-radius:16px;background:linear-gradient(135deg,rgba(20,77,94,.36),rgba(7,25,40,.72));display:grid;gap:12px}
+.store-purchase-copy{display:grid;gap:5px}.store-purchase-copy strong{font-size:18px}.store-purchase-copy p{font-size:12px;line-height:1.45;color:var(--muted)}
+.store-purchase-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.store-purchase-actions button:disabled{opacity:.65;cursor:not-allowed}
+@media(max-width:540px){.store-purchase-actions{grid-template-columns:1fr}}
