@@ -47,7 +47,7 @@
         if (!raw || raw.length < 30) continue;
         let parsed;
         try { parsed = JSON.parse(raw); } catch { continue; }
-        const candidates = [parsed, parsed?.currentSession, parsed?.session, parsed?.data?.session].filter(Boolean);
+        const candidates = [parsed, parsed?.currentSession, parsed?.session, parsed?.data?.session, parsed?.cloud?.session].filter(Boolean);
         for (const item of candidates) {
           if (item?.access_token && item?.refresh_token && item?.user?.id) {
             if (!best || Number(item.expires_at || 0) > Number(best.expires_at || 0)) best = item;
