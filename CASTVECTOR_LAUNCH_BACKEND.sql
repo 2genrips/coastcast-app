@@ -289,7 +289,7 @@ as $$
 begin
   if not public.coastcast_is_admin() then raise exception 'Admin access required'; end if;
   return query
-  select u.id,u.email,coalesce(e.access_level,'free'),coalesce(e.source,'free'),coalesce(e.status,'active'),e.expires_at,e.note
+  select u.id,u.email::text,coalesce(e.access_level,'free')::text,coalesce(e.source,'free')::text,coalesce(e.status,'active')::text,e.expires_at,e.note::text
   from auth.users u left join public.coastcast_entitlements e on e.user_id=u.id
   order by u.created_at desc limit greatest(1,least(coalesce(p_limit,50),200));
 end;
