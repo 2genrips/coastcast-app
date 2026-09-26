@@ -34,7 +34,7 @@
       watchCenter: {running:false,results:[],lastRun:null,species:'Red Drum'},
       oceanNetwork: {status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null},
       experience: {mode:'simple'},
-      membership: {tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true,server:null},
+      membership: {tier:'free',source:'free',status:'inactive',preview:'free',expiresAt:null,betaFullAccess:false,server:null},
       backend: {installed:false,lastAccessCheck:null,isAdmin:false,familyMembers:[]},
       seasonal: {selectedSpecies:null,lastViewedMonth:null},
       familyCrew: {members:[],shareTrips:true,shareFavorites:false},
@@ -306,7 +306,7 @@
         if(saved.watchCenter&&typeof saved.watchCenter==='object') this.state.watchCenter={...this.state.watchCenter,...saved.watchCenter,running:false,results:Array.isArray(saved.watchCenter.results)?saved.watchCenter.results:[]};
         if(saved.oceanNetwork&&typeof saved.oceanNetwork==='object') this.state.oceanNetwork={...this.state.oceanNetwork,...saved.oceanNetwork,status:saved.oceanNetwork.status==='loading'?'idle':saved.oceanNetwork.status,history:Array.isArray(saved.oceanNetwork.history)?saved.oceanNetwork.history:[]};
         if(saved.experience&&typeof saved.experience==='object') this.state.experience={...this.state.experience,...saved.experience};
-        if(saved.membership&&typeof saved.membership==='object') this.state.membership={...this.state.membership,...saved.membership,betaFullAccess:true};
+        if(saved.membership&&typeof saved.membership==='object') this.state.membership={...this.state.membership,...saved.membership,betaFullAccess:false};
         if(saved.backend&&typeof saved.backend==='object') this.state.backend={...this.state.backend,...saved.backend,familyMembers:Array.isArray(saved.backend.familyMembers)?saved.backend.familyMembers:[]};
         if(saved.seasonal&&typeof saved.seasonal==='object') this.state.seasonal={...this.state.seasonal,...saved.seasonal};
         if(saved.familyCrew&&typeof saved.familyCrew==='object') this.state.familyCrew={...this.state.familyCrew,...saved.familyCrew,members:Array.isArray(saved.familyCrew.members)?saved.familyCrew.members:[]};
@@ -1421,25 +1421,30 @@
       if(this.state.view==='map') this.renderMapLayers();
     },
 
+    entitlementPreviewEnabled(){return (window.COASTCAST_CONFIG||{}).allowEntitlementPreview===true;},
+
     membershipSnapshot(){
       const server=this.state.membership?.server;
       if(server&&this.state.backend?.installed){
-        const source=server.source||'free',premium=!!server.premium;
+        const source=server.source||'free',expiryMs=server.expires_at?Date.parse(server.expires_at):null,expired=Number.isFinite(expiryMs)&&expiryMs<=Date.now(),premium=!!server.premium&&!expired;
         const labels={play:'Paid Premium',family:'Family Premium',complimentary:'Complimentary Premium',lifetime:'Lifetime Premium',promo:'Promotional Premium',beta:'Beta Premium',free:'Free access'};
         let expiry='';
-        if(server.expires_at){try{expiry=`Access through ${new Date(server.expires_at).toLocaleDateString()}`;}catch(_){expiry='Expiring access';}}
+        if(server.expires_at){try{expiry=expired?`Access expired ${new Date(server.expires_at).toLocaleDateString()}`:`Access through ${new Date(server.expires_at).toLocaleDateString()}`;}catch(_){expiry=expired?'Expired access':'Expiring access';}}
         else expiry=premium?(source==='family'?'No separate subscription required':'Active server-verified access'):'Upgrade to unlock advanced tools';
-        return {premium,badge:source==='family'?'FAMILY PREMIUM':source==='complimentary'?'COMPLIMENTARY':source==='lifetime'?'LIFETIME':source==='promo'?'PROMO':premium?'PREMIUM':'FREE',title:premium?'CastVector Premium':'CastVector Free',source:labels[source]||source,expiry,server:true};
+        return {premium,badge:source==='family'&&premium?'FAMILY PREMIUM':source==='complimentary'&&premium?'COMPLIMENTARY':source==='lifetime'&&premium?'LIFETIME':source==='promo'&&premium?'PROMO':premium?'PREMIUM':'FREE',title:premium?'CastVector Premium':'CastVector Free',source:labels[source]||source,expiry,server:true};
       }
-      const m=this.state.membership||{},preview=m.preview||'premium';
+      if(!this.entitlementPreviewEnabled()){
+        return {premium:false,badge:'FREE',title:'CastVector Free',source:'Free access',expiry:'Sign in or subscribe to unlock advanced tools',server:false};
+      }
+      const preview=this.state.membership?.preview||'free';
       const map={
         free:{premium:false,badge:'FREE',title:'CastVector Free',source:'Free access preview',expiry:'Upgrade to unlock advanced tools'},
-        premium:{premium:true,badge:'PREMIUM',title:'CastVector Premium',source:'Paid Premium preview',expiry:'$4.99/month at launch'},
-        family:{premium:true,badge:'FAMILY PREMIUM',title:'CastVector Premium',source:'Family Premium preview',expiry:'No separate subscription for this family member'},
-        complimentary:{premium:true,badge:'COMPLIMENTARY',title:'CastVector Premium',source:'Owner-granted complimentary preview',expiry:'Expiration or lifetime can be set by admin'},
-        lifetime:{premium:true,badge:'LIFETIME',title:'CastVector Premium',source:'Owner-granted lifetime preview',expiry:'No expiration'}
+        premium:{premium:true,badge:'PREMIUM',title:'CastVector Premium',source:'Paid Premium preview',expiry:'Development preview only'},
+        family:{premium:true,badge:'FAMILY PREMIUM',title:'CastVector Premium',source:'Family Premium preview',expiry:'Development preview only'},
+        complimentary:{premium:true,badge:'COMPLIMENTARY',title:'CastVector Premium',source:'Owner-granted complimentary preview',expiry:'Development preview only'},
+        lifetime:{premium:true,badge:'LIFETIME',title:'CastVector Premium',source:'Owner-granted lifetime preview',expiry:'Development preview only'}
       };
-      return map[preview]||map.premium;
+      return map[preview]||map.free;
     },
 
     nativeBillingAvailable(){return !!(window.CastVectorPlay&&typeof window.CastVectorPlay.available==='function'&&window.CastVectorPlay.available());},
@@ -1482,18 +1487,19 @@
 
     openMembershipDialog(){
       const snap=this.membershipSnapshot();
-      if(this.$('membershipPreviewSetting'))this.$('membershipPreviewSetting').value=this.state.membership?.preview||'premium';
+      if(this.$('membershipPreviewSetting'))this.$('membershipPreviewSetting').value=this.state.membership?.preview||'free';
       if(this.$('membershipDialogTitle'))this.$('membershipDialogTitle').textContent=snap.title;
       if(this.$('membershipDialogSource'))this.$('membershipDialogSource').textContent=snap.source;
-      const preview=this.$('membershipPreviewBlock');if(preview)preview.hidden=!!(this.state.backend?.installed&&this.cloudSignedIn());
+      const preview=this.$('membershipPreviewBlock');if(preview)preview.hidden=!this.entitlementPreviewEnabled();
       this.openDialog('membershipDialog');
     },
 
     applyMembershipPreview(){
+      if(!this.entitlementPreviewEnabled()){this.showToast('Local Premium preview is disabled in production builds.');return;}
       if(this.state.backend?.installed&&this.cloudSignedIn()){this.showToast('Server access is active; local Premium preview is disabled.');return;}
-      const v=this.$('membershipPreviewSetting')?.value||'premium';
+      const v=this.$('membershipPreviewSetting')?.value||'free';
       if(!['free','premium','family','complimentary','lifetime'].includes(v))return;
-      this.state.membership={...this.state.membership,preview:v,betaFullAccess:true,status:v==='free'?'inactive':'active'};
+      this.state.membership={...this.state.membership,preview:v,betaFullAccess:false,status:v==='free'?'inactive':'active'};
       this.save();this.renderMembership();this.renderExperience();this.closeDialog('membershipDialog');this.showToast(`Access preview: ${this.membershipSnapshot().badge}.`);
     },
 
@@ -3049,7 +3055,7 @@
     resetApp(){
       if(!confirm('Reset saved CastVector spots, catches, settings and preferences?')) return;
       try{localStorage.removeItem('coastcast-v12-state');localStorage.removeItem('coastcast-v11-state');localStorage.removeItem('coastcast-v10-state');localStorage.removeItem('coastcast-v9-state');localStorage.removeItem('coastcast-v8-state');localStorage.removeItem('coastcast-v7-state');localStorage.removeItem('coastcast-v6-state');localStorage.removeItem('coastcast-v5-state');localStorage.removeItem('coastcast-v4-state');localStorage.removeItem('coastcast-v3-state');}catch(_){ }
-      this.state.live=false;try{['coastcast-v50-state','coastcast-v40-state','coastcast-v31-state','coastcast-v30-state','coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CastVector Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.watchCenter={running:false,results:[],lastRun:null,species:'Red Drum'};this.state.oceanNetwork={status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null};this.state.experience={mode:'simple'};this.state.membership={tier:'premium',source:'beta',status:'active',preview:'premium',expiresAt:null,betaFullAccess:true,server:null};this.state.backend={installed:false,lastAccessCheck:null,isAdmin:false,familyMembers:[]};this.state.seasonal={selectedSpecies:null,lastViewedMonth:null};this.state.familyCrew={members:[],shareTrips:true,shareFavorites:false};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CastVector reset.');
+      this.state.live=false;try{['coastcast-v50-state','coastcast-v40-state','coastcast-v31-state','coastcast-v30-state','coastcast-v23-state','coastcast-v22-state','coastcast-v21-state','coastcast-v20-state','coastcast-v18-state','coastcast-v17-state','coastcast-v16-state','coastcast-v15-state','coastcast-v14-state','coastcast-v13-state','coastcast-v12-state','coastcast-v11-state','coastcast-v10-state','coastcast-v9-state','coastcast-v8-state'].forEach(k=>localStorage.removeItem(k));}catch(_){}this.state.location={key:'wrightsville',name:'Wrightsville Beach, NC',lat:34.2085,lon:-77.7964,source:'Saved coast'};this.state.radius=10;this.state.tackleRadius=20;this.state.geoapifyKey='';try{localStorage.removeItem('coastcast-geoapify-key');}catch(_){}this.state.fishingStyle='Surf fishing';this.state.targetSpecies='Red Drum';this.state.waypoints=[];this.state.catches=[];this.state.trips=0;this.state.savedTripPlans=[];this.state.alertRules=[];this.state.alertMatches=[];this.state.profile={name:'CastVector Angler',homeCoast:'',favoriteSpecies:'Red Drum'};this.state.cloud={url:'',anonKey:'',email:'',autoSync:false,session:null,lastSync:null};this.state.scout={running:false,radius:25,period:'today',species:'Red Drum',results:[],compareIds:[],lastRun:null};this.state.goMode={active:false,startedAt:null,sessionId:null,location:null,species:null,baitPlan:null,checks:{bait:false,ice:false,license:false,gear:false},history:[]};this.state.gearPlan={checked:{},lastBuilt:null};this.state.departure={driveMinutes:45,setupMinutes:20,baitMinutes:20,selectedWindow:null};this.state.regChecks={};this.state.tackleBox=[];this.state.shoppingList=[];this.state.offlinePacks=[];this.state.community={tab:'feed',reactions:{},publishedLocalIds:[],challengeClaims:{},lastCloudRefresh:null};this.state.command={mode:'bite',lastPlan:null};this.state.watchCenter={running:false,results:[],lastRun:null,species:'Red Drum'};this.state.oceanNetwork={status:'idle',station:null,observation:null,history:[],lastChecked:null,error:null};this.state.experience={mode:'simple'};this.state.membership={tier:'free',source:'free',status:'inactive',preview:'free',expiresAt:null,betaFullAccess:false,server:null};this.state.backend={installed:false,lastAccessCheck:null,isAdmin:false,familyMembers:[]};this.state.seasonal={selectedSpecies:null,lastViewedMonth:null};this.state.familyCrew={members:[],shareTrips:true,shareFavorites:false};this.state.liveUpdatedAt=null;this._cloudCommunityPosts=[];this.state.safetyAlerts=[];this.state.sourceHealth={weather:'demo',marine:'demo',tides:'demo',shops:'demo',alerts:'demo',buoy:'demo'};this.state.mapPOIs=[];this.state.mapPlacesStatus='idle';this.state.selectedIntelSpot=null;this.state.data=this.buildDemoData();this.closeDialog('settingsDialog');this.renderAll();this.showToast('CastVector reset.');
     },
 
 
