@@ -21,8 +21,8 @@ android {
         applicationId 'com.castvector.fishing'
         minSdk 26
         targetSdk 36
-        versionCode 56201
-        versionName '5.6.2'
+        versionCode 57001
+        versionName '5.7.0'
 
         buildConfigField "String", "CASTVECTOR_WEB_URL", "\"${cvWebUrl}\""
         buildConfigField "String", "PREMIUM_PRODUCT_ID", "\"${premiumProductId}\""
