@@ -1,5 +1,5 @@
-const CACHE='castvector-v5.7.0';
-const CORE=['./','./index.html','./styles.css?v=5.7.0','./app.js?v=5.7.0','./decision-engine.js?v=5.7.0','./chat.css?v=5.7.0','./decision-engine.css?v=5.7.0','./chat.js?v=5.7.0','./native-billing-hook.js?v=5.7.0','./manifest.webmanifest','./coastcast-config.js?v=5.7.0','./icon-192.png','./icon-512.png','./icon-192-v56.png','./icon-512-v56.png','./apple-touch-icon.png','./favicon-32.png','./brand-emblem.png','./brand-watermark.png','./privacy.html','./terms.html','./support.html','./delete-account.html'];
+const CACHE='castvector-v5.8.0';
+const CORE=['./','./index.html','./styles.css?v=5.8.0','./app.js?v=5.8.0','./decision-engine.js?v=5.8.0','./take-me-fishing.js?v=5.8.0','./chat.css?v=5.8.0','./decision-engine.css?v=5.8.0','./take-me-fishing.css?v=5.8.0','./chat.js?v=5.8.0','./native-billing-hook.js?v=5.8.0','./manifest.webmanifest','./coastcast-config.js?v=5.8.0','./icon-192.png','./icon-512.png','./icon-192-v56.png','./icon-512-v56.png','./apple-touch-icon.png','./favicon-32.png','./brand-emblem.png','./brand-watermark.png','./privacy.html','./terms.html','./support.html','./delete-account.html'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
 });
