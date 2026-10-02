@@ -100,7 +100,8 @@ const D={
     const fw=window.CastVectorFreshwater;
     if(fw&&fw.mode?.(app)!==env)fw.setMode(app,env);
     app.state.scout.radius=p.radius;app.state.scout.period=p.when;
-    const species=p.target!=='best'&&app.species[p.target]?p.target:this.bestSpecies(app);
+    const allowed=app.coastRegionSpecies?.()||Object.keys(app.species||{});
+    const species=p.target!=='best'&&app.species[p.target]&&allowed.includes(p.target)?p.target:this.bestSpecies(app);
     app.state.scout.species=species;app.state.targetSpecies=species;
     app.recalculateScores?.();
 
@@ -157,7 +158,7 @@ const D={
   familyFit(c,p){
     if(p.party!=='family')return 0;
     const t=(c.type+' '+c.source+' '+c.sourceKind).toLowerCase();
-    let x=0;if(/public|access|pier|beach|park|ramp|lake|reservoir|pond/.test(t))x+=6;if(/private|pattern/.test(t))x-=2;if(c.distance<=10)x+=3;return x;
+    let x=0;if(/public|access|pier|beach|park|ramp|official|verified/.test(t))x+=6;if(/private|pattern/.test(t))x-=2;if(c.verified&&c.distance<=10)x+=3;return x;
   },
 
   personalFit(c){
@@ -188,7 +189,7 @@ const D={
     if(r.sourceKind==='Pattern Atlas')parts.push('proven by your own catch history');
     else if(r.sourceKind==='Favorite')parts.push('one of your saved waters');
     else if(r.verified)parts.push('verified/public access signal');
-    if(p.party==='family'&&this.familyFit(r,p)>0)parts.push('family-friendly access profile');
+    if(p.party==='family'&&this.familyFit(r,p)>0)parts.push('stronger verified-access fit for a family trip');
     if(env==='freshwater'&&app.state.freshwaterIQ?.status==='live')parts.push('USGS water context loaded');
     if(r.bestTime)parts.push('best around '+r.bestTime);
     return parts.slice(0,4).join(' • ');
@@ -239,7 +240,7 @@ const D={
     box.innerHTML=
       '<section class="discover-winner '+(safety.level>=2?'hold':'')+'">'+
         '<div class="discover-winner-top"><div><span class="discover-label">'+(safety.level>=2?'BEST OPTION • REVIEW SAFETY':'BEST CHOICE')+'</span><h3>'+app.escape(best.name)+'</h3><p>'+app.escape(best.type||prep.env)+'</p></div><div class="discover-score"><strong>'+best.discoverScore+'</strong><span>/100</span></div></div>'+
-        '<div class="discover-facts"><div><span>TARGET</span><strong>'+app.escape(prep.species)+'</strong></div><div><span>WHEN</span><strong>'+app.escape(best.bestTime||'Best loaded window')+'</strong></div><div><span>DISTANCE</span><strong>'+Number(best.distance||0).toFixed(1)+' mi</strong></div><div><span>LIVE SCORE</span><strong>'+best.liveScore+'/100</strong></div></div>'+
+        '<div class="discover-facts"><div><span>TARGET</span><strong>'+app.escape(prep.species)+'</strong></div><div><span>WHEN</span><strong>'+app.escape(best.bestTime||'Best loaded window')+'</strong></div><div><span>DISTANCE</span><strong>'+Number(best.distance||0).toFixed(1)+' mi</strong></div><div><span>LIVE SCORE</span><strong>'+best.liveScore+'/100</strong></div><div class="discover-access-fact"><span>ACCESS</span><strong>'+(best.verified?'Mapped / verified signal':'Verify locally')+'</strong></div></div>'+
         '<div class="discover-why"><span>WHY THIS ONE</span><strong>'+app.escape(best.why)+'</strong></div>'+
         '<div class="discover-actions"><button class="primary-button" type="button" data-discover-use="0">Use this spot</button><button class="secondary-button" type="button" data-discover-plan="0">Build trip</button><button class="ghost-button" type="button" data-discover-route="0">Route</button></div>'+
       '</section>'+
