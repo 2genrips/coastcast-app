@@ -40,6 +40,8 @@ public class MainActivity extends Activity {
     private WebView webView;
     private ValueCallback<Uri[]> fileCallback;
     private BillingManager billingManager;
+    private String pendingGeoOrigin;
+    private GeolocationPermissions.Callback pendingGeoCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,11 +152,12 @@ public class MainActivity extends Activity {
                     checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     callback.invoke(origin, true, false);
                 } else {
+                    pendingGeoOrigin = origin;
+                    pendingGeoCallback = callback;
                     requestPermissions(new String[]{
                             Manifest.permission.ACCESS_COARSE_LOCATION,
                             Manifest.permission.ACCESS_FINE_LOCATION
                     }, REQ_LOCATION);
-                    callback.invoke(origin, false, false);
                 }
             }
 
@@ -236,6 +239,19 @@ public class MainActivity extends Activity {
         if (billingManager != null) billingManager.destroy();
         if (webView != null) webView.destroy();
         super.onDestroy();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_LOCATION && pendingGeoCallback != null) {
+            boolean granted =
+                    checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            pendingGeoCallback.invoke(pendingGeoOrigin == null ? "" : pendingGeoOrigin, granted, false);
+            pendingGeoOrigin = null;
+            pendingGeoCallback = null;
+        }
     }
 
     @Override
