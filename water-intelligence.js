@@ -70,8 +70,8 @@ const waterIntel={
       'nwr('+box+')[man_made="breakwater"];'+
       'nwr('+box+')[man_made="groyne"];'+
       'nwr('+box+')[natural="reef"];'+
-      'nwr('+box+')['+'"'+'seamark:type'+'"'+='+"="+']["seamark:type"="wreck"];'+
-      'nwr('+box+')['+'"'+'seamark:type'+'"'+='+"="+']["seamark:type"="obstruction"];'+
+      'nwr('+box+')["seamark:type"="wreck"];'+
+      'nwr('+box+')["seamark:type"="obstruction"];'+
       'nwr('+box+')[historic="wreck"];'+
     ');out center tags;';
   },
