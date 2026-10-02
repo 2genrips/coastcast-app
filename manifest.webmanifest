@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 7.5 adds Freshwater Mode for lakes, reservoirs, rivers and ponds, freshwater species intelligence, nearby water discovery and modern USGS live-water context.",
+  "description": "CastVector 8.0 adds Universal Discover: one clean Where should I fish flow that ranks nearby coast and freshwater options with live conditions, access, distance, private history and personal patterns.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
