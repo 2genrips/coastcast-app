@@ -4,7 +4,8 @@ const module={
   version:'5.8.0',
   prefs:{duration:180,party:'solo',style:null,target:'best'},
   getPrefs(app){
-    const saved=app.state.takeMeFishing||{};
+    let local={};try{local=JSON.parse(localStorage.getItem('castvector-take-me-fishing-prefs')||'{}')||{};}catch(_){}
+    const saved={...local,...(app.state.takeMeFishing||{})};
     return {
       duration:Number(saved.duration)||180,
       party:saved.party||'solo',
@@ -12,7 +13,12 @@ const module={
       target:saved.target||'best'
     };
   },
-  savePrefs(app,p){app.state.takeMeFishing={...p,lastBuilt:app.state.takeMeFishing?.lastBuilt||null,lastPlan:app.state.takeMeFishing?.lastPlan||null};app.save();},
+  savePrefs(app,p){
+    app.state.takeMeFishing={...p,lastBuilt:app.state.takeMeFishing?.lastBuilt||null,lastPlan:app.state.takeMeFishing?.lastPlan||null};
+    try{localStorage.setItem('castvector-take-me-fishing-prefs',JSON.stringify(p));}catch(_){}
+    app.save();
+  },
+  lastPlan(app){return app.state.takeMeFishing?.lastPlan||(app.state.savedTripPlans||[]).find(x=>x.type==='take-me-fishing')||null;},
   styleLabel(v){return v==='Nearshore boat'?'Boat':v==='Inlet / jetty'?'Inlet / jetty':v==='Pier fishing'?'Pier':'Surf / shore';},
   partyLabel(v){return v==='family'?'Family':v==='friends'?'Friends':'Just me';},
   durationLabel(v){const n=Number(v)||180;return n<120?n+' min':n===180?'3 hours':n===360?'Half day':n===480?'Full day':Math.round(n/60)+' hours';},
@@ -155,7 +161,7 @@ const module={
       target.innerHTML='<option value="best">Best available species</option>'+Object.keys(app.species||{}).map(n=>'<option value="'+app.escape(n)+'">'+app.escape(n)+'</option>').join('');
       target.value=p.target;
     }
-    const last=app.state.takeMeFishing?.lastPlan;
+    const last=this.lastPlan(app);
     if(last)this.renderResult(app,last);
   },
   renderResult(app,plan){
@@ -177,13 +183,13 @@ const module={
     const launch=app.$('tmfLaunchBtn');if(launch){launch.disabled=plan.safety?.level>=2;launch.textContent=plan.safety?.level>=2?'Review safety before launch':'Start fishing mode';}
   },
   route(app,kind){
-    const plan=app.state.takeMeFishing?.lastPlan;if(!plan)return;
+    const plan=this.lastPlan(app);if(!plan)return;
     if(kind==='spot')window.open(app.mapsUrl(plan.lat,plan.lon,plan.location),'_blank','noopener');
     if(kind==='shop'&&plan.shop)window.open(app.mapsUrl(plan.shop.lat,plan.shop.lon,plan.shop.name),'_blank','noopener');
     if(kind==='regs'&&plan.regulations?.url)window.open(plan.regulations.url,'_blank','noopener');
   },
   launch(app){
-    const plan=app.state.takeMeFishing?.lastPlan;if(!plan)return app.showToast?.('Build a trip first.');
+    const plan=this.lastPlan(app);if(!plan)return app.showToast?.('Build a trip first.');
     if(plan.safety?.level>=2)return app.showToast?.('Review the active safety warning before starting this trip.');
     app.state.location={key:'take-me-fishing',name:plan.location,lat:plan.lat,lon:plan.lon,source:'Take Me Fishing'};
     app.state.targetSpecies=plan.species;
