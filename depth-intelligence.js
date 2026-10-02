@@ -140,11 +140,11 @@ const Depth={
     if(this.mode==='relief'){
       if(this.overlay){try{map.removeLayer(this.overlay);}catch(_){}this.overlay=null;}
       if(this.relief){try{map.removeLayer(this.relief);}catch(_){}}
-      this.relief=L.imageOverlay(url,ll,{opacity:.62,interactive:false,crossOrigin:true}).addTo(map);
+      this.relief=L.imageOverlay(url,ll,{opacity:.62,interactive:false}).addTo(map);
     }else{
       if(this.relief){try{map.removeLayer(this.relief);}catch(_){}this.relief=null;}
       if(this.overlay){try{map.removeLayer(this.overlay);}catch(_){}}
-      this.overlay=L.imageOverlay(url,ll,{opacity:.72,interactive:false,crossOrigin:true}).addTo(map);
+      this.overlay=L.imageOverlay(url,ll,{opacity:.72,interactive:false}).addTo(map);
     }
     const st=this.ensureState(app);st.status='live';st.lastUpdate=new Date().toISOString();
     this.render(app);
