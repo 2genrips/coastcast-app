@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B1D2E" />
-  <meta name="description" content="CastVector 5.8.0 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
+  <meta name="description" content="CastVector 5.9.0 is a nationwide coastal fishing command center with Ocean Network verification, live weather, marine conditions, NOAA tides, species intelligence, opportunity planning, Scout, trips, tackle inventory, catch analytics, community and a private logbook." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -15,11 +15,12 @@
   <meta property="og:description" content="Plan smarter fishing trips with tides, weather, wind, surf, species intelligence, catch cards and a privacy-first fishing community." />
   <meta property="og:image" content="brand-emblem.png" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css?v=5.8.0" />
-  <link rel="stylesheet" href="chat.css?v=5.8.0" />
-  <link rel="stylesheet" href="decision-engine.css?v=5.8.0" />
-  <link rel="stylesheet" href="take-me-fishing.css?v=5.8.0" />
-  <title>CastVector 5.8.0</title>
+  <link rel="stylesheet" href="styles.css?v=5.9.0" />
+  <link rel="stylesheet" href="chat.css?v=5.9.0" />
+  <link rel="stylesheet" href="decision-engine.css?v=5.9.0" />
+  <link rel="stylesheet" href="take-me-fishing.css?v=5.9.0" />
+  <link rel="stylesheet" href="live-guide.css?v=5.9.0" />
+  <title>CastVector 5.9.0</title>
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -28,7 +29,7 @@
         <img class="brand-emblem-img" src="brand-emblem.png" alt="" aria-hidden="true" />
         <div class="brand-copy">
           <div class="brand-name"><span>CAST</span><b>VECTOR</b></div>
-          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.8.0</span></div>
+          <div class="brand-kicker">FISHING FORECAST <span class="brand-version">5.9.0</span></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -155,6 +156,23 @@
               <button id="tmfRegsBtn" class="ghost-button" type="button">Official regulations</button>
               <button id="tmfLaunchBtn" class="primary-button" type="button">Start fishing mode</button>
             </div>
+          </div>
+        </section>
+
+        <section class="panel live-guide-panel" id="liveGuidePanel">
+          <div class="live-guide-head">
+            <div><div class="eyebrow">CASTVECTOR LIVE GUIDE • 5.9</div><h2 id="liveGuideHeadline">Live Guide activates when Go Fishing Mode starts.</h2></div>
+            <span id="liveGuideBadge" class="live-guide-badge">START A TRIP</span>
+          </div>
+          <p id="liveGuideSummary" class="live-guide-summary">Start a trip and CastVector will watch your session timing, loaded conditions and catches to suggest the next move.</p>
+          <div id="liveGuideStats" class="live-guide-stats"></div>
+          <div id="liveGuideTips" class="live-guide-tips"></div>
+          <div id="liveGuideLastCatch" class="live-guide-last">No active fishing session.</div>
+          <div class="live-guide-actions">
+            <button id="liveGuideNextMoveBtn" class="primary-button" type="button">Tell me my next move</button>
+            <button id="liveGuideCatchBtn" class="secondary-button" type="button">Log a catch</button>
+            <button id="liveGuideAdjustBtn" class="secondary-button" type="button">Log an adjustment</button>
+            <button id="liveGuideScoutBtn" class="ghost-button" type="button">Compare another spot</button>
           </div>
         </section>
 
@@ -1771,7 +1789,7 @@
       <div id="placesProviderStatus" class="settings-note">Open-data mode. CastVector is using OpenStreetMap plus verified local catalogs.</div>
       <div class="settings-actions"><a class="secondary-button" href="https://myprojects.geoapify.com/" target="_blank" rel="noopener">Get free Places key</a><button id="testPlacesProviderBtn" class="primary-button" type="button">Refresh tackle shops</button></div>
       <div class="settings-note">The Places key is stored only on this device and is not written into your GitHub files or CastVector backup. For a public app, restrict the key to your GitHub Pages origin in the provider dashboard.</div>
-      <div class="settings-note">CastVector v5.8.0 is the Google Play launch-ready candidate. No business database can guarantee 100% completeness, so CastVector shows source provenance and prefers verified fishing-store categories over guesswork.</div>
+      <div class="settings-note">CastVector v5.9.0 is the Google Play launch-ready candidate. No business database can guarantee 100% completeness, so CastVector shows source provenance and prefers verified fishing-store categories over guesswork.</div>
       <button id="resetAppBtn" class="danger-button full" type="button">Reset saved CastVector data</button>
     </form>
   </dialog>
@@ -1799,11 +1817,12 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="coastcast-config.js?v=5.8.0"></script>
-  <script src="app.js?v=5.8.0"></script>
-  <script src="decision-engine.js?v=5.8.0"></script>
-  <script src="take-me-fishing.js?v=5.8.0"></script>
-  <script src="chat.js?v=5.8.0"></script>
-  <script src="native-billing-hook.js?v=5.8.0"></script>
+  <script src="coastcast-config.js?v=5.9.0"></script>
+  <script src="app.js?v=5.9.0"></script>
+  <script src="decision-engine.js?v=5.9.0"></script>
+  <script src="take-me-fishing.js?v=5.9.0"></script>
+  <script src="live-guide.js?v=5.9.0"></script>
+  <script src="chat.js?v=5.9.0"></script>
+  <script src="native-billing-hook.js?v=5.9.0"></script>
 </body>
 </html>
