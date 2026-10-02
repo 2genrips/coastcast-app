@@ -1,4 +1,4 @@
-name: Build CastVector 6.1.0 Android Closed Test
+name: Build CastVector 6.2.0 Android Closed Test
 
 on:
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
           packages: platform-tools
 
       - name: Install Android 16 / API 36
-        run: yes | sdkmanager "platforms;android-36" "build-tools;36.1.0"
+        run: yes | sdkmanager "platforms;android-36" "build-tools;36.2.0"
 
       - name: Set up Gradle 8.13
         uses: gradle/actions/setup-gradle@v4
@@ -42,12 +42,12 @@ jobs:
         run: |
           grep -F "applicationId 'com.castvector.fishing'" android-native/app/build.gradle
           grep -F "targetSdk 36" android-native/app/build.gradle
-          grep -F "versionCode 61001" android-native/app/build.gradle
-          grep -F "versionName '6.1.0'" android-native/app/build.gradle
+          grep -F "versionCode 62001" android-native/app/build.gradle
+          grep -F "versionName '6.2.0'" android-native/app/build.gradle
           grep -F "castvector_premium_monthly" android-native/app/build.gradle
           grep -F "com.android.billingclient:billing:8.3.0" android-native/app/build.gradle
           test -f android-native/app/src/main/java/com/castvector/fishing/BillingManager.java
-          echo "VERIFIED: billing-enabled CastVector 6.1.0 Android source"
+          echo "VERIFIED: billing-enabled CastVector 6.2.0 Android source"
 
       - name: Build debug APK
         run: gradle -p android-native clean :app:assembleDebug --no-daemon --stacktrace
@@ -55,7 +55,7 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: CastVector-6.1.0-debug-apk
+          name: CastVector-6.2.0-debug-apk
           path: android-native/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
@@ -65,7 +65,7 @@ jobs:
       - name: Upload unsigned release AAB for private signing
         uses: actions/upload-artifact@v4
         with:
-          name: CastVector-6.1.0-unsigned-aab
+          name: CastVector-6.2.0-unsigned-aab
           path: android-native/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
 
@@ -89,6 +89,6 @@ jobs:
         if: env.ANDROID_KEYSTORE_BASE64 != ''
         uses: actions/upload-artifact@v4
         with:
-          name: CastVector-6.1.0-closed-test-aab
+          name: CastVector-6.2.0-closed-test-aab
           path: android-native/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30

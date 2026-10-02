@@ -102,7 +102,7 @@ const smartPan={
     if(!name&&type!=='Fishing access')return null;
     const place={
       id,name:name||'Fishing access',type,lat,lon,distance:d,
-      tags:{access:t.access||'',surface:t.surface||'',operator:t.operator||'',fee:t.fee||'',parking:t.parking||'',lit:t.lit||''},
+      tags:{access:t.access||'',surface:t.surface||'',operator:t.operator||'',fee:t.fee||'',parking:t.parking||'',lit:t.lit||'',wheelchair:t.wheelchair||'',toilets:t.toilets||'',opening_hours:t.opening_hours||'',phone:t.phone||t['contact:phone']||'',website:t.website||t['contact:website']||''},
       source:'OpenStreetMap • live viewport',sourceConfidence:'MAPPED',
       accessConfidence:/yes|public|permissive/i.test(String(t.access||''))?'mapped public/permissive':'access not explicitly confirmed'
     };
@@ -217,8 +217,17 @@ const smartPan={
   },
 
   markerPopup(app,p){
+    const t=p.tags||{},detail=[];
+    if(t.access)detail.push('Access: '+t.access);
+    if(t.fee)detail.push('Fee: '+t.fee);
+    if(t.parking)detail.push('Parking: '+t.parking);
+    if(t.surface)detail.push('Surface: '+t.surface);
+    if(t.operator)detail.push('Operator: '+t.operator);
+    if(t.wheelchair)detail.push('Wheelchair: '+t.wheelchair);
+    if(t.toilets)detail.push('Toilets: '+t.toilets);
     const accessNote=p.accessConfidence?'<br><small>'+app.escape(p.accessConfidence)+'</small>':'';
-    return '<div class="cc-popup"><strong>'+app.escape(p.name)+'</strong><br><span>'+app.escape(p.type)+' • visible map</span>'+accessNote+'<br><b>'+Math.round(p.match||70)+'/100 area match</b><div class="popup-actions"><button type="button" data-pan-analyze="'+app.escape(p.id)+'">Analyze</button><button type="button" data-pan-save="'+app.escape(p.id)+'">Save</button></div></div>';
+    const details=detail.length?'<div class="popup-meta">'+detail.slice(0,4).map(x=>'<span>'+app.escape(x)+'</span>').join('')+'</div>':'';
+    return '<div class="cc-popup"><strong>'+app.escape(p.name)+'</strong><br><span>'+app.escape(p.type)+' • visible map</span>'+accessNote+'<br><b>'+Math.round(p.match||70)+'/100 area match</b>'+details+'<div class="popup-actions"><button type="button" data-pan-analyze="'+app.escape(p.id)+'">Analyze</button><button type="button" data-pan-save="'+app.escape(p.id)+'">Save</button></div></div>';
   },
 
   shopPopup(app,s){
