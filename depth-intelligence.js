@@ -85,11 +85,13 @@ const Depth={
     const map=app.state.map;if(!map||map._depthIntelBound)return;
     map._depthIntelBound=true;
     map.on('moveend zoomend',()=>{if(Depth.enabled)Depth.scheduleOverlay(app);});
-    map.on('click',e=>{
-      if(!e?.latlng)return;
-      Depth.lastPoint={lat:e.latlng.lat,lon:e.latlng.lng};
-      Depth.analyze(app,e.latlng.lat,e.latlng.lng);
-    });
+    if(!window.CastVectorSpotDNA){
+      map.on('click',e=>{
+        if(!e?.latlng)return;
+        Depth.lastPoint={lat:e.latlng.lat,lon:e.latlng.lng};
+        Depth.analyze(app,e.latlng.lat,e.latlng.lng);
+      });
+    }
   },
 
   exportUrl(bounds,mode='survey'){
