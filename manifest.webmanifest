@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 7.0 Smart Home keeps the app clean and simple while moving advanced fishing intelligence into Map, Forecast, Trips, Logbook and Community hubs.",
+  "description": "CastVector 7.1 pairs a clean Smart Home with an Explore-first fishing map, compact Fish Here spot analysis, visual catch feed, live chat and challenges.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
