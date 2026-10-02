@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 7.1 pairs a clean Smart Home with an Explore-first fishing map, compact Fish Here spot analysis, visual catch feed, live chat and challenges.",
+  "description": "CastVector 7.2 adds private live-trip GPS route recording, catch-linked session replay and map playback on top of Smart Home, Explore, Trips and Community.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
