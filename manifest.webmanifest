@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 7.2 adds private live-trip GPS route recording, catch-linked session replay and map playback on top of Smart Home, Explore, Trips and Community.",
+  "description": "CastVector 7.3 adds NOAA survey bathymetry, broad seafloor relief, exact-point depth reads and bottom-shape analysis to Explore Map intelligence.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
