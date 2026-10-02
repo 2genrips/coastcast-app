@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "Nationwide coastal fishing intelligence with live forecasts, Decision Engine recommendations, Take Me Fishing trip planning, Live Guide in-trip coaching, Live Data Trust, enhanced bait/tackle intelligence, merged map intelligence, Smart Pan auto-populating map, Map Pro structure layers, NOAA station context, Water Intelligence and a Personal Fishing Brain that matches future conditions to your catch history, Scout, Community Live, trips, family-ready Premium access, catch analytics and offline tools.",
+  "description": "Nationwide coastal fishing intelligence with live forecasts, Decision Engine recommendations, Take Me Fishing trip planning, Live Guide in-trip coaching, Live Data Trust, enhanced bait/tackle intelligence, merged map intelligence, Smart Pan auto-populating map, Map Pro structure layers, NOAA station context, Water Intelligence and a Personal Fishing Brain that matches future conditions to your catch history, plus Spot DNA Fish Here exact-point analysis, Scout, Community Live, trips, family-ready Premium access, catch analytics and offline tools.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
