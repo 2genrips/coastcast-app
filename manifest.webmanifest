@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 7.3 adds NOAA survey bathymetry, broad seafloor relief, exact-point depth reads and bottom-shape analysis to Explore Map intelligence.",
+  "description": "CastVector 7.4 adds a private Pattern Atlas that clusters your own located catches into productive zones, summarizes bait/tide/time patterns, and re-analyzes hotspots with live Spot DNA and NOAA depth context.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
