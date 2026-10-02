@@ -260,6 +260,8 @@ const D={
         const tmf=window.CastVectorTakeMeFishing;
         if(tmf){
           const target=document.getElementById('tmfTarget');if(target)target.value=app.state.targetSpecies;
+          const party=document.getElementById('tmfParty');if(party)party.value=D.prefs(app).party;
+          const style=document.getElementById('tmfStyle');if(style)style.value=app.state.fishingStyle;
           tmf.build?.(app);
         }else app.openPlanner?.();
       },250);
