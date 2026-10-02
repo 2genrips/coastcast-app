@@ -8,8 +8,16 @@ const Atlas={
   app(){return window.CastVector;},
 
   ensureState(app){
-    if(!app.state.patternAtlas) app.state.patternAtlas={species:'all',mapVisible:false,selectedId:null};
+    if(!app.state.patternAtlas){
+      let saved=null;
+      try{saved=JSON.parse(localStorage.getItem('castvector-pattern-atlas-v74')||'null');}catch(_){}
+      app.state.patternAtlas={species:'all',mapVisible:false,selectedId:null,...(saved&&typeof saved==='object'?saved:{})};
+    }
     return app.state.patternAtlas;
+  },
+
+  saveState(app){
+    try{localStorage.setItem('castvector-pattern-atlas-v74',JSON.stringify(this.ensureState(app)));}catch(_){}
   },
 
   validCatches(app){
@@ -78,7 +86,7 @@ const Atlas={
     const repeat=Math.min(1,cs.length/6);
     const sessions=Math.max(1,sessionIds.size);
     const sessionSignal=Math.min(1,sessions/3);
-    const quality=avgScore==null?.65:Math.max(.35,Math.min(1,avgScore/100));
+    const quality=avgScore==null ? .65 : Math.max(.35,Math.min(1,avgScore/100));
     const patternScore=Math.round(Math.min(99,45+repeat*22+recency*14+sessionSignal*8+quality*10));
     const confidence=cs.length>=6?'HIGH':cs.length>=3?'MEDIUM':'LEARNING';
     const topSpecies=mode(speciesCounts),topBait=mode(baitCounts),bestTide=mode(tideCounts),bestTime=mode(timeCounts);
@@ -159,7 +167,7 @@ const Atlas={
       const center=await D.sample(app,Number(c.lat),Number(c.lon));
       if(center?.underwater){
         c.depthDNA={center,depthFeet:center.depthFeet,source:'NOAA/NCEI BAG'};
-        app.save?.();this.render(app);
+        app.save?.();this.saveState(app);this.render(app);
       }
     }catch(_){}
   },
@@ -228,7 +236,7 @@ const Atlas={
 
   openMap(app,id){
     const z=this.findZone(app,id);if(!z)return;
-    this.ensureState(app).mapVisible=true;app.save?.();
+    this.ensureState(app).mapVisible=true;app.save?.();this.saveState(app);
     app.navigate?.('map');
     setTimeout(()=>{app.ensureMap?.();app.state.map?.setView([z.lat,z.lon],15);this.renderMapLayer(app);},180);
   },
@@ -252,14 +260,14 @@ const Atlas={
   bind(app){
     document.addEventListener('change',e=>{
       if(e.target.id==='atlasSpeciesFilter'){
-        const s=this.ensureState(app);s.species=e.target.value||'all';app.save?.();this.render(app);this.renderMapLayer(app);
+        const s=this.ensureState(app);s.species=e.target.value||'all';app.save?.();this.saveState(app);this.render(app);this.renderMapLayer(app);
       }
     });
     document.addEventListener('click',e=>{
       const a=e.target.closest('[data-atlas-analyze]');if(a){this.analyze(app,a.dataset.atlasAnalyze);return;}
       const m=e.target.closest('[data-atlas-map]');if(m){this.openMap(app,m.dataset.atlasMap);return;}
       if(e.target.closest('#atlasMapToggle')){
-        const s=this.ensureState(app);s.mapVisible=!s.mapVisible;app.save?.();this.render(app);
+        const s=this.ensureState(app);s.mapVisible=!s.mapVisible;app.save?.();this.saveState(app);this.render(app);
         if(s.mapVisible){app.navigate?.('map');setTimeout(()=>{app.ensureMap?.();this.renderMapLayer(app);},150);}
         else this.renderMapLayer(app);
       }
