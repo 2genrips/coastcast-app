@@ -11,8 +11,27 @@ const H={
   ],
   setup(){
     const app=window.CastVector;if(!app)return;
+    this.relocateTools();
     this.hiddenSelectors.forEach(sel=>document.querySelectorAll('#view-home '+sel).forEach(el=>el.classList.add('advanced-home')));
     this.bind(app);this.render(app);
+  },
+  relocateTools(){
+    const moves=[
+      ['speciesCommandPanel','view-forecast'],
+      ['biteGridPanel','view-forecast'],
+      ['decisionEnginePanel','view-forecast'],
+      ['spotCompareProPanel','view-map'],
+      ['dataTrustPanel','view-map'],
+      ['opportunityRadarPanel','view-trips'],
+      ['tripCopilotPanel','view-trips'],
+      ['takeMeFishingPanel','view-trips'],
+      ['liveGuidePanel','view-trips'],
+      ['personalBrainPanel','view-logbook']
+    ];
+    moves.forEach(([id,targetId])=>{
+      const el=document.getElementById(id),target=document.getElementById(targetId);
+      if(el&&target&&!target.contains(el)){el.classList.remove('advanced-home');target.appendChild(el);}
+    });
   },
   bind(app){
     document.addEventListener('click',e=>{
