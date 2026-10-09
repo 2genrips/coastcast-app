@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 8.1 adds reliability hardening, Data Health, provider recovery, resilient caching and automated release checks across the fishing platform.",
+  "description": "CastVector 8.2 Map Pro adds public USGS aerial, hybrid and topo basemaps, fishing-focused layer controls, NOAA depth and private pattern toggles, resilient fallback and mobile focus mode.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
