@@ -304,7 +304,7 @@ const AA={
 
   radarUrl(map){
     const b=map.getBounds();
-    const q=new URLSearchParams({bbox:[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()].join(','),bboxSR:'4326',imageSR:'4326',size:'1200,900',format:'png32',transparent:'true',f:'image',_:String(Date.now())});
+    const q=new URLSearchParams({bbox:[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()].join(','),bboxSR:'4326',imageSR:'4326',size:'1200,900',format:'png32',transparent:'true',layers:'show:3',f:'image',_:String(Date.now())});
     return this.radarService+'/export?'+q.toString();
   },
 
