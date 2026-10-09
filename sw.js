@@ -1,7 +1,17 @@
-const CACHE='castvector-v8.0.0';
-const CORE=['./','./index.html','./styles.css?v=8.0.0','./app.js?v=8.0.0','./decision-engine.js?v=8.0.0','./take-me-fishing.js?v=8.0.0','./live-guide.js?v=8.0.0','./data-map-intelligence.js?v=8.0.0','./smart-pan-map.js?v=8.0.0','./water-intelligence.js?v=8.0.0','./personal-fishing-brain.js?v=8.0.0','./spot-dna.js?v=8.0.0','./trip-copilot.js?v=8.0.0','./opportunity-radar.js?v=8.0.0','./bitegrid.js?v=8.0.0','./spot-compare-pro.js?v=8.0.0','./species-command.js?v=8.0.0','./smart-home.js?v=8.0.0','./explore-feed.js?v=8.0.0','./depth-intelligence.js?v=8.0.0','./session-replay.js?v=8.0.0','./pattern-atlas.js?v=8.0.0','./freshwater-mode.js?v=8.0.0','./universal-discover.js?v=8.0.0','./chat.css?v=8.0.0','./decision-engine.css?v=8.0.0','./take-me-fishing.css?v=8.0.0','./live-guide.css?v=8.0.0','./data-map-intelligence.css?v=8.0.0','./smart-pan-map.css?v=8.0.0','./water-intelligence.css?v=8.0.0','./personal-fishing-brain.css?v=8.0.0','./spot-dna.css?v=8.0.0','./trip-copilot.css?v=8.0.0','./opportunity-radar.css?v=8.0.0','./bitegrid.css?v=8.0.0','./spot-compare-pro.css?v=8.0.0','./species-command.css?v=8.0.0','./smart-home.css?v=8.0.0','./explore-feed.css?v=8.0.0','./session-replay.css?v=8.0.0','./depth-intelligence.css?v=8.0.0','./pattern-atlas.css?v=8.0.0','./freshwater-mode.css?v=8.0.0','./universal-discover.css?v=8.0.0','./chat.js?v=8.0.0','./native-billing-hook.js?v=8.0.0','./manifest.webmanifest','./coastcast-config.js?v=8.0.0','./icon-192.png','./icon-512.png','./icon-192-v56.png','./icon-512-v56.png','./apple-touch-icon.png','./favicon-32.png','./brand-emblem.png','./brand-watermark.png','./privacy.html','./terms.html','./support.html','./delete-account.html'];
+const CACHE='castvector-v8.1.0';
+const CORE=['./','./index.html','./styles.css?v=8.1.0','./app.js?v=8.1.0','./decision-engine.js?v=8.1.0','./take-me-fishing.js?v=8.1.0','./live-guide.js?v=8.1.0','./data-map-intelligence.js?v=8.1.0','./smart-pan-map.js?v=8.1.0','./water-intelligence.js?v=8.1.0','./personal-fishing-brain.js?v=8.1.0','./spot-dna.js?v=8.1.0','./trip-copilot.js?v=8.1.0','./opportunity-radar.js?v=8.1.0','./bitegrid.js?v=8.1.0','./spot-compare-pro.js?v=8.1.0','./species-command.js?v=8.1.0','./smart-home.js?v=8.1.0','./explore-feed.js?v=8.1.0','./depth-intelligence.js?v=8.1.0','./session-replay.js?v=8.1.0','./pattern-atlas.js?v=8.1.0','./freshwater-mode.js?v=8.1.0','./universal-discover.js?v=8.1.0','./runtime-resilience.js?v=8.1.0','./chat.css?v=8.1.0','./decision-engine.css?v=8.1.0','./take-me-fishing.css?v=8.1.0','./live-guide.css?v=8.1.0','./data-map-intelligence.css?v=8.1.0','./smart-pan-map.css?v=8.1.0','./water-intelligence.css?v=8.1.0','./personal-fishing-brain.css?v=8.1.0','./spot-dna.css?v=8.1.0','./trip-copilot.css?v=8.1.0','./opportunity-radar.css?v=8.1.0','./bitegrid.css?v=8.1.0','./spot-compare-pro.css?v=8.1.0','./species-command.css?v=8.1.0','./smart-home.css?v=8.1.0','./explore-feed.css?v=8.1.0','./session-replay.css?v=8.1.0','./depth-intelligence.css?v=8.1.0','./pattern-atlas.css?v=8.1.0','./freshwater-mode.css?v=8.1.0','./universal-discover.css?v=8.1.0','./runtime-resilience.css?v=8.1.0','./chat.js?v=8.1.0','./native-billing-hook.js?v=8.1.0','./manifest.webmanifest','./coastcast-config.js?v=8.1.0','./icon-192.png','./icon-512.png','./icon-192-v56.png','./icon-512-v56.png','./apple-touch-icon.png','./favicon-32.png','./brand-emblem.png','./brand-watermark.png','./privacy.html','./terms.html','./support.html','./delete-account.html'];
+const ESSENTIAL=['./','./index.html','./styles.css?v=8.1.0','./app.js?v=8.1.0'];
+const OPTIONAL=CORE.filter(x=>!ESSENTIAL.includes(x));
 self.addEventListener('install',event=>{
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE);
+    await cache.addAll(ESSENTIAL);
+    await Promise.allSettled(OPTIONAL.map(async asset=>{
+      const response=await fetch(asset,{cache:'reload'});
+      if(response.ok)await cache.put(asset,response);
+    }));
+    await self.skipWaiting();
+  })());
 });
 self.addEventListener('activate',event=>{
   event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
@@ -10,9 +20,25 @@ self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
   const url=new URL(event.request.url);
   if(url.origin!==location.origin)return;
-  event.respondWith(fetch(event.request).then(response=>{
-    const clone=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,clone));return response;
-  }).catch(()=>caches.match(event.request).then(hit=>hit||caches.match('./index.html'))));
+
+  const isNavigation=event.request.mode==='navigate'||event.request.headers.get('accept')?.includes('text/html');
+  if(isNavigation){
+    event.respondWith(fetch(event.request,{cache:'no-store'}).then(async response=>{
+      if(response.ok){const cache=await caches.open(CACHE);cache.put('./index.html',response.clone());}
+      return response;
+    }).catch(async()=>await caches.match('./index.html')||await caches.match('./')));
+    return;
+  }
+
+  const refresh=fetch(event.request).then(async response=>{
+    if(response.ok){const cache=await caches.open(CACHE);await cache.put(event.request,response.clone());}
+    return response;
+  });
+  event.waitUntil(refresh.catch(()=>{}));
+  event.respondWith(caches.match(event.request).then(cached=>{
+    if(cached)return cached;
+    return refresh.catch(()=>new Response('',{status:504,statusText:'Offline'}));
+  }));
 });
 
 

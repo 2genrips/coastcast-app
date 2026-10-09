@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 8.0 adds Universal Discover: one clean Where should I fish flow that ranks nearby coast and freshwater options with live conditions, access, distance, private history and personal patterns.",
+  "description": "CastVector 8.1 adds reliability hardening, Data Health, provider recovery, resilient caching and automated release checks across the fishing platform.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
