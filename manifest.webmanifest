@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 8.2 Map Pro adds public USGS aerial, hybrid and topo basemaps, fishing-focused layer controls, NOAA depth and private pattern toggles, resilient fallback and mobile focus mode.",
+  "description": "CastVector 8.5 Angler Advantage adds official weather radar and warnings, Trip Trust, access confidence, regulation readiness, enhanced offline packs and stronger personal intelligence.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
