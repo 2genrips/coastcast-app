@@ -188,8 +188,8 @@ const AA={
 
   candidateAccess(c){
     const s=String(c?.source||'')+' '+String(c?.sourceKind||'')+' '+String(c?.reason||'');
-    if(/Officials*•|official state|NC DEQ|state access/i.test(s))return'official';
-    if(c?.verified||/Verifieds*•|verified local|verified catalog/i.test(s))return'verified';
+    if(/Official\\s*•|official state|NC DEQ|state access/i.test(s))return'official';
+    if(c?.verified||/Verified\\s*•|verified local|verified catalog/i.test(s))return'verified';
     if(/public access|public map|Fishing access|Beach|Pier|Boat ramp/i.test(String(c?.type||'')+' '+s))return'mapped';
     return'unverified';
   },
