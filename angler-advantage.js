@@ -47,6 +47,7 @@ const AA={
     this.ensureMap(app);
     this.refreshAlerts(app,{notify:false,quiet:true});
     this.startWatch(app);
+    this.wireVisibility(app);
     this.render(app);
   },
 
@@ -145,6 +146,21 @@ const AA={
         this.save?.();
       }
       AA.render(this);return out;
+    };
+
+    const oldOpen=app.handleOfflinePackClick?.bind(app);
+    if(oldOpen)app.handleOfflinePackClick=function(event){
+      const id=event.target.closest('[data-pack-view]')?.dataset.packView;
+      const out=oldOpen(event);
+      if(id){
+        const p=(this.state.offlinePacks||[]).find(x=>String(x.id)===String(id));
+        const extra=p?.anglerAdvantage,box=this.$?.('offlinePackDetail');
+        if(extra&&box){
+          const alertText=(extra.alerts||[]).length?(extra.alerts||[]).map(a=>a.event).slice(0,3).join(' • '):'No active NWS alerts were saved in this snapshot';
+          box.insertAdjacentHTML('beforeend','<div class="aa-offline-extra"><strong>Trip Trust '+this.escape(String(extra.trustScore??'—'))+'/100 • '+this.escape(extra.trustLabel||'VERIFY')+'</strong><span>'+this.escape(extra.access?.label||'VERIFY')+' access • '+(extra.regulations?.checked?'regulations checked':'regulations not marked checked')+' • personal '+this.escape(extra.personal?.match==null?'learning':extra.personal.match+'%')+'</span><small>'+this.escape(alertText)+'</small></div>');
+        }
+      }
+      return out;
     };
   },
 
@@ -357,6 +373,15 @@ const AA={
       style:f=>this.warningStyle(f.properties||{}),
       onEachFeature:(f,l)=>{const p=f.properties||{};l.bindPopup('<div class="cc-popup"><strong>'+app.escape(p.event||'NWS alert')+'</strong><br><span>'+app.escape(p.severity||'')+' • '+app.escape(p.areaDesc||'')+'</span><br><small>'+app.escape(p.headline||'Official NWS warning')+'</small></div>');}
     }).addTo(map);
+  },
+
+  wireVisibility(app){
+    document.addEventListener('visibilitychange',()=>{
+      if(document.visibilityState==='visible'){
+        const age=this.lastAlertCheck?(Date.now()-new Date(this.lastAlertCheck).getTime()):Infinity;
+        if(age>10*60*1000)this.refreshAlerts(app,{notify:true,quiet:true});
+      }
+    });
   },
 
   startWatch(app){
