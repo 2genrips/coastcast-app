@@ -30,15 +30,15 @@ self.addEventListener('fetch',event=>{
     return;
   }
 
-  event.respondWith((async()=>{
-    const cached=await caches.match(event.request);
-    const refresh=fetch(event.request).then(async response=>{
-      if(response.ok){const cache=await caches.open(CACHE);await cache.put(event.request,response.clone());}
-      return response;
-    });
-    if(cached){event.waitUntil(refresh.catch(()=>{}));return cached;}
-    try{return await refresh;}catch(_){return new Response('',{status:504,statusText:'Offline'});}
-  })());
+  const refresh=fetch(event.request).then(async response=>{
+    if(response.ok){const cache=await caches.open(CACHE);await cache.put(event.request,response.clone());}
+    return response;
+  });
+  event.waitUntil(refresh.catch(()=>{}));
+  event.respondWith(caches.match(event.request).then(cached=>{
+    if(cached)return cached;
+    return refresh.catch(()=>new Response('',{status:504,statusText:'Offline'}));
+  }));
 });
 
 
