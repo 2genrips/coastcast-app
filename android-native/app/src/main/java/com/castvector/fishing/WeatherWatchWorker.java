@@ -1,6 +1,7 @@
 package com.castvector.fishing;
 
 import android.Manifest;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,8 +12,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -154,18 +153,18 @@ public class WeatherWatchWorker extends Worker {
         if (area != null && !area.isEmpty()) body += " • " + area;
         if (locationName != null && !locationName.isEmpty()) body += " • Watching " + locationName;
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+        Notification.Builder builder = new Notification.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("CastVector safety: " + event)
                 .setContentText(body)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setStyle(new Notification.BigTextStyle().bigText(body))
+                .setCategory(Notification.CATEGORY_ALARM)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
         try {
-            NotificationManagerCompat.from(context).notify(Math.abs(id.hashCode()), builder.build());
+            NotificationManager manager = context.getSystemService(NotificationManager.class);
+            if (manager != null) manager.notify(Math.abs(id.hashCode()), builder.build());
         } catch (SecurityException ignored) {}
     }
 
