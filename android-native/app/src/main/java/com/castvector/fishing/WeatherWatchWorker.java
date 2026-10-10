@@ -115,6 +115,7 @@ public class WeatherWatchWorker extends Worker {
             return Result.retry();
         } finally {
             if (connection != null) connection.disconnect();
+            CastVectorWidgetProvider.updateAll(context);
         }
     }
 
