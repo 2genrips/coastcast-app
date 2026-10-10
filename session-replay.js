@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const Replay={
-  version:'7.2.0',
+  version:'9.5.0',
   watchId:null,
   replayLayer:null,
 
@@ -22,7 +22,7 @@ const Replay={
         points:[],events:[],distanceMiles:0,lastGpsAt:null,status:'ready',
         privacy:'private',location:g.location?.name||app.state.location.name
       };
-      app.save?.();
+      app.save?.({cloud:false});
     }
     return g.track;
   },
@@ -40,7 +40,7 @@ const Replay={
     const t=this.ensureTrack(app);if(!t)return;
     if(this.watchId!=null)return;
     if(!navigator.geolocation){
-      t.status='unavailable';app.save?.();this.render(app);return;
+      t.status='unavailable';app.save?.({cloud:false});this.render(app);return;
     }
     t.status='requesting';this.render(app);
     try{
@@ -50,7 +50,7 @@ const Replay={
         {enableHighAccuracy:true,maximumAge:5000,timeout:20000}
       );
     }catch(_){
-      t.status='unavailable';this.watchId=null;app.save?.();this.render(app);
+      t.status='unavailable';this.watchId=null;app.save?.({cloud:false});this.render(app);
     }
   },
 
@@ -59,14 +59,14 @@ const Replay={
       try{navigator.geolocation.clearWatch(this.watchId);}catch(_){}
     }
     this.watchId=null;
-    const t=app.state.goMode?.track;if(t){t.status='stopped';app.save?.();}
+    const t=app.state.goMode?.track;if(t){t.status='stopped';app.save?.({cloud:false});}
   },
 
   onError(app,err){
     const t=this.ensureTrack(app);if(!t)return;
     t.status=err?.code===1?'permission-denied':'gps-waiting';
     t.lastError=String(err?.message||'GPS unavailable');
-    app.save?.();this.render(app);
+    app.save?.({cloud:false});this.render(app);
   },
 
   onPosition(app,pos){
@@ -88,7 +88,7 @@ const Replay={
     if(t.points.length>1200)t.points=t.points.slice(-1200);
     t.distanceMiles=Number(t.distanceMiles||0)+(Number.isFinite(miles)?miles:0);
     t.lastGpsAt=at;t.status='tracking';
-    app.save?.();this.render(app);
+    app.save?.({cloud:false});this.render(app);
   },
 
   addEvent(app,type,label,detail=''){
@@ -99,7 +99,7 @@ const Replay={
       lat:p?.lat??null,lon:p?.lon??null,...this.snapshot(app)
     });
     t.events=t.events.slice(-100);
-    app.save?.();this.render(app);
+    app.save?.({cloud:false});this.render(app);
     app.showToast?.(label+' marked on this trip.');
   },
 
@@ -114,7 +114,7 @@ const Replay={
       catchId:catchItem.id,at:catchItem.date||new Date().toISOString(),
       lat:p?.lat??catchItem.lat,lon:p?.lon??catchItem.lon,...this.snapshot(app)
     });
-    app.save?.();this.render(app);
+    app.save?.({cloud:false});this.render(app);
   },
 
   finalize(app,track,historyItem){

@@ -35,15 +35,15 @@ for(const id of requiredIds){
 }
 ok('critical navigation and Home wiring present');
 
-const version='9.0.0';
+const version='9.5.0';
 if(pkg.version!==version)fail('package version mismatch: '+pkg.version);
 if(!index.includes('brand-version">'+version+'<'))fail('brand version mismatch');
 if(!sw.includes("castvector-v"+version))fail('service worker cache version mismatch');
 if(!gradle.includes("versionName '"+version+"'"))fail('Android versionName mismatch');
-if(!gradle.includes('versionCode 90001'))fail('Android versionCode mismatch');
+if(!gradle.includes('versionCode 95001'))fail('Android versionCode mismatch');
 ok('release versions aligned');
 
-const requiredModules=['smart-home.js','explore-feed.js','session-replay.js','depth-intelligence.js','pattern-atlas.js','freshwater-mode.js','universal-discover.js','runtime-resilience.js','map-pro.js','angler-advantage.js','competitive-core.js'];
+const requiredModules=['smart-home.js','explore-feed.js','session-replay.js','depth-intelligence.js','pattern-atlas.js','freshwater-mode.js','universal-discover.js','runtime-resilience.js','map-pro.js','angler-advantage.js','competitive-core.js','batch-upgrades.js'];
 for(const f of requiredModules){
   if(!index.includes('src="'+f+'?v='+version+'"'))fail('Module not loaded: '+f);
   if(!sw.includes("'./"+f+"?v="+version+"'"))fail('Module not cached: '+f);

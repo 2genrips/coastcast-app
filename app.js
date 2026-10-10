@@ -315,7 +315,7 @@
       }catch(_){ }
     },
 
-    save(){
+    save(options={}){
       const payload={
         live:this.state.live,location:this.state.location,radius:this.state.radius,tackleRadius:this.state.tackleRadius,
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
@@ -334,7 +334,7 @@
         command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,membership:this.state.membership,backend:this.state.backend,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt
       };
       try{ localStorage.setItem('coastcast-v50-state',JSON.stringify(payload)); }catch(_){ }
-      if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
+      if(options.cloud!==false&&this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
     bindNavigation(){
@@ -715,7 +715,7 @@
       const oceanData=results[5].status==='fulfilled'?results[5].value:null;
       if(oceanData)this.state.oceanNetwork=oceanData;else this.state.oceanNetwork={status:'fallback',station:null,observation:null,history:[],lastChecked:new Date().toISOString(),error:'NDBC observation feed unavailable'};
       this.state.safetyAlerts=alertData?.alerts||[];
-      this.state.sourceHealth={weather:weather?'live':'fallback',marine:marine?'live':'fallback',tides:tideData?'live':'fallback',shops:shops?(shops.some(x=>x.verified)?'verified':'live'):'fallback',alerts:alertData?'live':'fallback',buoy:oceanData?.observation?'live':'fallback'};
+      this.state.sourceHealth={weather:weather?'live':'fallback',marine:marine?'live':'fallback',tides:tideData?'live':'fallback',shops:shops?(shops.some(x=>x.stale||x.cached)?'cached':shops.some(x=>x.verified)?'verified':'live'):'fallback',alerts:alertData?'live':'fallback',buoy:oceanData?.observation?'live':'fallback'};
       this.state.data=this.mergeLiveData(base,weather,marine,tideData,shops);
       this.recalculateScores();
       this.renderAll();
@@ -938,7 +938,9 @@
       const n=String(name||'').trim();if(!n)return false;
       if(meta.verifiedFishing===true)return true;
       const text=(n+' '+String(meta.display_name||'')).toLowerCase();
-      const reject=/\b(sheriff|police|library|school|academy|church|courthouse|court house|city hall|town hall|county office|government|department of|fire station|hospital|medical|museum|bank|pharmacy|restaurant|hotel|motel|university|college|post office|dentist|law office|realty|real estate)\b/i;
+      const knownChain=/\b(bass pro shops?|cabela'?s|academy sports(?: \+ outdoors)?|sportsman'?s warehouse|west marine|dick'?s sporting goods|scheels)\b/i;
+      if(knownChain.test(text))return true;
+      const reject=/\b(sheriff|police|library|school|church|courthouse|court house|city hall|town hall|county office|government|department of|fire station|hospital|medical|museum|bank|pharmacy|restaurant|hotel|motel|university|college|post office|dentist|law office|realty|real estate)\b/i;
       if(reject.test(text))return false;
       const tags=meta.tags||meta.extratags||{};
       const cats=[...(Array.isArray(meta.categories)?meta.categories:[]),...(Array.isArray(tags.categories)?tags.categories:[])].map(x=>String(x).toLowerCase());
@@ -987,7 +989,7 @@
       }
 
       // Merge OpenStreetMap results instead of stopping after the first provider response.
-      const query=`[out:json][timeout:14];(nwr(around:${radiusMeters},${lat},${lon})[shop="fishing"];nwr(around:${radiusMeters},${lat},${lon})[shop="sports"][sport="fishing"];nwr(around:${radiusMeters},${lat},${lon})[shop="outdoor"][sport="fishing"];nwr(around:${radiusMeters},${lat},${lon})[name~"bait|tackle|angler|fishing|fishin|rod.{0,5}reel",i];nwr(around:${radiusMeters},${lat},${lon})[description~"bait|tackle|fishing supplies",i];nwr(around:${radiusMeters},${lat},${lon})[products~"bait|tackle|fishing",i];);out center tags;`;
+      const query=`[out:json][timeout:14];(nwr(around:${radiusMeters},${lat},${lon})[shop="fishing"];nwr(around:${radiusMeters},${lat},${lon})[shop="sports"][sport="fishing"];nwr(around:${radiusMeters},${lat},${lon})[shop="outdoor"][sport="fishing"];nwr(around:${radiusMeters},${lat},${lon})[shop~"hardware|convenience|general|supermarket"][products~"bait|tackle|fishing|rod|reel",i];nwr(around:${radiusMeters},${lat},${lon})[name~"bait|tackle|angler|fishing|fishin|rod.{0,5}reel|bass pro|cabela|academy sports|west marine|sportsman.{0,3}s warehouse",i];nwr(around:${radiusMeters},${lat},${lon})[description~"bait|tackle|fishing supplies",i];nwr(around:${radiusMeters},${lat},${lon})[products~"bait|tackle|fishing",i];);out center tags;`;
       const endpoints=['https://overpass.private.coffee/api/interpreter','https://overpass-api.de/api/interpreter'];
       for(const endpoint of endpoints){
         try{
@@ -1018,6 +1020,14 @@
           this.showToast(`Found ${shops.length} fishing/tackle result${shops.length===1?'':'s'} within about ${radiusMiles} miles${enhanced}.`);
         }
         return shops;
+      }
+      const stale=this.readPlaceCache(cacheKey,7*86400000);
+      const staleValid=(stale||[]).filter(x=>this.isLikelyTackleShop(x.name,{tags:x.osmTags||{},display_name:x.displayName||'',categories:x.categories||[],verifiedFishing:x.verified===true}));
+      if(staleValid.length){
+        const recovered=staleValid.slice(0,18).map(x=>({...x,cached:true,stale:true}));
+        if(this.state.data)this.state.data.shops=recovered;
+        if(forceToast){this.state.sourceHealth.shops='cached';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.renderDestinationHub();this.showToast('Live tackle search was unavailable. Showing recently verified fishing-store results.');}
+        return recovered;
       }
       if(forceToast){this.state.sourceHealth.shops='fallback';this.renderSourceHealth();this.renderShops();this.renderMapLayers();this.renderDestinationHub();this.showToast('No verified bait/tackle shop was found nearby. CastVector will not place unrelated businesses on the map.');}
       return [];
@@ -3177,7 +3187,17 @@
     },
 
     cloudStatePayload(){
-      const b=this.backupPayload();return {...b.appState,cloud:undefined};
+      const b=this.backupPayload(),data=JSON.parse(JSON.stringify(b.appState||{}));
+      data.cloud=undefined;
+      if(data.goMode?.track)data.goMode.track=null;
+      if(Array.isArray(data.goMode?.history)){
+        data.goMode.history=data.goMode.history.map(h=>{
+          if(!h?.routeReplay)return h;
+          const r=h.routeReplay||{};
+          return {...h,routeReplay:{version:r.version||'9.5.0',privacy:'private-local',distanceMiles:r.distanceMiles||0,startedAt:r.startedAt,endedAt:r.endedAt,catchCount:r.catchCount||0,avgScore:r.avgScore??null,points:[],events:[]}};
+        });
+      }
+      return data;
     },
 
     async cloudRequest(url,options={},retry=true){

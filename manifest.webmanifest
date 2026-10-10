@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 9.0 Competitive Core adds public-access intelligence, community catch mapping, quick map tools, location-aware regulations, offline map areas and stronger personal fishing profiles.",
+  "description": "CastVector 9.5 adds Personal Brain 3.0, real Community Pulse and catch heat, Offline Trips Pro, First Trip Coach, shareable trip cards, improved tackle-store recovery and stronger GPS/cloud privacy.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
