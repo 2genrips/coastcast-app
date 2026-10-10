@@ -579,8 +579,7 @@ public class MainActivity extends Activity {
             try {
                 Intent intent = new Intent(MainActivity.this, RouteTrackingService.class);
                 intent.setAction(RouteTrackingService.ACTION_STOP);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(intent);
-                else startService(intent);
+                startService(intent);
                 return "stopping";
             } catch (Exception e) {
                 return "error";
