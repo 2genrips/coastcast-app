@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 10.5 Daily Driver adds official NWS/MRMS Radar Replay, persistent Since Last Check intelligence and a unified Alert Center, while retaining native background safety monitoring.",
+  "description": "CastVector 11.0 Always-On Angler adds native Android background fishing-window monitoring, official NWS safety suppression, and a CastVector home-screen fishing widget.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
