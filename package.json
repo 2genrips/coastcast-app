@@ -1,7 +1,7 @@
 {
   "name": "castvector-native-wrapper",
   "private": true,
-  "version": "10.5.0",
+  "version": "9.6.0",
   "scripts": {
     "cap:add:android": "npx cap add android",
     "cap:add:ios": "npx cap add ios",
