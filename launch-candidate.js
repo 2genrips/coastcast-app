@@ -46,7 +46,7 @@ const LC={
       SD:{name:'South Dakota Game, Fish & Parks',url:'https://gfp.sd.gov/pages/regulations/'},
       TN:{name:'Tennessee Wildlife Resources Agency',url:'https://www.tn.gov/twra/fishing-regs.html'},
       UT:{name:'Utah Division of Wildlife Resources',url:'https://wildlife.utah.gov/guidebooks?sec=01'},
-      VT:{name:'Vermont Fish & Wildlife Department',url:'https://vtfishandwildlife.com/fish/fishing-regulations'},{name:'Utah Division of Wildlife Resources',url:'https://wildlife.utah.gov/guidebooks?sec=01'},
+      VT:{name:'Vermont Fish & Wildlife Department',url:'https://vtfishandwildlife.com/fish/fishing-regulations'},
       WV:{name:'West Virginia DNR',url:'https://wvdnr.gov/fishing/fishing-regulations/'},
       WI:{name:'Wisconsin DNR',url:'https://dnr.wisconsin.gov/topic/fishing/regulations'},
       WY:{name:'Wyoming Game & Fish Department',url:'https://wgfd.wyo.gov/Regulations/Fish/Fishing-Regulation'}
