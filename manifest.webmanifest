@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 13.5 adds official NWS four-hour radar playback and Front Watch weather-trend intelligence for fishing trip timing.",
+  "description": "CastVector 14.0 adds Android foreground background-route recording for Track My Water with private Session Replay merging.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",

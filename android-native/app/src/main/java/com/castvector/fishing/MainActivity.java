@@ -222,6 +222,11 @@ public class MainActivity extends Activity {
                 + "window.CastVectorNative.disableOpportunityWatch=function(){return CastVectorAndroidBridge.disableOpportunityWatch();};"
                 + "window.CastVectorNative.checkOpportunityWatchNow=function(){return CastVectorAndroidBridge.checkOpportunityWatchNow();};"
                 + "window.CastVectorNative.getOpportunityWatchStatus=function(){return CastVectorAndroidBridge.getOpportunityWatchStatus();};"
+                + "window.CastVectorNative.startRouteTracking=function(sessionId,name){return CastVectorAndroidBridge.startRouteTracking(String(sessionId||''),String(name||''));};"
+                + "window.CastVectorNative.stopRouteTracking=function(){return CastVectorAndroidBridge.stopRouteTracking();};"
+                + "window.CastVectorNative.getRouteTrackingStatus=function(){return CastVectorAndroidBridge.getRouteTrackingStatus();};"
+                + "window.CastVectorNative.getRouteTrack=function(){return CastVectorAndroidBridge.getRouteTrack();};"
+                + "window.CastVectorNative.clearRouteTrack=function(){return CastVectorAndroidBridge.clearRouteTrack();};"
                 + "window.dispatchEvent(new CustomEvent('castvector:native-ready',{detail:{platform:'android',version:'" + BuildConfig.VERSION_NAME + "'}}));"
                 + "})();";
         webView.evaluateJavascript(js, null);
@@ -547,6 +552,57 @@ public class MainActivity extends Activity {
                 return out.toString();
             } catch (Exception e) {
                 return "{\"available\":true,\"enabled\":false,\"lastStatus\":\"error\"}";
+            }
+        }
+
+        @JavascriptInterface
+        public String startRouteTracking(String sessionId, String name) {
+            boolean granted =
+                    checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            if (!granted) return "permission_required";
+            try {
+                Intent intent = new Intent(MainActivity.this, RouteTrackingService.class);
+                intent.setAction(RouteTrackingService.ACTION_START);
+                intent.putExtra(RouteTrackingService.EXTRA_SESSION, sessionId == null ? "" : sessionId);
+                intent.putExtra(RouteTrackingService.EXTRA_NAME, name == null ? "" : name);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(intent);
+                else startService(intent);
+                return "enabled";
+            } catch (Exception e) {
+                return "error";
+            }
+        }
+
+        @JavascriptInterface
+        public String stopRouteTracking() {
+            try {
+                Intent intent = new Intent(MainActivity.this, RouteTrackingService.class);
+                intent.setAction(RouteTrackingService.ACTION_STOP);
+                startService(intent);
+                return "stopping";
+            } catch (Exception e) {
+                return "error";
+            }
+        }
+
+        @JavascriptInterface
+        public String getRouteTrackingStatus() {
+            return RouteTrackingService.statusJson(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public String getRouteTrack() {
+            return RouteTrackingService.pointsJson(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public String clearRouteTrack() {
+            try {
+                RouteTrackingService.clear(MainActivity.this);
+                return "cleared";
+            } catch (Exception e) {
+                return "error";
             }
         }
 
