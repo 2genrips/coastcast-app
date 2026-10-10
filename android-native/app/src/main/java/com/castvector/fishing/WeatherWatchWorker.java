@@ -64,15 +64,26 @@ public class WeatherWatchWorker extends Worker {
             WindowResult window = null;
             if (prefs.getBoolean("fishing_watch_enabled", false)) {
                 try {
+                    int priorScore = prefs.getInt("watch_last_window_score", -1);
+                    int threshold = Math.max(50, Math.min(98, prefs.getInt("watch_score_threshold", 82)));
+                    int lastNotifiedScore = prefs.getInt("watch_last_notified_score", -1);
+                    long lastNotified = prefs.getLong("watch_last_notified", 0L);
+                    long now = System.currentTimeMillis();
+
                     window = findFishingWindow(prefs, lat, lon);
                     saveWindow(prefs, window);
                     if (window != null && window.qualified && !nws.highImpact) {
-                        String species = prefs.getString("watch_species", "Fishing");
-                        String key = species + "|" + window.timeRaw;
-                        String priorKey = prefs.getString("watch_last_window_key", "");
-                        if (!key.equals(priorKey)) {
+                        boolean crossed = priorScore < threshold && window.score >= threshold;
+                        boolean materiallyBetter = window.score >= threshold && window.score >= lastNotifiedScore + 5;
+                        boolean reminderWindow = window.score >= threshold && now - lastNotified >= 12L * 60L * 60L * 1000L;
+                        if (crossed || materiallyBetter || reminderWindow) {
+                            String species = prefs.getString("watch_species", "Fishing");
                             postFishingNotification(context, species, name, window);
-                            prefs.edit().putString("watch_last_window_key", key).apply();
+                            prefs.edit()
+                                    .putLong("watch_last_notified", now)
+                                    .putInt("watch_last_notified_score", window.score)
+                                    .putString("watch_last_window_key", species + "|" + window.timeRaw)
+                                    .apply();
                         }
                     }
                 } catch (RetryableException e) {
