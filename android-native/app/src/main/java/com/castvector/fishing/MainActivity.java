@@ -3,8 +3,10 @@ package com.castvector.fishing;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.appwidget.AppWidgetManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -215,6 +217,8 @@ public class MainActivity extends Activity {
                 + "window.CastVectorNative.restorePurchases=function(){CastVectorAndroidBridge.restorePurchases();};"
                 + "window.CastVectorNative.requestNotificationPermission=function(){return CastVectorAndroidBridge.requestNotificationPermission();};"
                 + "window.CastVectorNative.enableSafetyWatch=function(lat,lon,name){return CastVectorAndroidBridge.enableSafetyWatch(Number(lat),Number(lon),String(name||''));};"
+                + "window.CastVectorNative.enableFishingWatch=function(lat,lon,name,species,threshold,maxWind,waterMin,waterMax,waveMin,waveMax,tideBias,mode){return CastVectorAndroidBridge.enableFishingWatch(Number(lat),Number(lon),String(name||''),String(species||''),Number(threshold),Number(maxWind),Number(waterMin),Number(waterMax),Number(waveMin),Number(waveMax),Number(tideBias),String(mode||'coast'));};"
+                + "window.CastVectorNative.pinFishingWidget=function(){return CastVectorAndroidBridge.pinFishingWidget();};"
                 + "window.CastVectorNative.disableSafetyWatch=function(){return CastVectorAndroidBridge.disableSafetyWatch();};"
                 + "window.CastVectorNative.checkSafetyWatchNow=function(){return CastVectorAndroidBridge.checkSafetyWatchNow();};"
                 + "window.CastVectorNative.getSafetyWatchStatus=function(){return CastVectorAndroidBridge.getSafetyWatchStatus();};"
@@ -266,6 +270,27 @@ public class MainActivity extends Activity {
                 ExistingWorkPolicy.REPLACE,
                 now
         );
+    }
+
+    private void scheduleFishingWatch(double lat, double lon, String name, String species, int threshold,
+                                      double maxWind, double waterMin, double waterMax,
+                                      double waveMin, double waveMax, int tideBias, String mode) {
+        SharedPreferences prefs = getSharedPreferences(WeatherWatchWorker.PREFS, MODE_PRIVATE);
+        prefs.edit()
+                .putBoolean("fishing_watch_enabled", true)
+                .putString("watch_species", species == null || species.trim().isEmpty() ? "Target species" : species.trim())
+                .putInt("watch_score_threshold", Math.max(50, Math.min(98, threshold)))
+                .putLong("watch_max_wind_bits", Double.doubleToRawLongBits(Double.isFinite(maxWind) ? maxWind : 15.0))
+                .putLong("watch_water_min_bits", Double.doubleToRawLongBits(Double.isFinite(waterMin) ? waterMin : 55.0))
+                .putLong("watch_water_max_bits", Double.doubleToRawLongBits(Double.isFinite(waterMax) ? waterMax : 80.0))
+                .putLong("watch_wave_min_bits", Double.doubleToRawLongBits(Double.isFinite(waveMin) ? waveMin : 0.5))
+                .putLong("watch_wave_max_bits", Double.doubleToRawLongBits(Double.isFinite(waveMax) ? waveMax : 4.0))
+                .putInt("watch_tide_bias", Math.max(0, Math.min(12, tideBias)))
+                .putString("watch_water_mode", "freshwater".equalsIgnoreCase(mode) ? "freshwater" : "coast")
+                .putString("watch_last_window_key", "")
+                .apply();
+        scheduleSafetyWatch(lat, lon, name);
+        CastVectorWidgetProvider.updateAll(this);
     }
 
     private void showConfigurationPage() {
@@ -378,15 +403,48 @@ public class MainActivity extends Activity {
                 return "permission_required";
             }
             scheduleSafetyWatch(lat, lon, name);
+            CastVectorWidgetProvider.updateAll(MainActivity.this);
             return "enabled";
+        }
+
+        @JavascriptInterface
+        public String enableFishingWatch(double lat, double lon, String name, String species, int threshold,
+                                         double maxWind, double waterMin, double waterMax,
+                                         double waveMin, double waveMax, int tideBias, String mode) {
+            if (!Double.isFinite(lat) || !Double.isFinite(lon)) return "invalid_location";
+            if (Build.VERSION.SDK_INT >= 33 &&
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                return "permission_required";
+            }
+            scheduleFishingWatch(lat, lon, name, species, threshold, maxWind, waterMin, waterMax, waveMin, waveMax, tideBias, mode);
+            return "enabled";
+        }
+
+        @JavascriptInterface
+        public String pinFishingWidget() {
+            try {
+                AppWidgetManager manager = AppWidgetManager.getInstance(MainActivity.this);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !manager.isRequestPinAppWidgetSupported()) {
+                    return "unsupported";
+                }
+                ComponentName provider = new ComponentName(MainActivity.this, CastVectorWidgetProvider.class);
+                boolean requested = manager.requestPinAppWidget(provider, null, null);
+                return requested ? "requested" : "unavailable";
+            } catch (Exception e) {
+                return "error";
+            }
         }
 
         @JavascriptInterface
         public String disableSafetyWatch() {
             SharedPreferences prefs = getSharedPreferences(WeatherWatchWorker.PREFS, MODE_PRIVATE);
-            prefs.edit().putBoolean("watch_enabled", false).apply();
+            prefs.edit()
+                    .putBoolean("watch_enabled", false)
+                    .putBoolean("fishing_watch_enabled", false)
+                    .apply();
             WorkManager.getInstance(MainActivity.this).cancelUniqueWork(WeatherWatchWorker.UNIQUE_WORK);
             WorkManager.getInstance(MainActivity.this).cancelUniqueWork(WeatherWatchWorker.UNIQUE_WORK + "_now");
+            CastVectorWidgetProvider.updateAll(MainActivity.this);
             return "disabled";
         }
 
@@ -421,6 +479,14 @@ public class MainActivity extends Activity {
                 out.put("lastStatus", prefs.getString("watch_last_status", "idle"));
                 out.put("lastError", prefs.getString("watch_last_error", ""));
                 out.put("lastEvent", prefs.getString("watch_last_event", ""));
+                out.put("fishingEnabled", prefs.getBoolean("fishing_watch_enabled", false));
+                out.put("species", prefs.getString("watch_species", ""));
+                out.put("threshold", prefs.getInt("watch_score_threshold", 82));
+                out.put("maxWind", Double.longBitsToDouble(prefs.getLong("watch_max_wind_bits", Double.doubleToRawLongBits(15.0))));
+                out.put("lastWindowScore", prefs.getInt("watch_last_window_score", 0));
+                out.put("lastWindowTime", prefs.getString("watch_last_window_time", ""));
+                out.put("lastWindowQualified", prefs.getBoolean("watch_last_window_qualified", false));
+                out.put("waterMode", prefs.getString("watch_water_mode", "coast"));
                 boolean granted = Build.VERSION.SDK_INT < 33 ||
                         checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
                 out.put("notificationGranted", granted);
