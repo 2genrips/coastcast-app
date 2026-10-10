@@ -6,6 +6,7 @@ import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -30,12 +31,24 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
+import org.json.JSONObject;
+
 import java.net.URI;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity {
     private static final int REQ_LOCATION = 41;
     private static final int REQ_FILE = 42;
+    private static final int REQ_NOTIFICATIONS = 43;
 
     private WebView webView;
     private ValueCallback<Uri[]> fileCallback;
@@ -200,6 +213,11 @@ public class MainActivity extends Activity {
                 + "window.CastVectorNative.version='" + BuildConfig.VERSION_NAME + "';"
                 + "window.CastVectorNative.buyPremium=function(){CastVectorAndroidBridge.buyPremium();};"
                 + "window.CastVectorNative.restorePurchases=function(){CastVectorAndroidBridge.restorePurchases();};"
+                + "window.CastVectorNative.requestNotificationPermission=function(){return CastVectorAndroidBridge.requestNotificationPermission();};"
+                + "window.CastVectorNative.enableSafetyWatch=function(lat,lon,name){return CastVectorAndroidBridge.enableSafetyWatch(Number(lat),Number(lon),String(name||''));};"
+                + "window.CastVectorNative.disableSafetyWatch=function(){return CastVectorAndroidBridge.disableSafetyWatch();};"
+                + "window.CastVectorNative.checkSafetyWatchNow=function(){return CastVectorAndroidBridge.checkSafetyWatchNow();};"
+                + "window.CastVectorNative.getSafetyWatchStatus=function(){return CastVectorAndroidBridge.getSafetyWatchStatus();};"
                 + "window.dispatchEvent(new CustomEvent('castvector:native-ready',{detail:{platform:'android',version:'" + BuildConfig.VERSION_NAME + "'}}));"
                 + "})();";
         webView.evaluateJavascript(js, null);
@@ -211,6 +229,43 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             Toast.makeText(this, "Unable to open link.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void scheduleSafetyWatch(double lat, double lon, String name) {
+        SharedPreferences prefs = getSharedPreferences(WeatherWatchWorker.PREFS, MODE_PRIVATE);
+        prefs.edit()
+                .putBoolean("watch_enabled", true)
+                .putLong("watch_lat_bits", Double.doubleToRawLongBits(lat))
+                .putLong("watch_lon_bits", Double.doubleToRawLongBits(lon))
+                .putString("watch_name", name == null || name.trim().isEmpty() ? "Selected fishing location" : name.trim())
+                .apply();
+
+        WeatherWatchWorker.ensureChannel(this);
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        PeriodicWorkRequest periodic = new PeriodicWorkRequest.Builder(
+                WeatherWatchWorker.class,
+                30,
+                TimeUnit.MINUTES
+        ).setConstraints(constraints).build();
+
+        WorkManager manager = WorkManager.getInstance(this);
+        manager.enqueueUniquePeriodicWork(
+                WeatherWatchWorker.UNIQUE_WORK,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                periodic
+        );
+
+        OneTimeWorkRequest now = new OneTimeWorkRequest.Builder(WeatherWatchWorker.class)
+                .setConstraints(constraints)
+                .build();
+        manager.enqueueUniqueWork(
+                WeatherWatchWorker.UNIQUE_WORK + "_now",
+                ExistingWorkPolicy.REPLACE,
+                now
+        );
     }
 
     private void showConfigurationPage() {
@@ -252,6 +307,12 @@ public class MainActivity extends Activity {
             pendingGeoOrigin = null;
             pendingGeoCallback = null;
         }
+        if (requestCode == REQ_NOTIFICATIONS && webView != null) {
+            boolean granted = Build.VERSION.SDK_INT < 33 ||
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+            String js = "window.dispatchEvent(new CustomEvent('castvector:notification-permission',{detail:{granted:" + granted + "}}));";
+            webView.evaluateJavascript(js, null);
+        }
     }
 
     @Override
@@ -288,6 +349,85 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public String getVersion() {
             return BuildConfig.VERSION_NAME;
+        }
+
+        @JavascriptInterface
+        public String requestNotificationPermission() {
+            if (Build.VERSION.SDK_INT < 33 ||
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                if (webView != null) {
+                    webView.post(() -> webView.evaluateJavascript(
+                            "window.dispatchEvent(new CustomEvent('castvector:notification-permission',{detail:{granted:true}}));",
+                            null
+                    ));
+                }
+                return "granted";
+            }
+            runOnUiThread(() -> requestPermissions(
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQ_NOTIFICATIONS
+            ));
+            return "requested";
+        }
+
+        @JavascriptInterface
+        public String enableSafetyWatch(double lat, double lon, String name) {
+            if (!Double.isFinite(lat) || !Double.isFinite(lon)) return "invalid_location";
+            if (Build.VERSION.SDK_INT >= 33 &&
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                return "permission_required";
+            }
+            scheduleSafetyWatch(lat, lon, name);
+            return "enabled";
+        }
+
+        @JavascriptInterface
+        public String disableSafetyWatch() {
+            SharedPreferences prefs = getSharedPreferences(WeatherWatchWorker.PREFS, MODE_PRIVATE);
+            prefs.edit().putBoolean("watch_enabled", false).apply();
+            WorkManager.getInstance(MainActivity.this).cancelUniqueWork(WeatherWatchWorker.UNIQUE_WORK);
+            WorkManager.getInstance(MainActivity.this).cancelUniqueWork(WeatherWatchWorker.UNIQUE_WORK + "_now");
+            return "disabled";
+        }
+
+        @JavascriptInterface
+        public String checkSafetyWatchNow() {
+            SharedPreferences prefs = getSharedPreferences(WeatherWatchWorker.PREFS, MODE_PRIVATE);
+            if (!prefs.getBoolean("watch_enabled", false)) return "disabled";
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+            OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WeatherWatchWorker.class)
+                    .setConstraints(constraints)
+                    .build();
+            WorkManager.getInstance(MainActivity.this).enqueueUniqueWork(
+                    WeatherWatchWorker.UNIQUE_WORK + "_now",
+                    ExistingWorkPolicy.REPLACE,
+                    request
+            );
+            return "queued";
+        }
+
+        @JavascriptInterface
+        public String getSafetyWatchStatus() {
+            try {
+                SharedPreferences prefs = getSharedPreferences(WeatherWatchWorker.PREFS, MODE_PRIVATE);
+                JSONObject out = new JSONObject();
+                out.put("available", true);
+                out.put("enabled", prefs.getBoolean("watch_enabled", false));
+                out.put("name", prefs.getString("watch_name", ""));
+                out.put("lastChecked", prefs.getLong("watch_last_checked", 0L));
+                out.put("lastAlertCount", prefs.getInt("watch_last_alert_count", 0));
+                out.put("lastStatus", prefs.getString("watch_last_status", "idle"));
+                out.put("lastError", prefs.getString("watch_last_error", ""));
+                out.put("lastEvent", prefs.getString("watch_last_event", ""));
+                boolean granted = Build.VERSION.SDK_INT < 33 ||
+                        checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+                out.put("notificationGranted", granted);
+                return out.toString();
+            } catch (Exception e) {
+                return "{\"available\":true,\"enabled\":false,\"lastStatus\":\"error\"}";
+            }
         }
 
         @JavascriptInterface
