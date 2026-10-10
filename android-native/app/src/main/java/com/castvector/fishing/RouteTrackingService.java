@@ -80,7 +80,7 @@ public class RouteTrackingService extends Service implements LocationListener {
 
         startForeground(NOTIFICATION_ID, buildNotification());
         requestUpdates();
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private void requestUpdates() {
