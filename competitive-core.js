@@ -346,7 +346,7 @@ const C={
   async downloadOfflineMap(app){
     if(!('caches'in window))return app.showToast?.('Offline map storage is not available on this device.');
     const l=app.state.location||{},base=window.CastVectorMapPro?.activeBase||'hybrid',map=app.state.map,z0=Math.max(8,Math.min(16,map?.getZoom?.()||13));
-    const coords=[],seen=new Set(),add=(z,x,y)=>{const k=z+'/'+x+'/'+y;if(!seen.has(k)){seen.add(k);coords.push({z,x,y});}};
+    const coords=[],seen=new Set(),add=(z,x,y)=>{const n=Math.pow(2,z);x=Math.max(0,Math.min(n-1,x));y=Math.max(0,Math.min(n-1,y));const k=z+'/'+x+'/'+y;if(!seen.has(k)){seen.add(k);coords.push({z,x,y});}};
     for(const z of [Math.max(8,z0-1),z0,Math.min(16,z0+1)]){
       const c=this.tileXY(Number(l.lat),Number(l.lon),z);
       for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)add(z,c.x+dx,c.y+dy);
