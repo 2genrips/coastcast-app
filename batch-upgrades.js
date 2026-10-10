@@ -12,6 +12,7 @@ const B={
     this.installGrowthUI(app);
     this.patchCore(app);
     this.patchCommunity(app);
+    this.patchDiscover(app);
     this.patchCatch(app);
     this.patchRenders(app);
     this.bind(app);
@@ -252,6 +253,29 @@ const B={
     if(app._b95Community)return;app._b95Community=true;
     const old=app.loadCloudCommunity?.bind(app);
     if(old)app.loadCloudCommunity=async function(opts={}){const out=await old(opts);B.renderCommunityPulse(this);if(B.heatLayer){try{this.state.map?.removeLayer(B.heatLayer);}catch(_){}B.heatLayer=null;B.toggleHeat(this);}return out;};
+  },
+
+  communitySignal(app,candidate,species){
+    const posts=this.realCommunityPosts(app).filter(p=>p.locationPrecision!=='hidden'&&Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&Math.abs(p.lat)>1);
+    const near=posts.filter(p=>app.haversine(Number(candidate.lat),Number(candidate.lon),p.lat,p.lon)<=12&&(String(p.species)===String(species)||!species));
+    if(near.length<3)return{boost:0,count:near.length,bait:'—'};
+    const boost=Math.min(3,1+Math.floor(near.length/4));
+    return{boost,count:near.length,bait:this.mode(near.map(p=>p.bait).filter(x=>x&&x!=='Not listed'))};
+  },
+
+  patchDiscover(app){
+    const d=window.CastVectorDiscover;if(!d||d._b95Patched)return;d._b95Patched=true;
+    const oldEval=d.evaluate?.bind(d),oldWhy=d.why?.bind(d);
+    if(oldEval)d.evaluate=async function(a,c,p,env,species){
+      const r=await oldEval(a,c,p,env,species),sig=B.communitySignal(a,r,species);
+      if(sig.boost){r.discoverScore=Math.min(99,Number(r.discoverScore||0)+sig.boost);r.communitySignal=sig;}
+      return r;
+    };
+    if(oldWhy)d.why=function(a,r,p,env){
+      const base=oldWhy(a,r,p,env),sig=r.communitySignal||B.communitySignal(a,r,a.state.targetSpecies);
+      if(sig.count>=3)return [base,sig.count+' real nearby Community catches'+(sig.bait&&sig.bait!=='—'?' • '+sig.bait+' trending':'')].filter(Boolean).join(' • ');
+      return base;
+    };
   },
 
   patchCatch(app){
