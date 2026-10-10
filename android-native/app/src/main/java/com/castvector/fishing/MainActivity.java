@@ -2,9 +2,9 @@ package com.castvector.fishing;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.DownloadManager;
+import android.app.DownloadManager;\nimport android.appwidget.AppWidgetManager;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
+import android.content.Context;\nimport android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -222,6 +222,7 @@ public class MainActivity extends Activity {
                 + "window.CastVectorNative.disableOpportunityWatch=function(){return CastVectorAndroidBridge.disableOpportunityWatch();};"
                 + "window.CastVectorNative.checkOpportunityWatchNow=function(){return CastVectorAndroidBridge.checkOpportunityWatchNow();};"
                 + "window.CastVectorNative.getOpportunityWatchStatus=function(){return CastVectorAndroidBridge.getOpportunityWatchStatus();};"
+                + "window.CastVectorNative.pinFishingWidget=function(){return CastVectorAndroidBridge.pinFishingWidget();};"
                 + "window.dispatchEvent(new CustomEvent('castvector:native-ready',{detail:{platform:'android',version:'" + BuildConfig.VERSION_NAME + "'}}));"
                 + "})();";
         webView.evaluateJavascript(js, null);
@@ -547,6 +548,21 @@ public class MainActivity extends Activity {
                 return out.toString();
             } catch (Exception e) {
                 return "{\"available\":true,\"enabled\":false,\"lastStatus\":\"error\"}";
+            }
+        }
+
+        @JavascriptInterface
+        public String pinFishingWidget() {
+            try {
+                AppWidgetManager manager = AppWidgetManager.getInstance(MainActivity.this);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !manager.isRequestPinAppWidgetSupported()) {
+                    return "unsupported";
+                }
+                ComponentName provider = new ComponentName(MainActivity.this, CastVectorWidgetProvider.class);
+                boolean requested = manager.requestPinAppWidget(provider, null, null);
+                return requested ? "requested" : "unavailable";
+            } catch (Exception e) {
+                return "error";
             }
         }
 
