@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 12.5 turns detailed catch logs into private technique, structure, depth, clarity and lure-color patterns with PB detection and trip-specific personal guidance.",
+  "description": "CastVector 13.0 adds Community Explorer, real-catch local intel, advanced shared-catch filters, Species Watch, privacy-safe filtered maps and a Local Bite Pulse.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",

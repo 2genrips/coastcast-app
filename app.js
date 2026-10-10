@@ -2192,8 +2192,9 @@
         ago:this.prettyDate(c.date),date:c.date,bait:c.bait||'Not listed',
         water:c._communityPrecision==='hidden'?'Location hidden':c._communityPrecision==='exact'?c.location:this.generalizeWater(c.location),
         text:c._communityCaption||c.notes||'Shared a catch with CastVector.',photo:c.photo||'',
-        score:c.score||'',conditions:c.conditions||'',lat:c._communityPrecision==='exact'?Number(c.lat):Math.round(Number(c.lat)*10)/10,
-        lon:c._communityPrecision==='exact'?Number(c.lon):Math.round(Number(c.lon)*10)/10,likes:0
+        score:c.score||'',conditions:c.conditions||'',locationPrecision:c._communityPrecision||'general',
+        lat:c._communityPrecision==='hidden'?null:c._communityPrecision==='exact'?Number(c.lat):Math.round(Number(c.lat)*10)/10,
+        lon:c._communityPrecision==='hidden'?null:c._communityPrecision==='exact'?Number(c.lon):Math.round(Number(c.lon)*10)/10,likes:0
       }));
     },
 
