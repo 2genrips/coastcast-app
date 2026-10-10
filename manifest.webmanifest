@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 10.0 Launch Candidate adds optional Android background NWS safety monitoring, build-health diagnostics, verified inland regulation sources and the full competitive angler-growth toolset.",
+  "description": "CastVector 10.5 Daily Driver adds official NWS/MRMS Radar Replay, persistent Since Last Check intelligence and a unified Alert Center, while retaining native background safety monitoring.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
