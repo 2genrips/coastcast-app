@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 12.0 adds Android Background Bite Watch, a battery-conscious native fishing-opportunity worker that notifies anglers when a watched water crosses their chosen score threshold.",
+  "description": "CastVector 12.5 turns detailed catch logs into private technique, structure, depth, clarity and lure-color patterns with PB detection and trip-specific personal guidance.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
