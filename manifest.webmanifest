@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 14.0 adds Android foreground background-route recording for Track My Water with private Session Replay merging.",
+  "description": "CastVector 14.5 adds exact fishing presentation guidance for bait, color, size, depth, retrieve, technique and rig using live conditions and personal history.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
