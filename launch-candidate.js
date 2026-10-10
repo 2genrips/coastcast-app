@@ -2,7 +2,7 @@
 'use strict';
 
 const LC={
-  version:'10.0.0',
+  version:'11.0.0',
   pendingEnable:false,
 
   app(){return window.CastVector;},
