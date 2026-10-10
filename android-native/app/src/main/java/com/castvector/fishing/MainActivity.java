@@ -218,6 +218,10 @@ public class MainActivity extends Activity {
                 + "window.CastVectorNative.disableSafetyWatch=function(){return CastVectorAndroidBridge.disableSafetyWatch();};"
                 + "window.CastVectorNative.checkSafetyWatchNow=function(){return CastVectorAndroidBridge.checkSafetyWatchNow();};"
                 + "window.CastVectorNative.getSafetyWatchStatus=function(){return CastVectorAndroidBridge.getSafetyWatchStatus();};"
+                + "window.CastVectorNative.enableOpportunityWatch=function(lat,lon,name,species,minWater,maxWater,threshold,coast){return CastVectorAndroidBridge.enableOpportunityWatch(Number(lat),Number(lon),String(name||''),String(species||''),Number(minWater),Number(maxWater),Number(threshold),!!coast);};"
+                + "window.CastVectorNative.disableOpportunityWatch=function(){return CastVectorAndroidBridge.disableOpportunityWatch();};"
+                + "window.CastVectorNative.checkOpportunityWatchNow=function(){return CastVectorAndroidBridge.checkOpportunityWatchNow();};"
+                + "window.CastVectorNative.getOpportunityWatchStatus=function(){return CastVectorAndroidBridge.getOpportunityWatchStatus();};"
                 + "window.dispatchEvent(new CustomEvent('castvector:native-ready',{detail:{platform:'android',version:'" + BuildConfig.VERSION_NAME + "'}}));"
                 + "})();";
         webView.evaluateJavascript(js, null);
@@ -263,6 +267,49 @@ public class MainActivity extends Activity {
                 .build();
         manager.enqueueUniqueWork(
                 WeatherWatchWorker.UNIQUE_WORK + "_now",
+                ExistingWorkPolicy.REPLACE,
+                now
+        );
+    }
+
+    private void scheduleOpportunityWatch(double lat, double lon, String name, String species,
+                                          double idealMin, double idealMax, int threshold, boolean coast) {
+        SharedPreferences prefs = getSharedPreferences(FishingOpportunityWorker.PREFS, MODE_PRIVATE);
+        prefs.edit()
+                .putBoolean("opp_enabled", true)
+                .putLong("opp_lat_bits", Double.doubleToRawLongBits(lat))
+                .putLong("opp_lon_bits", Double.doubleToRawLongBits(lon))
+                .putString("opp_name", name == null || name.trim().isEmpty() ? "Watched water" : name.trim())
+                .putString("opp_species", species == null || species.trim().isEmpty() ? "Target species" : species.trim())
+                .putLong("opp_ideal_min_bits", Double.doubleToRawLongBits(idealMin))
+                .putLong("opp_ideal_max_bits", Double.doubleToRawLongBits(idealMax))
+                .putInt("opp_threshold", Math.max(60, Math.min(95, threshold)))
+                .putBoolean("opp_coast", coast)
+                .apply();
+
+        FishingOpportunityWorker.ensureChannel(this);
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        PeriodicWorkRequest periodic = new PeriodicWorkRequest.Builder(
+                FishingOpportunityWorker.class,
+                3,
+                TimeUnit.HOURS
+        ).setConstraints(constraints).build();
+
+        WorkManager manager = WorkManager.getInstance(this);
+        manager.enqueueUniquePeriodicWork(
+                FishingOpportunityWorker.UNIQUE_WORK,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                periodic
+        );
+
+        OneTimeWorkRequest now = new OneTimeWorkRequest.Builder(FishingOpportunityWorker.class)
+                .setConstraints(constraints)
+                .build();
+        manager.enqueueUniqueWork(
+                FishingOpportunityWorker.UNIQUE_WORK + "_now",
                 ExistingWorkPolicy.REPLACE,
                 now
         );
@@ -421,6 +468,79 @@ public class MainActivity extends Activity {
                 out.put("lastStatus", prefs.getString("watch_last_status", "idle"));
                 out.put("lastError", prefs.getString("watch_last_error", ""));
                 out.put("lastEvent", prefs.getString("watch_last_event", ""));
+                boolean granted = Build.VERSION.SDK_INT < 33 ||
+                        checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+                out.put("notificationGranted", granted);
+                return out.toString();
+            } catch (Exception e) {
+                return "{\"available\":true,\"enabled\":false,\"lastStatus\":\"error\"}";
+            }
+        }
+
+        @JavascriptInterface
+        public String enableOpportunityWatch(double lat, double lon, String name, String species,
+                                             double idealMin, double idealMax, double threshold, boolean coast) {
+            if (!Double.isFinite(lat) || !Double.isFinite(lon)) return "invalid_location";
+            if (Build.VERSION.SDK_INT >= 33 &&
+                    checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                return "permission_required";
+            }
+            scheduleOpportunityWatch(
+                    lat,
+                    lon,
+                    name,
+                    species,
+                    idealMin,
+                    idealMax,
+                    (int)Math.round(threshold),
+                    coast
+            );
+            return "enabled";
+        }
+
+        @JavascriptInterface
+        public String disableOpportunityWatch() {
+            SharedPreferences prefs = getSharedPreferences(FishingOpportunityWorker.PREFS, MODE_PRIVATE);
+            prefs.edit().putBoolean("opp_enabled", false).apply();
+            WorkManager.getInstance(MainActivity.this).cancelUniqueWork(FishingOpportunityWorker.UNIQUE_WORK);
+            WorkManager.getInstance(MainActivity.this).cancelUniqueWork(FishingOpportunityWorker.UNIQUE_WORK + "_now");
+            return "disabled";
+        }
+
+        @JavascriptInterface
+        public String checkOpportunityWatchNow() {
+            SharedPreferences prefs = getSharedPreferences(FishingOpportunityWorker.PREFS, MODE_PRIVATE);
+            if (!prefs.getBoolean("opp_enabled", false)) return "disabled";
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+            OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(FishingOpportunityWorker.class)
+                    .setConstraints(constraints)
+                    .build();
+            WorkManager.getInstance(MainActivity.this).enqueueUniqueWork(
+                    FishingOpportunityWorker.UNIQUE_WORK + "_now",
+                    ExistingWorkPolicy.REPLACE,
+                    request
+            );
+            return "queued";
+        }
+
+        @JavascriptInterface
+        public String getOpportunityWatchStatus() {
+            try {
+                SharedPreferences prefs = getSharedPreferences(FishingOpportunityWorker.PREFS, MODE_PRIVATE);
+                JSONObject out = new JSONObject();
+                out.put("available", true);
+                out.put("enabled", prefs.getBoolean("opp_enabled", false));
+                out.put("name", prefs.getString("opp_name", ""));
+                out.put("species", prefs.getString("opp_species", ""));
+                out.put("threshold", prefs.getInt("opp_threshold", 80));
+                out.put("lastChecked", prefs.getLong("opp_last_checked", 0L));
+                out.put("lastScore", prefs.getInt("opp_last_score", -1));
+                out.put("lastBestTime", prefs.getString("opp_last_best_time", ""));
+                out.put("lastStatus", prefs.getString("opp_last_status", "idle"));
+                out.put("lastError", prefs.getString("opp_last_error", ""));
+                out.put("lastDetail", prefs.getString("opp_last_detail", ""));
                 boolean granted = Build.VERSION.SDK_INT < 33 ||
                         checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
                 out.put("notificationGranted", granted);
