@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 13.0 adds Community Explorer, real-catch local intel, advanced shared-catch filters, Species Watch, privacy-safe filtered maps and a Local Bite Pulse.",
+  "description": "CastVector 13.5 adds Forecast vs Reality trip outcomes and cautious species-specific personal score calibration from rated real fishing trips.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
