@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -31,6 +32,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
 import androidx.work.Constraints;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
@@ -41,7 +43,10 @@ import androidx.work.WorkManager;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -227,6 +232,7 @@ public class MainActivity extends Activity {
                 + "window.CastVectorNative.getRouteTrackingStatus=function(){return CastVectorAndroidBridge.getRouteTrackingStatus();};"
                 + "window.CastVectorNative.getRouteTrack=function(){return CastVectorAndroidBridge.getRouteTrack();};"
                 + "window.CastVectorNative.clearRouteTrack=function(){return CastVectorAndroidBridge.clearRouteTrack();};"
+                + "window.CastVectorNative.shareGpx=function(filename,content){return CastVectorAndroidBridge.shareGpx(String(filename||''),String(content||''));};"
                 + "window.dispatchEvent(new CustomEvent('castvector:native-ready',{detail:{platform:'android',version:'" + BuildConfig.VERSION_NAME + "'}}));"
                 + "})();";
         webView.evaluateJavascript(js, null);
@@ -601,6 +607,48 @@ public class MainActivity extends Activity {
             try {
                 RouteTrackingService.clear(MainActivity.this);
                 return "cleared";
+            } catch (Exception e) {
+                return "error";
+            }
+        }
+
+        @JavascriptInterface
+        public String shareGpx(String filename, String content) {
+            if (content == null || content.isEmpty()) return "empty";
+            if (content.length() > 6_000_000) return "too_large";
+            try {
+                String safe = filename == null ? "castvector-route.gpx" : filename.replaceAll("[^A-Za-z0-9._-]", "-");
+                if (!safe.toLowerCase(Locale.US).endsWith(".gpx")) safe += ".gpx";
+                if (safe.length() > 96) safe = safe.substring(safe.length() - 96);
+
+                File dir = new File(getCacheDir(), "shares");
+                if (!dir.exists() && !dir.mkdirs()) return "storage_error";
+                File file = new File(dir, safe);
+                try (FileOutputStream out = new FileOutputStream(file, false)) {
+                    out.write(content.getBytes(StandardCharsets.UTF_8));
+                }
+
+                Uri uri = FileProvider.getUriForFile(
+                        MainActivity.this,
+                        getPackageName() + ".fileprovider",
+                        file
+                );
+
+                Intent send = new Intent(Intent.ACTION_SEND);
+                send.setType("application/gpx+xml");
+                send.putExtra(Intent.EXTRA_STREAM, uri);
+                send.putExtra(Intent.EXTRA_SUBJECT, "CastVector GPX");
+                send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                send.setClipData(ClipData.newRawUri("CastVector GPX", uri));
+
+                runOnUiThread(() -> {
+                    try {
+                        startActivity(Intent.createChooser(send, "Share CastVector GPX"));
+                    } catch (Exception e) {
+                        Toast.makeText(MainActivity.this, "No compatible app can share this GPX file.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return "queued";
             } catch (Exception e) {
                 return "error";
             }
