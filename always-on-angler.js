@@ -2,7 +2,7 @@
 'use strict';
 
 const AO={
-  version:'11.0.0',
+  version:'12.0.0',
   pendingArm:false,
 
   app(){return window.CastVector;},
@@ -26,7 +26,7 @@ const AO={
     if(trips&&!document.getElementById('alwaysOnAnglerPanel')){
       const p=document.createElement('section');p.id='alwaysOnAnglerPanel';p.className='panel always-on-panel';
       p.innerHTML=
-        '<div class="ao-head"><div><div class="eyebrow">ALWAYS-ON ANGLER • 11.0</div><h2>CastVector can watch while the app is closed</h2></div><span id="aoBadge" class="ao-badge">ANDROID</span></div>'+
+        '<div class="ao-head"><div><div class="eyebrow">ALWAYS-ON ANGLER • 12.0</div><h2>CastVector can watch while the app is closed</h2></div><span id="aoBadge" class="ao-badge">ANDROID</span></div>'+
         '<p class="ao-intro">Android checks official NWS warnings and the next 48 hours of fishing conditions in the background. High-impact weather suppresses fishing-window notifications.</p>'+
         '<div class="ao-grid">'+
           '<article><span>WATCHED WATER</span><strong id="aoWater">—</strong><small id="aoWaterMeta">Choose a fishing location</small></article>'+
