@@ -2221,7 +2221,7 @@
         let reactions=[];try{const rr=await this.cloudRequest(`${c.url}/rest/v1/community_reactions?select=post_id,user_id,reaction&limit=500`,{method:'GET'});const rb=await rr.json();if(rr.ok&&Array.isArray(rb))reactions=rb;}catch(_){}
         const counts={},mine={};reactions.forEach(x=>{counts[x.post_id]=(counts[x.post_id]||0)+1;if(String(x.user_id)===String(c.session.user.id))mine[x.post_id]=true;});
         this._cloudCommunityPosts=(Array.isArray(rows)?rows:[]).map(row=>({
-          id:row.id,cloud:true,own:String(row.user_id)===String(c.session.user.id),user:row.display_name||'CastVector Angler',
+          id:row.id,userId:row.user_id||'',cloud:true,own:String(row.user_id)===String(c.session.user.id),user:row.display_name||'CastVector Angler',
           species:row.species||'Catch',size:row.length_in?`${row.length_in} in`:'',length:row.length_in||'',weight:row.weight_lb||'',
           ago:this.prettyDate(row.catch_date||row.created_at),date:row.catch_date||row.created_at,bait:row.bait||'Not listed',
           water:row.location_label||'Location hidden',text:row.caption||'Shared a catch with CastVector.',photo:/^data:image\/(?:jpeg|png|webp);base64,/i.test(String(row.photo_data||''))?row.photo_data:'',
