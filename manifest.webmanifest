@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 11.5 adds Water Reports and a Water Watchlist with real shared-catch trends, favorite-water refreshes, private-history context and followed waters inside Discover.",
+  "description": "CastVector 12.0 Complete Angler combines Water Reports and Watchlist, Angler Toolkit, native background fishing-window monitoring, NWS safety suppression, and an Android home-screen widget.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
