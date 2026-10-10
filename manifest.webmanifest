@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 14.5 adds exact fishing presentation guidance for bait, color, size, depth, retrieve, technique and rig using live conditions and personal history.",
+  "description": "CastVector 15.0 adds privacy-safe real Community boards for contributors, trophies and active waters, plus personal contribution tracking.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
