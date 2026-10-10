@@ -9,12 +9,14 @@ const B={
   install(){
     const app=this.app();if(!app)return;
     this.installUI(app);
+    this.installGrowthUI(app);
     this.patchCore(app);
     this.patchCommunity(app);
     this.patchCatch(app);
     this.patchRenders(app);
     this.bind(app);
     this.render(app);
+    setTimeout(()=>this.maybeOnboard(app),450);
   },
 
   installUI(app){
@@ -61,6 +63,105 @@ const B={
       p.innerHTML='<div><div class="eyebrow">OFFLINE READY • 9.5</div><h2>One tap before you lose service</h2><p id="offlineLauncherMeta">Save this trip’s forecast, trust snapshot and map area together.</p></div><button id="offlineProOpen" class="primary-button" type="button">Offline Trip Manager</button>';
       const core=document.getElementById('competitiveCorePanel');if(core)core.after(p);else trips.prepend(p);
     }
+  },
+
+  installGrowthUI(app){
+    if(!document.getElementById('firstTripCoachDialog')){
+      const d=document.createElement('dialog');d.id='firstTripCoachDialog';d.className='sheet-dialog first-trip-dialog';
+      d.innerHTML='<div class="sheet-card first-trip-sheet">'+
+        '<div class="b95-head"><div><div class="eyebrow">FIRST TRIP COACH • 9.5</div><h2>Make CastVector fit how you fish</h2><p>Three quick choices. No account required.</p></div><button id="firstTripClose" class="icon-button" type="button">×</button></div>'+
+        '<div class="coach-step"><span>1 • EXPERIENCE</span><div class="coach-choices"><button type="button" data-coach-exp="new">New angler</button><button type="button" data-coach-exp="regular">Regular angler</button><button type="button" data-coach-exp="advanced">Advanced</button></div></div>'+
+        '<div class="coach-step"><span>2 • WATER</span><div class="coach-choices"><button type="button" data-coach-water="coast">Coast</button><button type="button" data-coach-water="freshwater">Freshwater</button></div></div>'+
+        '<div class="coach-step"><span>3 • MAIN GOAL</span><div class="coach-choices coach-goals"><button type="button" data-coach-goal="spots">Find better spots</button><button type="button" data-coach-goal="plan">Plan trips</button><button type="button" data-coach-goal="learn">Learn conditions</button><button type="button" data-coach-goal="log">Track catches</button></div></div>'+
+        '<div id="coachSummary" class="coach-summary">Choose one option in each section.</div>'+
+        '<button id="coachFinishBtn" class="primary-button full" type="button" disabled>Build my CastVector</button>'+
+      '</div>';
+      document.body.appendChild(d);
+    }
+
+    const quick=document.querySelector('#quickAnswerPanel .quick-answer-actions');
+    if(quick&&!document.getElementById('b95SharePlanBtn')){
+      const b=document.createElement('button');b.id='b95SharePlanBtn';b.className='ghost-button';b.type='button';b.textContent='Share trip card';quick.appendChild(b);
+    }
+
+    const profile=document.getElementById('view-profile');
+    if(profile&&!document.getElementById('rerunCoachBtn')){
+      const b=document.createElement('button');b.id='rerunCoachBtn';b.className='secondary-button';b.type='button';b.textContent='Run First Trip Coach';
+      const panel=document.getElementById('coreProfilePanel');if(panel)panel.appendChild(b);else profile.appendChild(b);
+    }
+  },
+
+  coachState(){return this._coach||(this._coach={experience:null,water:null,goal:null});},
+
+  maybeOnboard(app){
+    let done=false;try{done=!!localStorage.getItem('castvector-first-trip-coach-v95');}catch(_){}
+    const hasHistory=(app.state.catches||[]).length||(app.state.waypoints||[]).length||Number(app.state.trips||0)>0;
+    if(!done&&!hasHistory)this.openCoach();
+  },
+
+  openCoach(){
+    this._coach={experience:null,water:null,goal:null};
+    document.querySelectorAll('[data-coach-exp],[data-coach-water],[data-coach-goal]').forEach(b=>b.classList.remove('active'));
+    const d=document.getElementById('firstTripCoachDialog');if(d&&!d.open)d.showModal();
+    this.renderCoach();
+  },
+
+  renderCoach(){
+    const c=this.coachState(),summary=document.getElementById('coachSummary'),finish=document.getElementById('coachFinishBtn');
+    const labels={new:'New angler',regular:'Regular angler',advanced:'Advanced',coast:'Coast',freshwater:'Freshwater',spots:'Find better spots',plan:'Plan trips',learn:'Learn conditions',log:'Track catches'};
+    if(summary)summary.textContent=c.experience&&c.water&&c.goal?labels[c.experience]+' • '+labels[c.water]+' • '+labels[c.goal]:'Choose one option in each section.';
+    if(finish)finish.disabled=!(c.experience&&c.water&&c.goal);
+  },
+
+  finishCoach(app){
+    const c=this.coachState();if(!(c.experience&&c.water&&c.goal))return;
+    try{localStorage.setItem('castvector-first-trip-coach-v95',JSON.stringify({...c,at:new Date().toISOString()}));}catch(_){}
+    app.state.experience={...app.state.experience,mode:c.experience==='advanced'?'full':'simple'};
+    const fw=window.CastVectorFreshwater;if(fw?.setMode)fw.setMode(app,c.water);
+    else app.save?.();
+    document.getElementById('firstTripCoachDialog')?.close();
+    const dest={spots:'map',plan:'trips',learn:'forecast',log:'logbook'}[c.goal]||'home';
+    app.navigate?.(dest);app.showToast?.('CastVector is set up around how you want to fish.');
+  },
+
+  tripCardData(app){
+    const cmd=app.commandRecommendation?.()||{},best=cmd.best||{},bait=app.baitIntelligence?.(cmd.species||app.state.targetSpecies)||{},c=app.state.data?.current||{};
+    const trust=window.CastVectorAnglerAdvantage?.trust?.(app),personal=this.personalData(app);
+    const loc=app.generalizeWater?.(app.state.location?.name||'Fishing location')||app.state.location?.name||'Fishing location';
+    return{
+      location:loc,target:cmd.species||app.state.targetSpecies,score:Number(cmd.speciesScore||best.score||app.currentScore?.()||0),
+      window:best.window?.label||app.bestWindowToday?.()?.label||'Check forecast',
+      bait:bait.primary||'Check bait plan',backup:bait.backup||'',rig:bait.rig||'',wind:Number(c.windSpeed),wave:Number(c.waveHeight),
+      trust:trust?.score??null,personal:personal.match,call:cmd.call||'CastVector fishing plan'
+    };
+  },
+
+  async buildTripCard(app){
+    const d=this.tripCardData(app),canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext('2d');
+    const g=ctx.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#07131b');g.addColorStop(.6,'#0b2936');g.addColorStop(1,'#07131b');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1350);
+    ctx.fillStyle='#19d7ba';ctx.font='900 44px system-ui';ctx.fillText('CASTVECTOR',70,110);
+    ctx.fillStyle='#84b9cc';ctx.font='700 22px system-ui';ctx.fillText('PLAN SMARTER. FISH BETTER.',70,146);
+    ctx.fillStyle='#f5fbff';ctx.font='900 66px system-ui';ctx.fillText('MY FISHING PLAN',70,245);
+    ctx.fillStyle='#8bc2d3';ctx.font='700 25px system-ui';ctx.fillText(String(d.location).slice(0,48),70,292);
+    ctx.fillStyle='#0f3441';ctx.fillRect(70,350,940,220);
+    ctx.fillStyle='#7fdccb';ctx.font='800 22px system-ui';ctx.fillText('TARGET',105,405);ctx.fillText('CASTVECTOR SCORE',610,405);
+    ctx.fillStyle='#f4fbff';ctx.font='900 48px system-ui';ctx.fillText(String(d.target).slice(0,24),105,470);ctx.font='900 72px system-ui';ctx.fillText(String(d.score),610,485);
+    const rows=[['BEST WINDOW',d.window],['START WITH',d.bait],['BACKUP',d.backup||'—'],['RIG',d.rig||'—'],['WIND',Number.isFinite(d.wind)?Math.round(d.wind)+' mph':'—'],['SURF / WAVE',Number.isFinite(d.wave)?d.wave.toFixed(1)+' ft':'—']];
+    rows.forEach((r,i)=>{const y=645+i*82;ctx.fillStyle='#7fa6b5';ctx.font='800 20px system-ui';ctx.fillText(r[0],80,y);ctx.fillStyle='#eef9fd';ctx.font='800 31px system-ui';ctx.fillText(String(r[1]).slice(0,42),320,y);});
+    ctx.fillStyle='#0f2b37';ctx.fillRect(70,1138,940,105);ctx.fillStyle='#7fdccb';ctx.font='800 19px system-ui';ctx.fillText('TRIP TRUST',100,1180);ctx.fillText('PERSONAL MATCH',450,1180);ctx.fillStyle='#f4fbff';ctx.font='900 32px system-ui';ctx.fillText(d.trust==null?'—':d.trust+'/100',100,1220);ctx.fillText(d.personal==null?'LEARNING':d.personal+'%',450,1220);
+    ctx.fillStyle='#688b99';ctx.font='600 18px system-ui';ctx.fillText('Location is generalized on shared cards • Verify weather, access and regulations before fishing.',70,1310);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.9));if(!blob)return null;
+    let file=null;try{file=new File([blob],'castvector-trip-plan.jpg',{type:'image/jpeg'});}catch(_){}
+    return{blob,file};
+  },
+
+  async shareTripCard(app){
+    const built=await this.buildTripCard(app);if(!built)return app.showToast?.('Could not build the trip card.');
+    const d=this.tripCardData(app),text='CastVector fishing plan • '+d.target+' • '+d.score+'/100 • '+d.window;
+    try{
+      if(built.file&&navigator.share&&(!navigator.canShare||navigator.canShare({files:[built.file]}))){await navigator.share({title:'CastVector fishing plan',text,files:[built.file]});return;}
+    }catch(e){if(e?.name==='AbortError')return;}
+    const u=URL.createObjectURL(built.blob),a=document.createElement('a');a.href=u;a.download='castvector-trip-plan.jpg';a.click();setTimeout(()=>URL.revokeObjectURL(u),1200);app.showToast?.('Trip card downloaded.');
   },
 
   personalData(app){
@@ -223,6 +324,13 @@ const B={
 
   bind(app){
     document.addEventListener('click',e=>{
+      const exp=e.target.closest('[data-coach-exp]');if(exp){this.coachState().experience=exp.dataset.coachExp;document.querySelectorAll('[data-coach-exp]').forEach(b=>b.classList.toggle('active',b===exp));this.renderCoach();return;}
+      const water=e.target.closest('[data-coach-water]');if(water){this.coachState().water=water.dataset.coachWater;document.querySelectorAll('[data-coach-water]').forEach(b=>b.classList.toggle('active',b===water));this.renderCoach();return;}
+      const goal=e.target.closest('[data-coach-goal]');if(goal){this.coachState().goal=goal.dataset.coachGoal;document.querySelectorAll('[data-coach-goal]').forEach(b=>b.classList.toggle('active',b===goal));this.renderCoach();return;}
+      if(e.target.closest('#coachFinishBtn')){this.finishCoach(app);return;}
+      if(e.target.closest('#firstTripClose')){document.getElementById('firstTripCoachDialog')?.close();return;}
+      if(e.target.closest('#rerunCoachBtn')){this.openCoach();return;}
+      if(e.target.closest('#b95SharePlanBtn')){this.shareTripCard(app);return;}
       if(e.target.closest('#cpHeatBtn')||e.target.closest('[data-b95-layer="heat"]')){app.navigate?.('map');setTimeout(()=>{app.ensureMap?.();this.toggleHeat(app);},160);return;}
       if(e.target.closest('#cpRefreshBtn')){app.loadCloudCommunity?.({quiet:false});return;}
       if(e.target.closest('#offlineProOpen')){this.renderOffline(app);const d=document.getElementById('offlineProDialog');if(d&&!d.open)d.showModal();return;}
