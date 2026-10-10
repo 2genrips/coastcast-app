@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 11.0 adds saved Map Modes, Trip Loadouts tied to tackle inventory, richer catch logging, a searchable Species Guide and a personal Trophy Board.",
+  "description": "CastVector 11.0 Complete Angler combines saved Map Modes, Trip Loadouts, richer catch logging, Species Guide and Trophy Board with native background fishing-window monitoring and an Android home-screen widget.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
