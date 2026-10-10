@@ -21,8 +21,8 @@ android {
         applicationId 'com.castvector.fishing'
         minSdk 26
         targetSdk 36
-        versionCode 95001
-        versionName '9.5.0'
+        versionCode 100001
+        versionName '10.0.0'
 
         buildConfigField "String", "CASTVECTOR_WEB_URL", "\"${cvWebUrl}\""
         buildConfigField "String", "PREMIUM_PRODUCT_ID", "\"${premiumProductId}\""
@@ -71,4 +71,5 @@ android {
 
 dependencies {
     implementation 'com.android.billingclient:billing:8.3.0'
+    implementation 'androidx.work:work-runtime:2.12.0'
 }

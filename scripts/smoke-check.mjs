@@ -35,15 +35,15 @@ for(const id of requiredIds){
 }
 ok('critical navigation and Home wiring present');
 
-const version='9.5.0';
+const version='10.0.0';
 if(pkg.version!==version)fail('package version mismatch: '+pkg.version);
 if(!index.includes('brand-version">'+version+'<'))fail('brand version mismatch');
 if(!sw.includes("castvector-v"+version))fail('service worker cache version mismatch');
 if(!gradle.includes("versionName '"+version+"'"))fail('Android versionName mismatch');
-if(!gradle.includes('versionCode 95001'))fail('Android versionCode mismatch');
+if(!gradle.includes('versionCode 100001'))fail('Android versionCode mismatch');
 ok('release versions aligned');
 
-const requiredModules=['smart-home.js','explore-feed.js','session-replay.js','depth-intelligence.js','pattern-atlas.js','freshwater-mode.js','universal-discover.js','runtime-resilience.js','map-pro.js','angler-advantage.js','competitive-core.js','batch-upgrades.js'];
+const requiredModules=['smart-home.js','explore-feed.js','session-replay.js','depth-intelligence.js','pattern-atlas.js','freshwater-mode.js','universal-discover.js','runtime-resilience.js','map-pro.js','angler-advantage.js','competitive-core.js','batch-upgrades.js','launch-candidate.js'];
 for(const f of requiredModules){
   if(!index.includes('src="'+f+'?v='+version+'"'))fail('Module not loaded: '+f);
   if(!sw.includes("'./"+f+"?v="+version+"'"))fail('Module not cached: '+f);
@@ -52,6 +52,15 @@ ok('major feature modules loaded and cached');
 
 if(!read('.github/workflows/android-closed-test.yml').includes('"build-tools;36.0.0"'))fail('Android build-tools baseline changed');
 ok('Android build-tools baseline remains 36.0.0');
+
+const mainActivity=read('android-native/app/src/main/java/com/castvector/fishing/MainActivity.java');
+const weatherWorker=read('android-native/app/src/main/java/com/castvector/fishing/WeatherWatchWorker.java');
+if(!gradle.includes("androidx.work:work-runtime:2.12.0"))fail('WorkManager dependency missing');
+if(!mainActivity.includes('enableSafetyWatch'))fail('Native safety-watch bridge missing');
+if(!mainActivity.includes('REQ_NOTIFICATIONS'))fail('Native notification permission bridge missing');
+if(!weatherWorker.includes('api.weather.gov/alerts/active?point='))fail('NWS point-alert worker endpoint missing');
+if(!weatherWorker.includes('Periodic') && !mainActivity.includes('PeriodicWorkRequest'))fail('Periodic background safety scheduling missing');
+ok('native background safety-watch wiring present');
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('CastVector smoke checks passed.');
