@@ -64,9 +64,15 @@ jobs:
           grep -F "androidx.work:work-runtime:2.12.0" android-native/app/build.gradle
           test -f android-native/app/src/main/java/com/castvector/fishing/BillingManager.java
           test -f android-native/app/src/main/java/com/castvector/fishing/WeatherWatchWorker.java
-          grep -F "enableSafetyWatch" android-native/app/src/main/java/com/castvector/fishing/MainActivity.java
+          test -f android-native/app/src/main/java/com/castvector/fishing/CastVectorWidgetProvider.java
+          test -f android-native/app/src/main/res/layout/castvector_widget.xml
+          test -f android-native/app/src/main/res/xml/castvector_widget_info.xml
+          grep -F "enableFishingWatch" android-native/app/src/main/java/com/castvector/fishing/MainActivity.java
+          grep -F "pinFishingWidget" android-native/app/src/main/java/com/castvector/fishing/MainActivity.java
           grep -F "api.weather.gov/alerts/active?point=" android-native/app/src/main/java/com/castvector/fishing/WeatherWatchWorker.java
-          echo "VERIFIED: billing + background-safety CastVector 11.0.0 Android source"
+          grep -F "api.open-meteo.com/v1/forecast" android-native/app/src/main/java/com/castvector/fishing/WeatherWatchWorker.java
+          grep -F "marine-api.open-meteo.com/v1/marine" android-native/app/src/main/java/com/castvector/fishing/WeatherWatchWorker.java
+          echo "VERIFIED: billing + Angler Toolkit + Always-On Angler + widget CastVector 11.0.0 Android source"
 
       - name: Build debug APK
         run: gradle -p android-native clean :app:assembleDebug --no-daemon --stacktrace
