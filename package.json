@@ -1,7 +1,7 @@
 {
   "name": "castvector-native-wrapper",
   "private": true,
-  "version": "12.0.0",
+  "version": "12.5.0",
   "scripts": {
     "cap:add:android": "npx cap add android",
     "cap:add:ios": "npx cap add ios",
@@ -18,4 +18,4 @@
   "devDependencies": {
     "@capacitor/cli": "latest"
   }
-}
+}\n
