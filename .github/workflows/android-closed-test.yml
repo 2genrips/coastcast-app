@@ -1,4 +1,4 @@
-name: Build CastVector 12.0.0 Android Closed Test
+name: Build CastVector 12.5.0 Android Closed Test
 
 on:
   workflow_dispatch:
@@ -57,19 +57,23 @@ jobs:
         run: |
           grep -F "applicationId 'com.castvector.fishing'" android-native/app/build.gradle
           grep -F "targetSdk 36" android-native/app/build.gradle
-          grep -F "versionCode 120001" android-native/app/build.gradle
-          grep -F "versionName '12.0.0'" android-native/app/build.gradle
+          grep -F "versionCode 125001" android-native/app/build.gradle
+          grep -F "versionName '12.5.0'" android-native/app/build.gradle
           grep -F "castvector_premium_monthly" android-native/app/build.gradle
           grep -F "com.android.billingclient:billing:8.3.0" android-native/app/build.gradle
           grep -F "androidx.work:work-runtime:2.12.0" android-native/app/build.gradle
           test -f android-native/app/src/main/java/com/castvector/fishing/BillingManager.java
           test -f android-native/app/src/main/java/com/castvector/fishing/WeatherWatchWorker.java
           test -f android-native/app/src/main/java/com/castvector/fishing/FishingOpportunityWorker.java
+          test -f android-native/app/src/main/java/com/castvector/fishing/CastVectorWidgetProvider.java
+          test -f android-native/app/src/main/res/layout/castvector_widget.xml
+          test -f android-native/app/src/main/res/xml/castvector_widget_info.xml
+          grep -F "pinFishingWidget" android-native/app/src/main/java/com/castvector/fishing/MainActivity.java
           grep -F "enableSafetyWatch" android-native/app/src/main/java/com/castvector/fishing/MainActivity.java
           grep -F "api.weather.gov/alerts/active?point=" android-native/app/src/main/java/com/castvector/fishing/WeatherWatchWorker.java
           grep -F "enableOpportunityWatch" android-native/app/src/main/java/com/castvector/fishing/MainActivity.java
           grep -F "api.open-meteo.com/v1/forecast" android-native/app/src/main/java/com/castvector/fishing/FishingOpportunityWorker.java
-          echo "VERIFIED: billing + background-safety + bite-watch CastVector 12.0.0 Android source"
+          echo "VERIFIED: billing + safety-watch + bite-watch + Always-On widget CastVector 12.5.0 Android source"
 
       - name: Build debug APK
         run: gradle -p android-native clean :app:assembleDebug --no-daemon --stacktrace
@@ -77,7 +81,7 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: CastVector-12.0.0-debug-apk
+          name: CastVector-12.5.0-debug-apk
           path: android-native/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
@@ -87,7 +91,7 @@ jobs:
       - name: Upload unsigned release AAB for private signing
         uses: actions/upload-artifact@v4
         with:
-          name: CastVector-12.0.0-unsigned-aab
+          name: CastVector-12.5.0-unsigned-aab
           path: android-native/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
 
@@ -111,6 +115,6 @@ jobs:
         if: env.ANDROID_KEYSTORE_BASE64 != ''
         uses: actions/upload-artifact@v4
         with:
-          name: CastVector-12.0.0-closed-test-aab
+          name: CastVector-12.5.0-closed-test-aab
           path: android-native/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
