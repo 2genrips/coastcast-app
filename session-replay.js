@@ -1,11 +1,69 @@
 (function(){
 'use strict';
 const Replay={
-  version:'9.5.0',
+  version:'14.0.0',
   watchId:null,
   replayLayer:null,
 
   app(){return window.CastVector;},
+  native(){return window.CastVectorNative||null;},
+
+  nativeStatus(){
+    const n=this.native();if(!n?.getRouteTrackingStatus)return{available:false,active:false};
+    try{const x=n.getRouteTrackingStatus();return typeof x==='string'?JSON.parse(x):x;}catch(_){return{available:true,active:false,status:'error'};}
+  },
+
+  startNative(app){
+    const t=this.ensureTrack(app),n=this.native();if(!t||!n?.startRouteTracking)return'web_only';
+    const st=this.nativeStatus();
+    if(st.active&&String(st.sessionId)===String(t.sessionId)){t.nativeBackground=true;t.nativeStatus='tracking';return'enabled';}
+    try{
+      const r=n.startRouteTracking(String(t.sessionId),String(t.location||app.state.location?.name||'Fishing session'));
+      if(r==='enabled'){t.nativeBackground=true;t.nativeStatus='tracking';app.save?.({cloud:false});}
+      else if(r==='permission_required')t.nativeStatus='permission_required';
+      else t.nativeStatus=String(r||'unavailable');
+      return r;
+    }catch(_){t.nativeStatus='error';return'error';}
+  },
+
+  stopNative(){
+    const n=this.native();if(!n?.stopRouteTracking)return'web_only';
+    try{return n.stopRouteTracking();}catch(_){return'error';}
+  },
+
+  mergeNative(app,{clear=false}={}){
+    const t=this.ensureTrack(app),n=this.native();if(!t||!n?.getRouteTrack)return 0;
+    let raw=[];try{const x=n.getRouteTrack();raw=typeof x==='string'?JSON.parse(x):x;}catch(_){raw=[];}
+    if(!Array.isArray(raw)||!raw.length){if(clear)try{n.clearRouteTrack?.();}catch(_){}return 0;}
+    const native=raw.map(p=>({
+      lat:Number(p.lat),lon:Number(p.lon),
+      at:new Date(Number(p.at)||Date.now()).toISOString(),
+      accuracy:Number.isFinite(Number(p.accuracy))?Number(p.accuracy):null,
+      speedMph:Number.isFinite(Number(p.speedMps))?Math.max(0,Number(p.speedMps)*2.23694):null,
+      nativeBackground:true
+    })).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon));
+    const all=[...(t.points||[]),...native].sort((a,b)=>new Date(a.at)-new Date(b.at)),merged=[];
+    for(const p of all){
+      const prev=merged[merged.length-1];
+      if(prev){
+        const seconds=Math.abs(new Date(p.at)-new Date(prev.at))/1000;
+        const miles=app.haversine(prev.lat,prev.lon,p.lat,p.lon);
+        if(seconds<6&&miles<0.006){
+          if(!prev.nativeBackground&&p.nativeBackground)continue;
+          if(prev.nativeBackground&&!p.nativeBackground)merged[merged.length-1]=p;
+          continue;
+        }
+      }
+      merged.push(p);
+    }
+    let distance=0;
+    for(let i=1;i<merged.length;i++){const d=app.haversine(merged[i-1].lat,merged[i-1].lon,merged[i].lat,merged[i].lon);if(Number.isFinite(d))distance+=d;}
+    t.points=merged.slice(-1500);t.distanceMiles=distance;t.nativeBackground=true;t.nativeImported=(Number(t.nativeImported)||0)+native.length;
+    const last=t.points[t.points.length-1];if(last)t.lastGpsAt=last.at;
+    app.save?.({cloud:false});
+    if(clear)try{n.clearRouteTrack?.();}catch(_){}
+    return native.length;
+  },
 
   activeTrack(app){
     const g=app.state.goMode||{};
@@ -49,8 +107,9 @@ const Replay={
         err=>this.onError(app,err),
         {enableHighAccuracy:true,maximumAge:5000,timeout:20000}
       );
+      this.startNative(app);
     }catch(_){
-      t.status='unavailable';this.watchId=null;app.save?.({cloud:false});this.render(app);
+      t.status='unavailable';this.watchId=null;app.save?.({cloud:false});this.startNative(app);this.render(app);
     }
   },
 
@@ -88,6 +147,7 @@ const Replay={
     if(t.points.length>1200)t.points=t.points.slice(-1200);
     t.distanceMiles=Number(t.distanceMiles||0)+(Number.isFinite(miles)?miles:0);
     t.lastGpsAt=at;t.status='tracking';
+    if(this.nativeStatus().available&&!this.nativeStatus().active)this.startNative(app);
     app.save?.({cloud:false});this.render(app);
   },
 
@@ -124,7 +184,7 @@ const Replay={
     const start=points[0],end=points[points.length-1];
     const scores=points.map(x=>Number(x.score)).filter(Number.isFinite);
     historyItem.routeReplay={
-      version:'7.2.0',privacy:'private',
+      version:'14.0.0',privacy:'private-local',
       points:points.slice(0,1200),
       events:(track.events||[]).slice(0,100),
       distanceMiles:Number(track.distanceMiles||0),
@@ -139,7 +199,7 @@ const Replay={
   },
 
   svg(track,catches=[]){
-    const pts=track?.points||[];if(pts.length<2)return'<div class="replay-empty">Keep CastVector open during a live trip to build a GPS route replay.</div>';
+    const pts=track?.points||[];if(pts.length<2)return'<div class="replay-empty">Start Go Fishing Mode to build a private GPS route replay. Android 14.0+ can keep tracking while the app is backgrounded.</div>';
     const lats=pts.map(p=>p.lat),lons=pts.map(p=>p.lon),minLat=Math.min(...lats),maxLat=Math.max(...lats),minLon=Math.min(...lons),maxLon=Math.max(...lons);
     const latSpan=Math.max(.0001,maxLat-minLat),lonSpan=Math.max(.0001,maxLon-minLon);
     const xy=p=>({x:6+88*((p.lon-minLon)/lonSpan),y:94-88*((p.lat-minLat)/latSpan)});
@@ -152,7 +212,7 @@ const Replay={
     let el=document.getElementById('sessionReplayPanel');if(el)return el;
     const trips=document.getElementById('view-trips'),go=document.getElementById('goModePanel');if(!trips)return null;
     el=document.createElement('section');el.id='sessionReplayPanel';el.className='panel session-replay-panel';
-    el.innerHTML='<div class="replay-head"><div><div class="eyebrow">TRACK MY WATER • SESSION REPLAY 7.2</div><h2>Your trip becomes fishing intelligence</h2></div><span id="replayStatusBadge" class="replay-badge">READY</span></div><div id="replayActive"></div><div class="replay-mark-actions" id="replayMarkActions" hidden><button type="button" class="secondary-button small" data-replay-mark="bite">Mark bite</button><button type="button" class="secondary-button small" data-replay-mark="move">Mark move</button><button type="button" class="secondary-button small" data-replay-mark="bait">Mark bait change</button></div><div class="replay-subhead">PAST SESSION REPLAYS</div><div id="replayHistory" class="replay-history"></div>';
+    el.innerHTML='<div class="replay-head"><div><div class="eyebrow">TRACK MY WATER • BACKGROUND REPLAY 14.0</div><h2>Your trip becomes fishing intelligence</h2></div><span id="replayStatusBadge" class="replay-badge">READY</span></div><div id="replayActive"></div><div class="replay-mark-actions" id="replayMarkActions" hidden><button type="button" class="secondary-button small" data-replay-mark="bite">Mark bite</button><button type="button" class="secondary-button small" data-replay-mark="move">Mark move</button><button type="button" class="secondary-button small" data-replay-mark="bait">Mark bait change</button></div><div class="replay-subhead">PAST SESSION REPLAYS</div><div id="replayHistory" class="replay-history"></div>';
     if(go)go.after(el);else trips.appendChild(el);
     return el;
   },
@@ -163,9 +223,10 @@ const Replay={
     const badge=document.getElementById('replayStatusBadge'),box=document.getElementById('replayActive'),marks=document.getElementById('replayMarkActions');
     if(active&&t){
       const pts=t.points||[],last=pts[pts.length-1],mins=Math.max(0,Math.floor((Date.now()-new Date(t.startedAt))/60000));
-      badge.textContent=t.status==='tracking'?'TRACKING':'GPS '+String(t.status||'READY').toUpperCase();
-      badge.className='replay-badge '+(t.status==='tracking'?'live':'');
-      box.innerHTML='<div class="replay-live-card"><div class="replay-live-map">'+this.svg(t)+'</div><div class="replay-live-stats"><div><span>TIME</span><strong>'+app.formatDuration(mins)+'</strong></div><div><span>DISTANCE</span><strong>'+Number(t.distanceMiles||0).toFixed(2)+' mi</strong></div><div><span>GPS POINTS</span><strong>'+pts.length+'</strong></div><div><span>CATCHES</span><strong>'+app.sessionCatches().length+'</strong></div></div><p>'+(t.status==='permission-denied'?'Location permission is off. The fishing session still works, but route recording is paused.':'Route is private and records only while this live CastVector session is open.')+'</p></div>';
+      const native=this.nativeStatus(),background=!!(native.active&&String(native.sessionId)===String(t.sessionId));
+      badge.textContent=background?'BACKGROUND GPS':t.status==='tracking'?'TRACKING':'GPS '+String(t.status||'READY').toUpperCase();
+      badge.className='replay-badge '+(background||t.status==='tracking'?'live':'');
+      box.innerHTML='<div class="replay-live-card"><div class="replay-live-map">'+this.svg(t)+'</div><div class="replay-live-stats"><div><span>TIME</span><strong>'+app.formatDuration(mins)+'</strong></div><div><span>DISTANCE</span><strong>'+Number(t.distanceMiles||0).toFixed(2)+' mi</strong></div><div><span>GPS POINTS</span><strong>'+pts.length+'</strong></div><div><span>CATCHES</span><strong>'+app.sessionCatches().length+'</strong></div></div><p>'+(t.status==='permission-denied'?'Location permission is off. The fishing session still works, but route recording is paused.':background?'Android background tracking is active. A persistent notification stays visible while the route is recording. Route points remain private on this device by default.':'Route is private. Keep CastVector open for web tracking; Android 14.0+ enables background recording when available.')+'</p></div>';
       marks.hidden=false;
     }else{
       badge.textContent='READY';badge.className='replay-badge';
@@ -202,7 +263,9 @@ const Replay={
 
     const end=app.endGoMode?.bind(app);
     if(end)app.endGoMode=function(){
-      const sessionId=this.state.goMode?.sessionId,track=this.state.goMode?.track?JSON.parse(JSON.stringify(this.state.goMode.track)):null;
+      const sessionId=this.state.goMode?.sessionId;
+      Replay.stopNative();Replay.mergeNative(this,{clear:true});
+      const track=this.state.goMode?.track?JSON.parse(JSON.stringify(this.state.goMode.track)):null;
       Replay.stop(this);const out=end();
       const item=(this.state.goMode?.history||[]).find(x=>x.sessionId===sessionId);
       Replay.finalize(this,track,item);this.state.goMode.track=null;this.save?.();Replay.render(this);this.renderTrips?.();return out;
@@ -235,7 +298,14 @@ const Replay={
       const map=e.target.closest('[data-replay-map]');if(map)Replay.viewOnMap(app,map.dataset.replayMap);
     });
 
-    if(app.state.goMode?.active){this.ensureTrack(app);this.start(app);}
+    document.addEventListener('visibilitychange',()=>{
+      if(document.visibilityState==='visible'&&app.state.goMode?.active){this.mergeNative(app,{clear:true});this.startNative(app);this.render(app);}
+    });
+    window.addEventListener('castvector:native-ready',()=>{
+      if(app.state.goMode?.active){this.startNative(app);this.mergeNative(app,{clear:true});this.render(app);}
+    });
+
+    if(app.state.goMode?.active){this.ensureTrack(app);this.start(app);this.mergeNative(app,{clear:true});}
   },
 
   init(){const app=this.app();if(!app)return;this.panel();this.bind(app);this.render(app);}
