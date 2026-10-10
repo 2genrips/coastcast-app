@@ -98,6 +98,7 @@ public class FishingOpportunityWorker extends Worker {
                     .putString("opp_last_detail", best.detail)
                     .apply();
 
+            CastVectorWidgetProvider.updateAll(context);
             return Result.success();
         } catch (Exception e) {
             prefs.edit()
@@ -105,6 +106,7 @@ public class FishingOpportunityWorker extends Worker {
                     .putString("opp_last_status", "error")
                     .putString("opp_last_error", e.getMessage() == null ? "Opportunity watch failed" : e.getMessage())
                     .apply();
+            CastVectorWidgetProvider.updateAll(context);
             return Result.retry();
         }
     }
