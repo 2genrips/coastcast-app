@@ -25,20 +25,28 @@ const LC={
 
   applyRegulationSources(app){
     const direct={
+      AZ:{name:'Arizona Game & Fish Department',url:'https://www.azgfd.com/fishing-2/licenses-and-regulations/'},
       AR:{name:'Arkansas Game & Fish Commission',url:'https://www.agfc.com/regulations/'},
+      CO:{name:'Colorado Parks & Wildlife',url:'https://cpw.state.co.us/rules-and-regulations'},
       ID:{name:'Idaho Fish and Game',url:'https://idfg.idaho.gov/rules/fish'},
       IN:{name:'Indiana DNR Fish & Wildlife',url:'https://www.in.gov/dnr/fish-and-wildlife/fishing/fishing-guide-and-regulations/'},
       IA:{name:'Iowa DNR',url:'https://www.iowadnr.gov/things-do/fishing/regulations-laws'},
+      KS:{name:'Kansas Department of Wildlife & Parks',url:'https://ksoutdoors.com/Fishing/Fishing-Regulations'},
+      KY:{name:'Kentucky Department of Fish & Wildlife',url:'https://fw.ky.gov/More/Pages/Guides.aspx'},
       MI:{name:'Michigan DNR',url:'https://www.michigan.gov/dnr/things-to-do/fishing/fishing-regulations'},
       MN:{name:'Minnesota DNR',url:'https://www.dnr.state.mn.us/regulations/fishing/index.html'},
       MO:{name:'Missouri Department of Conservation',url:'https://mdc.mo.gov/fishing/regulations'},
       MT:{name:'Montana Fish, Wildlife & Parks',url:'https://fwp.mt.gov/fish/regulations'},
       NE:{name:'Nebraska Game & Parks',url:'https://outdoornebraska.gov/guides-maps/fishing-guides-reports/fishing-guide/'},
+      NV:{name:'Nevada Department of Wildlife',url:'https://www.ndow.org/rules-regulations/'},
       NM:{name:'New Mexico Department of Game & Fish',url:'https://wildlife.dgf.nm.gov/home/publications/'},
       ND:{name:'North Dakota Game & Fish',url:'https://gf.nd.gov/regulations/fishing'},
+      OK:{name:'Oklahoma Department of Wildlife Conservation',url:'https://www.wildlifedepartment.com/fishing/regs'},
       PA:{name:'Pennsylvania Fish & Boat Commission',url:'https://www.pa.gov/agencies/fishandboat/fishing/regulations'},
+      SD:{name:'South Dakota Game, Fish & Parks',url:'https://gfp.sd.gov/pages/regulations/'},
       TN:{name:'Tennessee Wildlife Resources Agency',url:'https://www.tn.gov/twra/fishing-regs.html'},
       UT:{name:'Utah Division of Wildlife Resources',url:'https://wildlife.utah.gov/guidebooks?sec=01'},
+      VT:{name:'Vermont Fish & Wildlife Department',url:'https://vtfishandwildlife.com/fish/fishing-regulations'},{name:'Utah Division of Wildlife Resources',url:'https://wildlife.utah.gov/guidebooks?sec=01'},
       WV:{name:'West Virginia DNR',url:'https://wvdnr.gov/fishing/fishing-regulations/'},
       WI:{name:'Wisconsin DNR',url:'https://dnr.wisconsin.gov/topic/fishing/regulations'},
       WY:{name:'Wyoming Game & Fish Department',url:'https://wgfd.wyo.gov/Regulations/Fish/Fishing-Regulation'}
