@@ -35,15 +35,15 @@ for(const id of requiredIds){
 }
 ok('critical navigation and Home wiring present');
 
-const version='12.0.0';
+const version='12.5.0';
 if(pkg.version!==version)fail('package version mismatch: '+pkg.version);
 if(!index.includes('brand-version">'+version+'<'))fail('brand version mismatch');
 if(!sw.includes("castvector-v"+version))fail('service worker cache version mismatch');
 if(!gradle.includes("versionName '"+version+"'"))fail('Android versionName mismatch');
-if(!gradle.includes('versionCode 120001'))fail('Android versionCode mismatch');
+if(!gradle.includes('versionCode 125001'))fail('Android versionCode mismatch');
 ok('release versions aligned');
 
-const requiredModules=['smart-home.js','explore-feed.js','session-replay.js','depth-intelligence.js','pattern-atlas.js','freshwater-mode.js','universal-discover.js','runtime-resilience.js','map-pro.js','angler-advantage.js','competitive-core.js','batch-upgrades.js','launch-candidate.js','daily-driver.js','angler-toolkit.js','water-reports.js','opportunity-watch.js'];
+const requiredModules=['smart-home.js','explore-feed.js','session-replay.js','depth-intelligence.js','pattern-atlas.js','freshwater-mode.js','universal-discover.js','runtime-resilience.js','map-pro.js','angler-advantage.js','competitive-core.js','batch-upgrades.js','launch-candidate.js','daily-driver.js','angler-toolkit.js','water-reports.js','opportunity-watch.js','always-on-center.js'];
 for(const f of requiredModules){
   if(!index.includes('src="'+f+'?v='+version+'"'))fail('Module not loaded: '+f);
   if(!sw.includes("'./"+f+"?v="+version+"'"))fail('Module not cached: '+f);
@@ -62,10 +62,13 @@ if(!mainActivity.includes('REQ_NOTIFICATIONS'))fail('Native notification permiss
 if(!weatherWorker.includes('api.weather.gov/alerts/active?point='))fail('NWS point-alert worker endpoint missing');
 if(!weatherWorker.includes('Periodic') && !mainActivity.includes('PeriodicWorkRequest'))fail('Periodic background safety scheduling missing');
 if(!mainActivity.includes('enableOpportunityWatch'))fail('Native opportunity-watch bridge missing');
+if(!mainActivity.includes('pinFishingWidget'))fail('Native widget pin bridge missing');
+if(!fs.existsSync(path.join(root,'android-native/app/src/main/java/com/castvector/fishing/CastVectorWidgetProvider.java')))fail('Android Always-On widget provider missing');
+if(!fs.existsSync(path.join(root,'android-native/app/src/main/res/layout/castvector_widget.xml')))fail('Android Always-On widget layout missing');
 if(!mainActivity.includes('getOpportunityWatchStatus'))fail('Native opportunity-watch status bridge missing');
 if(!opportunityWorker.includes('api.open-meteo.com/v1/forecast'))fail('Background opportunity weather endpoint missing');
 if(!opportunityWorker.includes('castvector_bite_alerts'))fail('Background opportunity notification channel missing');
-ok('native background safety-watch and opportunity-watch wiring present');
+ok('native safety-watch + opportunity-watch + Always-On widget wiring present');
 
 if(process.exitCode)process.exit(process.exitCode);
 console.log('CastVector smoke checks passed.');
