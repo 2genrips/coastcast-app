@@ -1,6 +1,7 @@
-const CACHE='castvector-v8.5.0';
-const CORE=['./','./index.html','./styles.css?v=8.5.0','./app.js?v=8.5.0','./decision-engine.js?v=8.5.0','./take-me-fishing.js?v=8.5.0','./live-guide.js?v=8.5.0','./data-map-intelligence.js?v=8.5.0','./smart-pan-map.js?v=8.5.0','./water-intelligence.js?v=8.5.0','./personal-fishing-brain.js?v=8.5.0','./spot-dna.js?v=8.5.0','./trip-copilot.js?v=8.5.0','./opportunity-radar.js?v=8.5.0','./bitegrid.js?v=8.5.0','./spot-compare-pro.js?v=8.5.0','./species-command.js?v=8.5.0','./smart-home.js?v=8.5.0','./explore-feed.js?v=8.5.0','./depth-intelligence.js?v=8.5.0','./session-replay.js?v=8.5.0','./pattern-atlas.js?v=8.5.0','./freshwater-mode.js?v=8.5.0','./universal-discover.js?v=8.5.0','./map-pro.js?v=8.5.0','./angler-advantage.js?v=8.5.0','./runtime-resilience.js?v=8.5.0','./chat.css?v=8.5.0','./decision-engine.css?v=8.5.0','./take-me-fishing.css?v=8.5.0','./live-guide.css?v=8.5.0','./data-map-intelligence.css?v=8.5.0','./smart-pan-map.css?v=8.5.0','./water-intelligence.css?v=8.5.0','./personal-fishing-brain.css?v=8.5.0','./spot-dna.css?v=8.5.0','./trip-copilot.css?v=8.5.0','./opportunity-radar.css?v=8.5.0','./bitegrid.css?v=8.5.0','./spot-compare-pro.css?v=8.5.0','./species-command.css?v=8.5.0','./smart-home.css?v=8.5.0','./explore-feed.css?v=8.5.0','./session-replay.css?v=8.5.0','./depth-intelligence.css?v=8.5.0','./pattern-atlas.css?v=8.5.0','./freshwater-mode.css?v=8.5.0','./universal-discover.css?v=8.5.0','./runtime-resilience.css?v=8.5.0','./map-pro.css?v=8.5.0','./angler-advantage.css?v=8.5.0','./chat.js?v=8.5.0','./native-billing-hook.js?v=8.5.0','./manifest.webmanifest','./coastcast-config.js?v=8.5.0','./icon-192.png','./icon-512.png','./icon-192-v56.png','./icon-512-v56.png','./apple-touch-icon.png','./favicon-32.png','./brand-emblem.png','./brand-watermark.png','./privacy.html','./terms.html','./support.html','./delete-account.html'];
-const ESSENTIAL=['./','./index.html','./styles.css?v=8.5.0','./app.js?v=8.5.0'];
+const CACHE='castvector-v9.0.0';
+const OFFLINE_MAP_CACHE='castvector-offline-map-v90';
+const CORE=['./','./index.html','./styles.css?v=9.0.0','./app.js?v=9.0.0','./decision-engine.js?v=9.0.0','./take-me-fishing.js?v=9.0.0','./live-guide.js?v=9.0.0','./data-map-intelligence.js?v=9.0.0','./smart-pan-map.js?v=9.0.0','./water-intelligence.js?v=9.0.0','./personal-fishing-brain.js?v=9.0.0','./spot-dna.js?v=9.0.0','./trip-copilot.js?v=9.0.0','./opportunity-radar.js?v=9.0.0','./bitegrid.js?v=9.0.0','./spot-compare-pro.js?v=9.0.0','./species-command.js?v=9.0.0','./smart-home.js?v=9.0.0','./explore-feed.js?v=9.0.0','./depth-intelligence.js?v=9.0.0','./session-replay.js?v=9.0.0','./pattern-atlas.js?v=9.0.0','./freshwater-mode.js?v=9.0.0','./universal-discover.js?v=9.0.0','./map-pro.js?v=9.0.0','./angler-advantage.js?v=9.0.0','./competitive-core.js?v=9.0.0','./runtime-resilience.js?v=9.0.0','./chat.css?v=9.0.0','./decision-engine.css?v=9.0.0','./take-me-fishing.css?v=9.0.0','./live-guide.css?v=9.0.0','./data-map-intelligence.css?v=9.0.0','./smart-pan-map.css?v=9.0.0','./water-intelligence.css?v=9.0.0','./personal-fishing-brain.css?v=9.0.0','./spot-dna.css?v=9.0.0','./trip-copilot.css?v=9.0.0','./opportunity-radar.css?v=9.0.0','./bitegrid.css?v=9.0.0','./spot-compare-pro.css?v=9.0.0','./species-command.css?v=9.0.0','./smart-home.css?v=9.0.0','./explore-feed.css?v=9.0.0','./session-replay.css?v=9.0.0','./depth-intelligence.css?v=9.0.0','./pattern-atlas.css?v=9.0.0','./freshwater-mode.css?v=9.0.0','./universal-discover.css?v=9.0.0','./runtime-resilience.css?v=9.0.0','./map-pro.css?v=9.0.0','./angler-advantage.css?v=9.0.0','./competitive-core.css?v=9.0.0','./chat.js?v=9.0.0','./native-billing-hook.js?v=9.0.0','./manifest.webmanifest','./coastcast-config.js?v=9.0.0','./icon-192.png','./icon-512.png','./icon-192-v56.png','./icon-512-v56.png','./apple-touch-icon.png','./favicon-32.png','./brand-emblem.png','./brand-watermark.png','./privacy.html','./terms.html','./support.html','./delete-account.html'];
+const ESSENTIAL=['./','./index.html','./styles.css?v=9.0.0','./app.js?v=9.0.0'];
 const OPTIONAL=CORE.filter(x=>!ESSENTIAL.includes(x));
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
@@ -14,11 +15,25 @@ self.addEventListener('install',event=>{
   })());
 });
 self.addEventListener('activate',event=>{
-  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE&&k!==OFFLINE_MAP_CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
 });
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
   const url=new URL(event.request.url);
+  const offlineTileHost=url.hostname==='basemap.nationalmap.gov'||url.hostname==='a.tile.openstreetmap.org'||url.hostname==='b.tile.openstreetmap.org'||url.hostname==='c.tile.openstreetmap.org';
+  if(url.origin!==location.origin&&offlineTileHost){
+    event.respondWith((async()=>{
+      const saved=await caches.open(OFFLINE_MAP_CACHE);
+      try{
+        const fresh=await fetch(event.request);
+        if(fresh&&(fresh.ok||fresh.type==='opaque'))saved.put(event.request,fresh.clone());
+        return fresh;
+      }catch(_){
+        return (await saved.match(event.request))||new Response('',{status:504,statusText:'Offline map tile unavailable'});
+      }
+    })());
+    return;
+  }
   if(url.origin!==location.origin)return;
 
   const isNavigation=event.request.mode==='navigate'||event.request.headers.get('accept')?.includes('text/html');

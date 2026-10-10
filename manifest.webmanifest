@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 8.5 Angler Advantage adds official weather radar and warnings, Trip Trust, access confidence, regulation readiness, enhanced offline packs and stronger personal intelligence.",
+  "description": "CastVector 9.0 Competitive Core adds public-access intelligence, community catch mapping, quick map tools, location-aware regulations, offline map areas and stronger personal fishing profiles.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
