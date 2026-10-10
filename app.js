@@ -315,7 +315,7 @@
       }catch(_){ }
     },
 
-    save(){
+    save(options={}){
       const payload={
         live:this.state.live,location:this.state.location,radius:this.state.radius,tackleRadius:this.state.tackleRadius,
         fishingStyle:this.state.fishingStyle,targetSpecies:this.state.targetSpecies,
@@ -334,7 +334,7 @@
         command:this.state.command,watchCenter:this.state.watchCenter,oceanNetwork:this.state.oceanNetwork,experience:this.state.experience,membership:this.state.membership,backend:this.state.backend,seasonal:this.state.seasonal,familyCrew:this.state.familyCrew,liveUpdatedAt:this.state.liveUpdatedAt
       };
       try{ localStorage.setItem('coastcast-v50-state',JSON.stringify(payload)); }catch(_){ }
-      if(this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
+      if(options.cloud!==false&&this.state.cloud?.autoSync&&this.cloudSignedIn()) this.queueCloudSync();
     },
 
     bindNavigation(){
@@ -3177,7 +3177,17 @@
     },
 
     cloudStatePayload(){
-      const b=this.backupPayload();return {...b.appState,cloud:undefined};
+      const b=this.backupPayload(),data=JSON.parse(JSON.stringify(b.appState||{}));
+      data.cloud=undefined;
+      if(data.goMode?.track)data.goMode.track=null;
+      if(Array.isArray(data.goMode?.history)){
+        data.goMode.history=data.goMode.history.map(h=>{
+          if(!h?.routeReplay)return h;
+          const r=h.routeReplay||{};
+          return {...h,routeReplay:{version:r.version||'9.5.0',privacy:'private-local',distanceMiles:r.distanceMiles||0,startedAt:r.startedAt,endedAt:r.endedAt,catchCount:r.catchCount||0,avgScore:r.avgScore??null,points:[],events:[]}};
+        });
+      }
+      return data;
     },
 
     async cloudRequest(url,options={},retry=true){
