@@ -396,7 +396,7 @@ public class WeatherWatchWorker extends Worker {
             connection.setConnectTimeout(12000);
             connection.setReadTimeout(12000);
             connection.setRequestProperty("Accept", accept);
-            connection.setRequestProperty("User-Agent", "CastVector/11.0 (https://2genrips.github.io/coastcast-app/)");
+            connection.setRequestProperty("User-Agent", "CastVector/12.0 (https://2genrips.github.io/coastcast-app/)");
             connection.setRequestProperty("Cache-Control", "no-cache");
 
             int code = connection.getResponseCode();
