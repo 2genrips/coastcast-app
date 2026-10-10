@@ -1,7 +1,7 @@
 {
   "name": "CastVector Fishing Forecast",
   "short_name": "CastVector",
-  "description": "CastVector 13.0 adds Community Explorer, real-catch local intel, advanced shared-catch filters, Species Watch, privacy-safe filtered maps and a Local Bite Pulse.",
+  "description": "CastVector 13.5 adds official NWS four-hour radar playback and Front Watch weather-trend intelligence for fishing trip timing.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
